@@ -1,0 +1,28 @@
+{
+  "name": "event-signup",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:jwt": "vitest run tests/jwt.test.js",
+    "test:race": "vitest run tests/concurrency.test.js",
+    "test:contract": "vitest run tests/contract.test.js",
+    "dev": "wrangler dev --local --port 8788",
+    "db:init": "wrangler d1 execute signup --local --file=./schema.sql",
+    "db:seed": "wrangler d1 execute signup --local --file=./seed.sql",
+    "check:money": "sh scripts/check-money.sh",
+    "check:time": "sh scripts/check-time-injection.sh",
+    "check:jwt": "sh scripts/check-jwt-timing.sh",
+    "check:all": "npm run check:money && npm run check:time && npm run check:jwt",
+    "smoke": "sh scripts/smoke.sh"
+  },
+  "devDependencies": {
+    "vitest": "^3.2.4",
+    "wrangler": "^4.128.0"
+  },
+  "dependencies": {
+    "hono": "^4.10.3"
+  }
+}

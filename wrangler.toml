@@ -1,0 +1,8 @@
+name = "event-signup"
+main = "src/worker.js"
+compatibility_date = "2026-09-01"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "signup"
+database_id = "local-dev-placeholder"   # 手動:wrangler d1 create signup 之後換成真的 id
