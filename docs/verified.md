@@ -11,7 +11,9 @@
 
 | 日期 | 項目 | 證據 |
 |---|---|---|
-| 2026-09-04 | 五支靜態檢查的自我測試(含簽章反向寫法) | `sh scripts/self-test.sh` 全過 |
+| 2026-09-04 | 三支靜態檢查的自我測試(含簽章反向寫法) | `sh scripts/self-test.sh` 全過 |
+| 2026-09-09 | 併發檢查(`check-concurrency.sh`)加入,探針 2 筆 | `self-test.sh` 7/7 |
+| 2026-09-10 | 價格快照檢查(`check-price-snapshot.sh`)加入,探針 2 筆 | `self-test.sh` **9/9** |
 | 2026-09-04 | 閘門 helper 三項單元測試 | `npx vitest run` 3 passed |
 | 2026-09-04 | 靜態檢查在乾淨狀態下通過 | 同上 |
 
@@ -27,9 +29,12 @@
 | JWT 七項邊界 | 尚未實作 |
 | 契約測試 | `openapi.yaml` 尚未撰寫 |
 | 免費額度數據 | 尚未上線 |
+| **規則 5 的另一半:「存快照」而非 JOIN 即時算** | `check-price-snapshot.sh` 只管到「金額欄不可被 `UPDATE`」。要檢查「明細有沒有存單價快照」得知道票種表與價格欄叫什麼,而 `docs/spec.md` 只定義 17 條 endpoint,沒定義 schema。**`schema.sql` 落地後補**;在那之前由 `/check-schema` 第 6 條人工把關 |
 
 ## 已知的坑(踩過,留著提醒)
 
 | 日期 | 事件 |
 |---|---|
+| 2026-09-10 | `check-price-snapshot.sh` 第一版以單引號切開 SQL,結果 `SET status = 'confirmed', amount_cents = 0` 在 `'confirmed'` 那裡被切斷,**金額欄逃掉了**。改成在每個 `UPDATE` 前斷行,一行一個語句 |
+| 2026-09-09 | `check-concurrency.sh` 第一版只 grep `changes` 這個字,而測資的**註解**裡剛好寫著「但沒檢查 changes」—— **註解餵飽了檢查**。改成要求真的是屬性存取 |
 | 2026-09-04 | 靜態檢查第一版用 `rg`,而 `rg` 在 `sh` 下不存在(互動 shell 的 function),加上 `2>/dev/null` 吃掉錯誤 → **三支檢查因為工具不存在而全部靜默通過**。改用 POSIX `grep`,並加 `self-test.sh` 強制每支檢查證明自己抓得到 |

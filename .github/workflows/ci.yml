@@ -35,6 +35,10 @@ jobs:
         id: race
         if: always()
         run: npm run check:race
+      - name: 確認後金額不可變
+        id: snapshot
+        if: always()
+        run: npm run check:snapshot
 
       # 第 2 道:單元與契約
       - name: 測試
@@ -67,6 +71,7 @@ jobs:
             echo "| 時間必須是參數 | ${{ steps.time.outcome || '—' }} |"
             echo "| 簽章常數時間比對 | ${{ steps.jwt.outcome || '—' }} |"
             echo "| 併發判斷寫在 WHERE 裡 | ${{ steps.race.outcome || '—' }} |"
+            echo "| 確認後金額不可變 | ${{ steps.snapshot.outcome || '—' }} |"
             echo "| 測試 | ${{ steps.test.outcome || '—' }} |"
             echo "| 併發(重跑 5 次) | ${{ steps.concurrency.outcome || 'skipped' }} |"
             echo ""

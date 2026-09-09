@@ -24,10 +24,17 @@
 | 2 時間當參數 | `scripts/check-time-injection.sh` |
 | 3 併發寫進 `WHERE` | `scripts/check-concurrency.sh` |
 | 4 常數時間比對 | `scripts/check-jwt-timing.sh` |
-| 5 價格快照 | **還沒有。** 靠 review,等 `schema.sql` 落地再補 |
+| 5 價格快照 | `scripts/check-price-snapshot.sh` —— **只管到一半**,見下 |
 
 `scripts/self-test.sh` 負責證明上面每一支都真的抓得到 ——
 一支從不亮紅燈的檢查,跟沒有檢查是同一件事。
+
+> ⚠️ **規則 5 只有一半有裁判。** `check-price-snapshot.sh` 管的是
+> 「**沒有任何 `UPDATE` 可以寫入金額欄**」—— 金額只在建單那次 `INSERT` 寫進去。
+> 另一半「明細要存快照,不是靠 `ticket_type_id` JOIN 即時算」**還沒有自動檢查**:
+> 那要知道票種表與價格欄叫什麼,而 `docs/spec.md` 目前只定義 17 條 endpoint,
+> 沒定義 schema。`schema.sql` 落地之後補;在那之前那一半由 `/check-schema` 第 6 條
+> 人工把關,狀態記在 `docs/verified.md`。
 
 ## 目錄
 

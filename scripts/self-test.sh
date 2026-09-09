@@ -31,6 +31,8 @@ check "簽章比對 A" check-jwt-timing.sh     'export const v = (expected, sign
 check "簽章比對 B" check-jwt-timing.sh     'export const v = (expected, signature) => signature !== expected'
 check "併發無 WHERE" check-concurrency.sh    "export const t = (db) => db.prepare(\`UPDATE reservations SET status = 'x'\`).run()"
 check "併發沒看 rows" check-concurrency.sh   "export const t = (db) => db.prepare('UPDATE events SET remaining = remaining - 1 WHERE id = ? AND remaining > 0').run()"
+check "金額被 UPDATE" check-price-snapshot.sh "export const t = (db) => db.prepare('UPDATE orders SET total_cents = ? WHERE id = ?').run()"
+check "金額夾在多欄中" check-price-snapshot.sh "export const t = (db) => db.prepare(\`UPDATE orders SET status = 'confirmed', amount_cents = 0 WHERE id = ?\`).run()"
 
 echo ""
 echo "=== 乾淨狀態應全過 ==="
@@ -38,5 +40,6 @@ sh scripts/check-money.sh          >/dev/null && echo "✅ 金額"
 sh scripts/check-time-injection.sh >/dev/null && echo "✅ 時間"
 sh scripts/check-jwt-timing.sh     >/dev/null && echo "✅ 簽章"
 sh scripts/check-concurrency.sh    >/dev/null && echo "✅ 併發"
+sh scripts/check-price-snapshot.sh >/dev/null && echo "✅ 價格快照"
 
 exit $FAIL
