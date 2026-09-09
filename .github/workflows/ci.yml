@@ -13,22 +13,33 @@ jobs:
       # 第 0 道:尺自己要先被驗過。
       # 一支從不亮紅燈的檢查,跟沒有檢查是同一件事。
       - name: 靜態檢查的自我測試
+        id: selftest
         run: sh scripts/self-test.sh
 
       - run: npm ci
 
       # 第 1 道:靜態規則(測試永遠不會為它們變紅)
       - name: 金額路徑零浮點
+        id: money
+        if: always()
         run: npm run check:money
       - name: 時間必須是參數
+        id: time
+        if: always()
         run: npm run check:time
       - name: 簽章常數時間比對
+        id: jwt
+        if: always()
         run: npm run check:jwt
       - name: 併發判斷寫在 WHERE 裡
+        id: race
+        if: always()
         run: npm run check:race
 
       # 第 2 道:單元與契約
       - name: 測試
+        id: test
+        if: always()
         run: npm test
 
       # 第 3 道:併發要重跑,單次通過不算
@@ -36,5 +47,28 @@ jobs:
       # 檔案出現的那一刻它自己就開始把關,而且紅得起來。
       # 現況以 docs/verified.md 的 ❌ 欄為準,不是以 CI 的顏色為準。
       - name: 併發(重跑 5 次)
+        id: concurrency
         if: hashFiles('tests/concurrency.test.js') != ''
         run: for i in 1 2 3 4 5; do npm run test:race || exit 1; done
+
+      # 第 4 道不是閘門,是帳本。
+      # Day 30 要報「這 30 天量了幾次、擋下幾次」,而那個數字沒人事後補得回來 ——
+      # 所以每一次 CI 都把自己這一輪的結果寫進 job summary,現在就開始累積。
+      - name: 📊 記錄本輪閘門結果
+        if: always()
+        run: |
+          {
+            echo "## 閘門結果 · $(date -u '+%Y-%m-%d %H:%M UTC')"
+            echo ""
+            echo "| 閘門 | 結果 |"
+            echo "|---|---|"
+            echo "| 靜態檢查的自我測試 | ${{ steps.selftest.outcome || job.status }} |"
+            echo "| 金額路徑零浮點 | ${{ steps.money.outcome || '—' }} |"
+            echo "| 時間必須是參數 | ${{ steps.time.outcome || '—' }} |"
+            echo "| 簽章常數時間比對 | ${{ steps.jwt.outcome || '—' }} |"
+            echo "| 併發判斷寫在 WHERE 裡 | ${{ steps.race.outcome || '—' }} |"
+            echo "| 測試 | ${{ steps.test.outcome || '—' }} |"
+            echo "| 併發(重跑 5 次) | ${{ steps.concurrency.outcome || 'skipped' }} |"
+            echo ""
+            echo "commit \`${GITHUB_SHA:0:12}\` · run #${GITHUB_RUN_NUMBER}"
+          } >> "$GITHUB_STEP_SUMMARY"
