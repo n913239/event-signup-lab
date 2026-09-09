@@ -16,6 +16,19 @@
 4. **簽章比對必須是常數時間。** 不得自己重算 HMAC 再 `===`。
 5. **確認後的訂單金額不可變。** 明細要存價格快照,不是 JOIN 即時算。
 
+每一條都要有裁判 —— 沒有裁判的規則等於沒有規則:
+
+| 規則 | 裁判 |
+|---|---|
+| 1 金額整數 | `scripts/check-money.sh` |
+| 2 時間當參數 | `scripts/check-time-injection.sh` |
+| 3 併發寫進 `WHERE` | `scripts/check-concurrency.sh` |
+| 4 常數時間比對 | `scripts/check-jwt-timing.sh` |
+| 5 價格快照 | **還沒有。** 靠 review,等 `schema.sql` 落地再補 |
+
+`scripts/self-test.sh` 負責證明上面每一支都真的抓得到 ——
+一支從不亮紅燈的檢查,跟沒有檢查是同一件事。
+
 ## 目錄
 
 ```

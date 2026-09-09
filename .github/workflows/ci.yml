@@ -24,6 +24,8 @@ jobs:
         run: npm run check:time
       - name: 簽章常數時間比對
         run: npm run check:jwt
+      - name: 併發判斷寫在 WHERE 裡
+        run: npm run check:race
 
       # 第 2 道:單元與契約
       - name: 測試

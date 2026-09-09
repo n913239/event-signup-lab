@@ -15,7 +15,8 @@
     "check:money": "sh scripts/check-money.sh",
     "check:time": "sh scripts/check-time-injection.sh",
     "check:jwt": "sh scripts/check-jwt-timing.sh",
-    "check:all": "npm run check:money && npm run check:time && npm run check:jwt",
+    "check:race": "sh scripts/check-concurrency.sh",
+    "check:all": "npm run check:money && npm run check:time && npm run check:jwt && npm run check:race",
     "smoke": "sh scripts/smoke.sh"
   },
   "devDependencies": {

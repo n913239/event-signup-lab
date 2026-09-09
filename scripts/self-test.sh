@@ -29,11 +29,14 @@ check "金額除法  " check-money.sh          'export const t = (c) => c / 100'
 check "時間副作用" check-time-injection.sh 'export const ok = (e) => Date.now() < e.deadline_at'
 check "簽章比對 A" check-jwt-timing.sh     'export const v = (expected, signature) => expected !== signature'
 check "簽章比對 B" check-jwt-timing.sh     'export const v = (expected, signature) => signature !== expected'
+check "併發無 WHERE" check-concurrency.sh    "export const t = (db) => db.prepare(\`UPDATE reservations SET status = 'x'\`).run()"
+check "併發沒看 rows" check-concurrency.sh   "export const t = (db) => db.prepare('UPDATE events SET remaining = remaining - 1 WHERE id = ? AND remaining > 0').run()"
 
 echo ""
 echo "=== 乾淨狀態應全過 ==="
 sh scripts/check-money.sh          >/dev/null && echo "✅ 金額"
 sh scripts/check-time-injection.sh >/dev/null && echo "✅ 時間"
 sh scripts/check-jwt-timing.sh     >/dev/null && echo "✅ 簽章"
+sh scripts/check-concurrency.sh    >/dev/null && echo "✅ 併發"
 
 exit $FAIL
