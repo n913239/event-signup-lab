@@ -22,7 +22,7 @@
 
 ## 技術棧
 
-Cloudflare Workers + Hono + D1 ｜ Pages(web)｜ SwiftUI(iOS)｜ 自製 JWT ｜ OpenAPI 契約
+Cloudflare Workers + Hono + D1 · Pages(web)· SwiftUI(iOS)· 自製 JWT · OpenAPI 契約
 
 **一份契約餵兩個前端** —— 契約錯的時候,兩邊各自都是對的。
 

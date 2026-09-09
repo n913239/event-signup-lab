@@ -30,5 +30,9 @@ jobs:
         run: npm test
 
       # 第 3 道:併發要重跑,單次通過不算
+      # 併發測試還沒寫出來。這一步不假裝綠、也不掛著紅 ——
+      # 檔案出現的那一刻它自己就開始把關,而且紅得起來。
+      # 現況以 docs/verified.md 的 ❌ 欄為準,不是以 CI 的顏色為準。
       - name: 併發(重跑 5 次)
+        if: hashFiles('tests/concurrency.test.js') != ''
         run: for i in 1 2 3 4 5; do npm run test:race || exit 1; done
