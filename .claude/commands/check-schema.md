@@ -14,7 +14,11 @@ description: 檢查 schema 的靜態約束
 2. **時間欄位存 UTC**,型別一致(全部 INTEGER epoch 或全部 TEXT ISO,不可混用)。
 3. **`status` 有 `CHECK` 約束**,而且列舉值與 `docs/spec.md` 的狀態機**不多不少**一致。
    少一個值 = 有狀態進不來;多一個值 = 有狀態沒人處理。兩種都是失敗。
-4. **座位有 `UNIQUE(event_id, seat_no)`**。
+4. **座位的唯一性由部分唯一索引保證**:
+   `UNIQUE INDEX … ON seat_holds(event_id, seat_no) WHERE status IN ('holding','confirmed')`。
+   ⚠️ 述詞**必須含 `confirmed`** —— 只寫 `'holding'` 的話,hold 一確認、
+   狀態離開述詞,索引項就釋放,已確認的座位反而失去保護(實跑驗證過)。
+   普通的 `UNIQUE(event_id, seat_no)` 判 ❌:過期列會一直佔著 key,座位無法重佔。
 5. **名額有 `CHECK (remaining >= 0)`**。
 6. **訂單明細存了價格快照**(單價欄位在 `order_items` 上,不是只靠 `ticket_type_id` JOIN)。
 7. **沒有非目標清單以外的表**(對照 `docs/non-goals.md`)。
