@@ -20,6 +20,12 @@ FILES=$(find src -type f \( -name '*.js' -o -name '*.ts' -o -name '*.sql' \) \
 
 # 金額欄:帶單位的欄名(規則 1 的約定),或直白的 amount/price/total
 MONEY='[a-z_]*(_cents|_amount|amount|price|total)[a-z_]*'
+# 只管訂單側的表。票種的現價本來就該能改(`PATCH /ticket-types/:id`,
+# docs/spec.md 第 11 條),不能改的是**已成立訂單的快照**。
+# 2026-09-10:第一版禁「任何 UPDATE 寫入金額欄」,連合法的改價一起擋 ——
+# 而那條 endpoint 正是價格快照陷阱的觸發器,擋掉它 Day 26 就沒東西可寫。
+# 表名出處:.claude/commands/check-schema.md 第 6 條。
+ORDER_TABLES='orders|order_items'
 RC=0
 for f in $FILES; do
   # 把換行拉平,然後在每個 UPDATE 前面斷行 —— 一行一個 UPDATE 語句,
@@ -29,20 +35,24 @@ for f in $FILES; do
   BAD=$(tr '\n' ' ' < "$f" |
         sed 's/[Uu][Pp][Dd][Aa][Tt][Ee][ \t]/\
 &/g' |
-        awk -v m="$MONEY" '
+        awk -v m="$MONEY" -v ot="$ORDER_TABLES" '
           toupper($0) ~ /^UPDATE[ \t]+[A-Za-z_]/ && toupper($0) ~ /SET/ {
+            t = $0
+            sub(/^[Uu][Pp][Dd][Aa][Tt][Ee][ \t]+/, "", t)
+            sub(/[^A-Za-z_].*/, "", t)
+            if (tolower(t) !~ "^(" ot ")$") next     # 不是訂單側的表就不管
             s = $0
             sub(/^[^Ss]*[Ss][Ee][Tt][ \t]/, "", s)   # 第一個 SET 之後
             sub(/[Ww][Hh][Ee][Rr][Ee][ \t].*/, "", s) # WHERE 之後不算
             if (tolower(s) ~ m "[ \t]*=") print substr($0, 1, 120)
           }')
   if [ -n "$BAD" ]; then
-    echo "❌ $f:UPDATE 寫入了金額欄"
+    echo "❌ $f:UPDATE 寫入了訂單的金額欄"
     echo "$BAD" | sed 's/^/   /'
     echo "   確認後金額不可變 —— 金額只在建單那次 INSERT 寫入"
     RC=1
   fi
 done
 
-[ "$RC" -eq 0 ] && echo "✅ 沒有任何 UPDATE 寫入金額欄"
+[ "$RC" -eq 0 ] && echo "✅ 沒有 UPDATE 寫入訂單的金額欄"
 exit $RC

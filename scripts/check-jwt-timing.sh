@@ -4,7 +4,7 @@
 set -e
 . "$(dirname "$0")/_lib.sh"
 
-if ! scan "簽章比對" '(signature *[!=]==|[!=]== *signature)' src/domain src/routes; then
+if ! scan "簽章比對" '(signature *[!=]==|[!=]== *signature)' src; then
   echo ""
   echo "❌ 簽章用了字串比對"
   echo "   改用 crypto.subtle.verify('HMAC', key, sigBytes, dataBytes)"

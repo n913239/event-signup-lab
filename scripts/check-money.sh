@@ -7,10 +7,11 @@ set -e
 FLOAT='parseFloat|toFixed\(|\* *1\.0|\bfloat\b|\bREAL\b'
 DIV='/ *100([^0-9]|$)'
 
-if ! scan "金額浮點" "$FLOAT" src/domain src/routes; then
+export SCAN_EXCLUDE=presentation
+if ! scan "金額浮點" "$FLOAT" src; then
   echo ""; echo "❌ 金額路徑出現浮點運算 —— 一律用整數(最小單位)"; exit 1
 fi
-if ! scan "金額除法" "$DIV" src/domain src/routes; then
+if ! scan "金額除法" "$DIV" src; then
   echo ""; echo "❌ 金額路徑出現 /100 —— 那是顯示轉換,應放 src/presentation/"; exit 1
 fi
 echo "✅ 金額路徑零浮點"

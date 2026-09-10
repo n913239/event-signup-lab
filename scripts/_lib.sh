@@ -14,10 +14,21 @@ scan() {
     return 0
   fi
 
+  # SCAN_EXCLUDE:要跳過的子目錄名(單一個,POSIX grep 只吃固定參數)
+  # 2026-09-10:掃描範圍從 src/domain src/routes 放大到整個 src —— 原本
+  # 放在 src/lib/ 或 src/auth/ 的程式碼三支檢查全部看不到,而 impl-spec
+  # 的陷阱 7 寫的路徑就是 src/auth/。尺是好的,只是沒伸到那裡。
   set +e
-  _out=$(grep -rEn --include='*.js' --include='*.ts' --include='*.sql' \
-                   --exclude='*.test.*' --exclude='*.spec.*' \
-                   "$_pattern" $_dirs 2>&1)
+  if [ -n "${SCAN_EXCLUDE:-}" ]; then
+    _out=$(grep -rEn --include='*.js' --include='*.ts' --include='*.sql' \
+                     --exclude='*.test.*' --exclude='*.spec.*' \
+                     --exclude-dir="$SCAN_EXCLUDE" \
+                     "$_pattern" $_dirs 2>&1)
+  else
+    _out=$(grep -rEn --include='*.js' --include='*.ts' --include='*.sql' \
+                     --exclude='*.test.*' --exclude='*.spec.*' \
+                     "$_pattern" $_dirs 2>&1)
+  fi
   _rc=$?
   set -e
 

@@ -14,6 +14,7 @@
 | 2026-09-04 | 三支靜態檢查的自我測試(含簽章反向寫法) | `sh scripts/self-test.sh` 全過 |
 | 2026-09-09 | 併發檢查(`check-concurrency.sh`)加入,探針 2 筆 | `self-test.sh` 7/7 |
 | 2026-09-10 | 價格快照檢查(`check-price-snapshot.sh`)加入,探針 2 筆 | `self-test.sh` **9/9** |
+| 2026-09-10 | 掃描範圍放大到整個 `src`、補盲區探針與反向探針 | `self-test.sh` **12/12**(含 1 筆「不得誤報」) |
 | 2026-09-04 | 閘門 helper 三項單元測試 | `npx vitest run` 3 passed |
 | 2026-09-04 | 靜態檢查在乾淨狀態下通過 | 同上 |
 

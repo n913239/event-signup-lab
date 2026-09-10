@@ -2,7 +2,12 @@
 description: 檢查 schema 的靜態約束
 ---
 
-讀 `schema.sql`,逐條檢查下列約束,**不要修改任何檔案**,只回報:
+讀 `$ARGUMENTS`(沒給就讀 `schema.sql`),逐條檢查下列約束,
+**不要修改任何檔案**,只回報:
+
+> 吃路徑參數是為了 Day 22:那天要拿同一套約束去打**無菌室 session 交出的
+> 那份 schema**(`devlog/raw/exp-01/schema.sql`),再跟我自己的版本比。
+> 寫死一個檔名的檢查,只能檢查自己人。
 
 1. **金額欄位是整數**,而且欄名帶單位(例如 `_cents`)。
    出現 `REAL` / `FLOAT` / `NUMERIC` 在金額欄位 = 失敗。

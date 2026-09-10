@@ -7,20 +7,39 @@ set -e
 cd "$(dirname "$0")/.."
 
 PROBE=src/domain/__self_test_probe.js
+PROBE_LIB=src/lib/__self_test_probe.js
 FAIL=0
-cleanup() { rm -f "$PROBE"; }
+cleanup() { rm -f "$PROBE" "$PROBE_LIB"; rmdir src/lib 2>/dev/null || true; }
 trap cleanup EXIT
 
+# check <名稱> <腳本> <程式碼> [探針路徑]
+# 第四個參數 2026-09-10 加的:探針原本一律寫進 src/domain/,所以只驗得到
+# 檢查在 src/domain 抓不抓得到 —— 而三支檢查當時根本沒掃 src/lib、src/auth。
+# 自我測試照不到的地方,就是尺伸不到的地方。
 check() {
-  _name="$1"; _script="$2"; _code="$3"
-  mkdir -p src/domain
-  printf '%s\n' "$_code" > "$PROBE"
+  _name="$1"; _script="$2"; _code="$3"; _probe="${4:-$PROBE}"
+  mkdir -p "$(dirname "$_probe")"
+  printf '%s\n' "$_code" > "$_probe"
   if sh "scripts/$_script" >/dev/null 2>&1; then
     echo "🔴 $_name — 沒抓到違規(檢查壞了)"; FAIL=1
   else
     echo "✅ $_name — 抓得到"
   fi
-  rm -f "$PROBE"
+  rm -f "$_probe"
+}
+
+# 反向探針:合法的寫法**不可以**被擋下。檢查抓得太寬跟抓不到一樣糟 ——
+# 一支會對正常程式碼亮紅燈的閘門,最後一定會被 --no-verify 繞過去。
+allow() {
+  _name="$1"; _script="$2"; _code="$3"; _probe="${4:-$PROBE}"
+  mkdir -p "$(dirname "$_probe")"
+  printf '%s\n' "$_code" > "$_probe"
+  if sh "scripts/$_script" >/dev/null 2>&1; then
+    echo "✅ $_name — 沒誤報"
+  else
+    echo "🔴 $_name — 誤報了(合法寫法被擋)"; FAIL=1
+  fi
+  rm -f "$_probe"
 }
 
 echo "=== 靜態檢查自我測試 ==="
@@ -32,6 +51,9 @@ check "簽章比對 B" check-jwt-timing.sh     'export const v = (expected, sign
 check "併發無 WHERE" check-concurrency.sh    "export const t = (db) => db.prepare(\`UPDATE reservations SET status = 'x'\`).run()"
 check "併發沒看 rows" check-concurrency.sh   "export const t = (db) => db.prepare('UPDATE events SET remaining = remaining - 1 WHERE id = ? AND remaining > 0').run()"
 check "金額被 UPDATE" check-price-snapshot.sh "export const t = (db) => db.prepare('UPDATE orders SET total_cents = ? WHERE id = ?').run()"
+check "盲區:簽章比對在 src/lib" check-jwt-timing.sh "export const v = (expected, signature) => expected !== signature" "$PROBE_LIB"
+check "盲區:parseFloat 在 src/lib" check-money.sh          "export const t = (i) => parseFloat(i.price)" "$PROBE_LIB"
+allow "合法改價不誤報" check-price-snapshot.sh "export const t = (db,c,i) => db.prepare('UPDATE ticket_types SET price_cents = ? WHERE id = ?').run()"
 check "金額夾在多欄中" check-price-snapshot.sh "export const t = (db) => db.prepare(\`UPDATE orders SET status = 'confirmed', amount_cents = 0 WHERE id = ?\`).run()"
 
 echo ""
