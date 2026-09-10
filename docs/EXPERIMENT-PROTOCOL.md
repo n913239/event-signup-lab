@@ -17,12 +17,22 @@
 
 ## 適用對象
 
-| 對象 | 文章 |
-|---|---|
-| schema | Day 22 |
-| 金額引擎與折扣順序 | Day 25 |
-| 時間判定 | Day 26 |
-| 併發(超賣 / 座位 / TTL) | Day 27 |
+| 對象 | 文章 | 無菌室在哪 |
+|---|---|---|
+| schema | Day 22 | 空目錄 + `brief.md` |
+| 金額引擎與折扣順序 | Day 25 | 同上 |
+| 時間判定 | Day 26 | 同上 |
+| 併發(超賣 / 座位 / TTL) | Day 27 | 同上 |
+| JWT | Day 24 | 同上 —— **2026-09-10 補**:寫作 session 知道規則 4 與七項邊界,它寫的 JWT 一定用 `crypto.subtle.verify`,那就不是實驗 |
+| **架構文件的編造率** | **Day 4** | **`apple/container` 的 clone,而且連 `Package.swift` 都不能給** |
+
+> ⚠️ **Day 4 的無菌室不在這個 repo。** 它是「讓 AI 讀 `apple/container` 產一份架構文件,
+> 再逐句對賬」,而地面真值是 `Package.swift`(50 個 target)與 `graph.json`
+> (5,992 節點 / 35 個 target)。所以那一輪:
+>
+> - **不給 `graph.json`**、**不給 `Package.swift` 的內容**(可以 clone repo,但不要引導它去讀那個檔)
+> - 寫作 session 早就看過全部地面真值,**它是最不該當受試者的那一個**
+> - 判準往嚴的那邊靠:模糊句一律記「查無」,不記「可驗證」
 
 ## 無菌室 session 的規則
 
