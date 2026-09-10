@@ -25,6 +25,8 @@
 | 2026-09-10 | `check-price-snapshot.sh` 的第一版 | 以**單引號**切開 SQL 再逐段檢查,結果 `SET status = 'confirmed', amount_cents = 0` 在 `'confirmed'` 那裡被切斷,金額欄落在下一段 | 三筆壞測資只擋下兩筆 |
 | 2026-09-10 | `check-money.sh` / `check-jwt-timing.sh` 的掃描範圍 | 只掃 `src/domain src/routes`。放在 `src/lib/`、`src/auth/` 的程式碼**完全看不到** —— 而 impl-spec 的陷阱 7 寫的路徑就是 `src/auth/`。**尺是好的,只是沒伸到那裡**;而 `self-test.sh` 的探針一律寫進 `src/domain/`,所以自我測試也照不到 | 規劃 Day 21–30 時把探針改放 `src/lib/`,兩支檢查靜默通過 |
 | 2026-09-10 | `check-price-snapshot.sh` 的 `REPLACE INTO` 那條 | 我在互動 shell 手測 `grep` **抓得到**,腳本跑在 `sh` 底下**抓不到** —— 因為互動 shell 的 `grep` 是 ugrep,`sh` 底下是 BSD grep,而 BSD 不吃 `["\[]?` 這種選擇性引號字元類,**還是靜默不吃**。**LEDGER 第 1 筆同一種病的第七次**,而我差點又拿「我手測過了」當證據 | 補測資時該擋的通過了,追下去才發現兩個 grep |
+| 2026-09-10 | `tests/schema.test.js` 的第一版 | 用 `PRAGMA table_info(t)` 讀欄位,而 **D1 擋 PRAGMA**(回 `SQLITE_AUTH`)—— 五條斷言對正確的 schema 全紅。改用同名的 table-valued function `pragma_table_info('t')` 就過。**差一個寫法,一個全紅一個全綠** | 拿一份刻意做對的 schema 打它,結果 11 條紅了 5 條 |
+| 2026-09-10 | `tests/schema.test.js` 的「塞不存在的狀態」那條 | 用 `tables().find(async …)` 找有 status 的表 —— **async 的述詞回傳 Promise,永遠是 truthy**,所以永遠取第一張表;而 INSERT 因為別的 NOT NULL 欄位失敗,測試就綠了。**沒有 CHECK 的 schema 它也放行** | 補一份「status 沒有 CHECK」的測資,它沒紅 |
 | 2026-09-10 | `strip_comments` 自己 | 剝註解用 `s://[^"'`]*$::`,而註解裡只要有一個**撇號**(`don't`)字元類就斷掉,整行沒被剝掉 —— **剝註解器本身也是一把要驗的尺** | `allow` 探針「註解提到 Date.now」誤報 |
 | 2026-09-10 | `check-price-snapshot.sh` **抓太寬** | 禁「任何 `UPDATE` 寫入金額欄」,連合法的 `PATCH /ticket-types/:id` 改票價一起擋 —— 而那條 endpoint 正是價格快照陷阱的觸發器。**一支會對正常程式碼亮紅燈的閘門,最後一定會被繞過去** | 同上,拿規格第 11 條當測資試跑 |
 
@@ -37,6 +39,8 @@
 > 6. 尺**抓太寬** —— 合法寫法被擋,而被誤報的閘門最後會被繞過去(2026-09-10)
 > 7. **我手測的 grep 跟腳本跑的 grep 不是同一支**(2026-09-10)—— 第 1 筆的重演
 > 8. **剝註解器自己被一個撇號打敗**(2026-09-10)
+> 9. **平台擋掉了我讀 metadata 的方式**,而換個同義寫法就過(2026-09-10)
+> 10. **async 述詞永遠是 truthy** —— 測試綠得毫無道理,因為它根本沒在測(2026-09-10)
 >
 > **沒有一次是「粗心」** —— 每一次都是一個當下看起來完全合理的實作決定。
 > 而第 5、6 筆多講了一件事:**「抓不到」與「抓太多」是同一種病的兩端**。
@@ -49,5 +53,5 @@
 |---|---:|
 | AI 第一版被退回 | — |
 | 硬規則被違反 | — |
-| 我的尺壞掉 | **8**(截至 2026-09-10,見下) |
+| 我的尺壞掉 | **10**(截至 2026-09-10,見下) |
 | devlog 份數 · 字數 | — · — |

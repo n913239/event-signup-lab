@@ -18,6 +18,8 @@
 | 2026-09-10 | 五支檢查全面補漏補誤報:剝註解、表名解析、變數名擴大、整數百分比 | `self-test.sh` **40/40**(21 筆抓得到 + 11 筆不誤報 + 8 筆原有) |
 | 2026-09-10 | 部分唯一索引行為(述詞含 `confirmed`、過期後可重佔、`ON CONFLICT` 的 `changes=0`) | SQLite 3.51.0 實跑,輸出見 `docs/spec.md` |
 | 2026-09-10 | 多座 hold 的原子性:裸 `INSERT` 全有全無 vs `DO NOTHING` 半成功 | 同上,兩種寫法各跑一次 |
+| 2026-09-10 | 骨架:17 條 endpoint 路由、`/health`、零 SQL | `npx vitest run` 24 passed;`grep -rc 'prepare(' src/` = 0 |
+| 2026-09-10 | schema 裁判(11 條斷言)先於 schema 寫好,並自我測試過 | `npm run test:schema:selftest` 9/9(8 份壞 schema 各紅在對應那條 + good 不誤報) |
 | 2026-09-04 | 閘門 helper 三項單元測試 | `npx vitest run` 3 passed |
 | 2026-09-04 | 靜態檢查在乾淨狀態下通過 | 同上 |
 

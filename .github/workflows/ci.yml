@@ -41,6 +41,12 @@ jobs:
         run: npm run check:snapshot
 
       # 第 2 道:單元與契約
+      # schema 的裁判要先被驗過,才有資格去量作者與無菌室的兩份 schema
+      - name: schema 裁判的自我測試
+        id: schemaselftest
+        if: always()
+        run: npm run test:schema:selftest
+
       - name: 測試
         id: test
         if: always()
@@ -67,6 +73,7 @@ jobs:
             echo "| 閘門 | 結果 |"
             echo "|---|---|"
             echo "| 靜態檢查的自我測試 | ${{ steps.selftest.outcome || job.status }} |"
+            echo "| schema 裁判的自我測試 | ${{ steps.schemaselftest.outcome || '—' }} |"
             echo "| 金額路徑零浮點 | ${{ steps.money.outcome || '—' }} |"
             echo "| 時間必須是參數 | ${{ steps.time.outcome || '—' }} |"
             echo "| 簽章常數時間比對 | ${{ steps.jwt.outcome || '—' }} |"

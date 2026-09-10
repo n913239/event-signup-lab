@@ -17,6 +17,8 @@
     "check:jwt": "sh scripts/check-jwt-timing.sh",
     "check:race": "sh scripts/check-concurrency.sh",
     "check:snapshot": "sh scripts/check-price-snapshot.sh",
+    "test:schema": "vitest run tests/schema.test.js",
+    "test:schema:selftest": "sh scripts/schema-selftest.sh",
     "check:all": "npm run check:money && npm run check:time && npm run check:jwt && npm run check:race && npm run check:snapshot",
     "smoke": "sh scripts/smoke.sh"
   },
