@@ -4,7 +4,13 @@
 set -e
 . "$(dirname "$0")/_lib.sh"
 
-if ! scan "簽章比對" '(signature *[!=]==|[!=]== *signature)' src; then
+# 2026-09-10 擴大:第一版只認變數名剛好叫 signature、而且只認三等號。
+# expected !== sig / expected != signature / expectedSig === providedSig
+# / localeCompare(signature) === 0 全都漏 —— 而這是 Day 24 那條「沒有任何
+# 測試會為它變紅」的規則的唯一裁判。
+SIGVAR='(sig|signature|expected|expectedsig|expectedsignature|computed|computedsig|mac|hmac|digest|providedsig)[a-z0-9_]*'
+export SCAN_ICASE=1
+if ! scan "簽章比對" "([[:space:]]|^)$SIGVAR[[:space:]]*[!=]=|[!=]=[[:space:]]*$SIGVAR([^a-z0-9_]|\$)|localecompare\(" src; then
   echo ""
   echo "❌ 簽章用了字串比對"
   echo "   改用 crypto.subtle.verify('HMAC', key, sigBytes, dataBytes)"

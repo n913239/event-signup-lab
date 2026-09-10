@@ -31,9 +31,9 @@ Cloudflare Workers + Hono + D1 · Pages(web)· SwiftUI(iOS)· 自製 JWT · Open
 尺造好了,被量的東西還沒有。
 
 ```bash
-sh scripts/self-test.sh   # 七筆探針證明四支靜態檢查都抓得到
+sh scripts/self-test.sh   # 40 筆探針:五支靜態檢查抓得到、而且不誤報
 npm test                  # 閘門 helper
-npm run check:all         # 三支靜態檢查
+npm run check:all         # 五支靜態檢查
 ```
 
 尚未實作:schema、所有 endpoint、金額引擎、JWT、前端。

@@ -4,7 +4,9 @@
 set -e
 . "$(dirname "$0")/_lib.sh"
 
-if ! scan "時間副作用" 'Date\.now\(\)|new Date\(\)' src/domain; then
+# 2026-09-10 補漏:new Date(不帶括號)、Date.now 當值傳、解構 { now } = Date、
+# Date()、performance.now、Temporal.Now —— 全部是合法 JS,第一版都看不到。
+if ! scan "時間副作用" 'Date\.now|new[[:space:]]+Date[[:space:]]*\([[:space:]]*\)|new[[:space:]]+Date([^A-Za-z_(]|$)|[^A-Za-z_]Date\(\)|performance\.now|Temporal\.Now' src/domain; then
   echo ""
   echo "❌ domain 層自己取了現在時間"
   echo "   now 要當參數傳進來,例如 canJoin(event, now)"

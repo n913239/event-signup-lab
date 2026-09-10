@@ -11,6 +11,7 @@
 #   沒定義 schema。schema.sql 落地之後補,在那之前那一半只有 /check-schema 第 6 條
 #   在人工把關(見 docs/verified.md)。
 set -e
+. "$(dirname "$0")/_lib.sh"
 cd "$(dirname "$0")/.."
 [ -d src ] || { echo "跳過: 價格快照 (src/ 還不存在)"; exit 0; }
 
@@ -19,40 +20,60 @@ FILES=$(find src -type f \( -name '*.js' -o -name '*.ts' -o -name '*.sql' \) \
 [ -n "$FILES" ] || { echo "✅ 價格快照:src/ 還沒有可掃的檔案"; exit 0; }
 
 # 金額欄:帶單位的欄名(規則 1 的約定),或直白的 amount/price/total
-MONEY='[a-z_]*(_cents|_amount|amount|price|total)[a-z_]*'
+# 金額欄:規則 1 要求欄名帶單位,所以只認 _cents / _amount 結尾,
+# 並加詞界 —— 第一版用 (price|total|amount) 無錨,連 price_locked、
+# total_seats 這種合法欄名都中(2026-09-10 實測)。
+MONEY='[a-z_]*(_cents|_amount)([^a-z_]|$)'
 # 只管訂單側的表。票種的現價本來就該能改(`PATCH /ticket-types/:id`,
 # docs/spec.md 第 11 條),不能改的是**已成立訂單的快照**。
-# 2026-09-10:第一版禁「任何 UPDATE 寫入金額欄」,連合法的改價一起擋 ——
-# 而那條 endpoint 正是價格快照陷阱的觸發器,擋掉它 Day 26 就沒東西可寫。
 # 表名出處:.claude/commands/check-schema.md 第 6 條。
 ORDER_TABLES='orders|order_items'
+
 RC=0
 for f in $FILES; do
-  # 把換行拉平,然後在每個 UPDATE 前面斷行 —— 一行一個 UPDATE 語句,
-  # 這樣單引號 SQL 與多行 template literal 都能一致處理
-  # (前一版以單引號切段,結果 SET status = 'confirmed', amount_cents = 0
-  #  在 'confirmed' 那裡被切斷,金額欄逃掉了)
-  BAD=$(tr '\n' ' ' < "$f" |
-        sed 's/[Uu][Pp][Dd][Aa][Tt][Ee][ \t]/\
+  SRC=$(strip_comments "$f")
+  FLAT=$(printf '%s' "$SRC" | tr '\n' ' ')
+
+  # (一) UPDATE <訂單表> SET … <金額欄> =
+  #     表名前可能有 OR IGNORE/REPLACE(正規 SQLite 語法)、schema 前綴、
+  #     引號或方括號 —— 第一版全部漏掉。
+  BAD=$(printf '%s' "$FLAT" | sed 's/UPDATE[[:space:]]/\
 &/g' |
         awk -v m="$MONEY" -v ot="$ORDER_TABLES" '
-          toupper($0) ~ /^UPDATE[ \t]+[A-Za-z_]/ && toupper($0) ~ /SET/ {
+          toupper($0) ~ /^UPDATE[[:space:]]/ && toupper($0) ~ /SET/ {
             t = $0
-            sub(/^[Uu][Pp][Dd][Aa][Tt][Ee][ \t]+/, "", t)
-            sub(/[^A-Za-z_].*/, "", t)
-            if (tolower(t) !~ "^(" ot ")$") next     # 不是訂單側的表就不管
-            s = $0
-            sub(/^[^Ss]*[Ss][Ee][Tt][ \t]/, "", s)   # 第一個 SET 之後
-            sub(/[Ww][Hh][Ee][Rr][Ee][ \t].*/, "", s) # WHERE 之後不算
-            if (tolower(s) ~ m "[ \t]*=") print substr($0, 1, 120)
+            sub(/^[Uu][Pp][Dd][Aa][Tt][Ee][[:space:]]+/, "", t)
+            sub(/^[Oo][Rr][[:space:]]+[A-Za-z]+[[:space:]]+/, "", t)   # OR IGNORE / OR REPLACE
+            gsub(/["\[\]`]/, "", t)                                    # "orders" [orders] `orders`
+            sub(/[^A-Za-z_.].*/, "", t)
+            sub(/^[A-Za-z_]+\./, "", t)                                # main.orders → orders
+            if (tolower(t) !~ "^(" ot ")$") next
+            v = $0
+            sub(/^[^Ss]*[Ss][Ee][Tt][[:space:]]/, "", v)
+            sub(/[Ww][Hh][Ee][Rr][Ee][[:space:]].*/, "", v)
+            if (tolower(v) ~ m "[[:space:]]*=") print substr($0, 1, 120)
           }')
-  if [ -n "$BAD" ]; then
-    echo "❌ $f:UPDATE 寫入了訂單的金額欄"
-    echo "$BAD" | sed 's/^/   /'
+
+  # (二) UPSERT 與 REPLACE INTO —— 改寫已成立訂單金額的另外兩條通道
+  # ⚠️ 這裡不要用 ["\[]? 這種選擇性引號字元類 —— 互動 shell 的 ugrep 吃,
+  #    但 hook 與 CI 跑在 sh 底下用 BSD grep,它不吃,而且是靜默不吃。
+  #    2026-09-10 手測通過、腳本裡卻抓不到,查了才發現是兩個 grep。
+  #    LEDGER 第 1 筆同一種病的第七次。改成先剝引號再比。
+  NOQ=$(printf '%s' "$FLAT" | tr -d '"`[]')
+  BAD2=$(printf '%s' "$NOQ" |
+         grep -oiE '(REPLACE|INSERT[[:space:]]+OR[[:space:]]+REPLACE)[[:space:]]+INTO[[:space:]]+('"$ORDER_TABLES"')([^A-Za-z_]|$)[^;]*' || true)
+  BAD3=$(printf '%s' "$FLAT" |
+         grep -oiE 'DO[[:space:]]+UPDATE[[:space:]]+SET[^;)]*(_cents|_amount)[[:space:]]*=' || true)
+
+  if [ -n "$BAD$BAD2$BAD3" ]; then
+    echo "❌ $f:改寫了訂單的金額欄"
+    [ -n "$BAD"  ] && echo "$BAD"  | sed 's/^/   UPDATE  /'
+    [ -n "$BAD2" ] && echo "$BAD2" | sed 's/^/   REPLACE /'
+    [ -n "$BAD3" ] && echo "$BAD3" | sed 's/^/   UPSERT  /'
     echo "   確認後金額不可變 —— 金額只在建單那次 INSERT 寫入"
     RC=1
   fi
 done
 
-[ "$RC" -eq 0 ] && echo "✅ 沒有 UPDATE 寫入訂單的金額欄"
+[ "$RC" -eq 0 ] && echo "✅ 沒有任何寫法改到訂單的金額欄"
 exit $RC
