@@ -23,7 +23,7 @@
 | 金額引擎與折扣順序 | Day 25 | 同上 |
 | 時間判定 | Day 26 | 同上 |
 | 併發(超賣 / 座位 / TTL) | Day 27 | 同上 |
-| JWT | Day 24 | 同上 —— **2026-09-10 補**:寫作 session 知道規則 4 與七項邊界,它寫的 JWT 一定用 `crypto.subtle.verify`,那就不是實驗 |
+| JWT | Day 24 | 同上 —— **2026-09-14 定案為第五個實驗**:作者先寫六個測試 + 一條靜態規則並 commit(「AI 尚未介入」);乾淨 session 只拿到「實作 JWT 登入,要有 refresh token」一句(不給測試、不給規則 4);AI 版放進 repo 跑測試與 `check-jwt-timing.sh`。寫作 session 知道規則 4 與七項邊界,不能當受試者 |
 | **架構文件的編造率** | **Day 4** | **`apple/container` 的 clone,而且連 `Package.swift` 都不能給** |
 
 > ⚠️ **Day 4 的無菌室不在這個 repo。** 它是「讓 AI 讀 `apple/container` 產一份架構文件,
@@ -41,6 +41,7 @@
 - `CLAUDE.md`
 - `2026-impl-spec.md` 第三節(七個陷阱)
 - 這份檔案
+- **`specs/` 與 `.specify/`(spec-kit 的產物;`data-model.md` 有八個實體的不變條件,`plan.md` 有 gate 的討論 —— 2026-09-14 補,Day 22 的無菌室若用 clone 會整份帶進去)**
 - 任何提到「用整數存金額」「時間要當參數」的東西
 
 > 你知道要測什麼,AI 不能知道 —— 否則它不是在解題,是在應付考試。
@@ -55,7 +56,8 @@
 | 對象 | 誰做 |
 |---|---|
 | schema、金額引擎與折扣順序、時間判定、併發 | **作者手寫 → 另開乾淨 session 出 AI 版** |
-| 骨架、endpoint 接線、JWT、契約、web 前端、CI、測試基礎設施 | 寫作 session 可直接實作(不是實驗對象) |
+| **JWT(2026-09-14 加入)** | **作者寫測試並 commit → 乾淨 session 出實作 → 測試與靜態檢查打它** |
+| 骨架、endpoint 接線、契約、web 前端、CI、測試基礎設施 | 寫作 session 可直接實作(不是實驗對象) |
 
 **推論:骨架不能先把 schema 寫死。** 17 條 endpoint 要接線就要碰資料表,
 但 schema 是 Day 22 的實驗對象,先寫死就毀了實驗。

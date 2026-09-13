@@ -14,7 +14,7 @@
 - **[P]**: 可與同 phase 其他 [P] 並行(不同檔、無未完成相依)
 - **[Story]**: US1–US5,對應 spec.md
 - **📅**: 建議日期(9/14 開工、10/13 結束、一人全端、每天一篇文 —— 所以每天只排半天工程量)
-- **🖐 作者手寫,AI 不得先出版本**:`docs/EXPERIMENT-PROTOCOL.md` 的實驗對象。順序:作者 commit(message 寫「AI 尚未介入」)→ 開乾淨 session 出 AI 版 → 另外 commit + 原文存 `devlog/raw/` → 比對。**本 session 看過考題,不能扮演那個乾淨 session。**
+- **🖐 作者手寫,AI 不得先出版本**:`docs/EXPERIMENT-PROTOCOL.md` 的實驗對象(2026-09-14 起含 JWT,第五個)。順序:作者 commit(message 寫「AI 尚未介入」)→ 開乾淨 session 出 AI 版 → 另外 commit + 原文存 `devlog/raw/` → 比對。**本 session 看過考題,不能扮演那個乾淨 session。**
 - ⚠️1(規則 III vs D1 batch)三個候選**不選**,全部留給 T030 的手寫實驗。
 
 ## Path Conventions
@@ -46,7 +46,8 @@ repo 根:`src/`(API)、`tests/`、`scripts/`、`web/`(Pages)、`ios/EventSignup/
 - [ ] T008 📅9/17 🖐 開乾淨 session(不給 CLAUDE.md / 本 specs / EXPERIMENT-PROTOCOL)出 AI 版 schema → 存 `devlog/raw/exp-01-schema/`(prompt 逐字、輸出原文)→ `SCHEMA=devlog/raw/exp-01-schema/schema.sql npm run test:schema` → 差異寫進 devlog;另外 commit
 - [ ] T009 [P] 📅9/17 寫 `seed.sql`(R11):staff `staff@example.com` / member `member@example.com`(密碼 `password123`,雜湊由 T010 的 `lib/password.js` 先算好貼上)、1 個 `on_sale` 活動(`hold_ttl_minutes` 10、團體 4/10)、票種「一般」100000 分 × 60、「VIP」200000 分 × 40(早鳥 10%、7 天)、全站優惠碼 `WELCOME` 10000 分;`npm run db:init && npm run db:seed` 可重跑
 - [ ] T010 [P] 📅9/18 先寫 `tests/lib/password.test.js`(雜湊格式 `pbkdf2$100000$<salt>$<hash>`、同密碼不同 salt、錯密碼 false)→ 實作 `src/lib/password.js`:`hash(pw)`、`verify(pw, stored)` 用 `crypto.subtle.deriveBits` PBKDF2-SHA256 100,000 次,比對用 `crypto.subtle.timingSafeEqual`
-- [ ] T011 [P] 📅9/18 先寫 `tests/jwt.test.js`(repo 內能寫的:簽發 → 驗證通過;改一個字元 → 拒;`exp <= now` → 拒;`now` 從參數進;alg 不是 HS256 → 拒;缺 sub → 拒;外部七項清單以 `it.todo('外部清單第 N 項')` 掛七個占位)→ 實作 `src/lib/jwt.js`:`sign(claims, key)`、`verify(token, key, now)` 用 **`crypto.subtle.verify`**;`importKey(secret)`;確認 `npm run check:jwt` 綠
+- [ ] T011 📅9/18 🖐 **JWT 是第五個實驗(2026-09-14 加入 EXPERIMENT-PROTOCOL)**。作者手寫 `tests/jwt.test.js`:六個分開的 `it`(過期 / 簽章竄改 / alg none 或換演算法 / 重放 / 輪替後失效 / 格式異常回 401 不是 500)+ 第 7 項由 `scripts/check-jwt-timing.sh` 裁判;commit message 寫「AI 尚未介入」。**本 session 不寫測試也不寫實作。**
+- [ ] T011b 📅9/19 🖐 乾淨 session(空目錄 + brief:「在 Cloudflare Workers 上實作 JWT 登入,要有 refresh token」,不給 CLAUDE.md / 規則 IV / 測試)出 `src/lib/jwt.js` 與 auth 路由 → 原文存 `devlog/raw/exp-05-jwt/` → 放進 repo 跑六個測試 + `check-jwt-timing.sh` → 七項逐一記結果(Day 24 的表)。access 15 分 / refresh 30 天 / 重放撤全部(C16、C17)是驗收標準,不是給它的提示
 - [ ] T012 📅9/19 `src/lib/db/members.js`(`create`、`findByEmail`、`findById`)與 `src/lib/db/refresh-tokens.js`(`insert`、`rotate(db, hash, now)` 一個 batch:`UPDATE … SET revoked_at = ? WHERE token_hash = ? AND revoked_at IS NULL AND expires_at > ?` + `INSERT`,回 `changes`;`revokeAllForMember`、`revoke`);每個函式吃 `(db, params, now)`
 - [ ] T013 📅9/19 `src/routes/_auth.js`:`requireMember`(Bearer → `verify(token, key, c.get('now'))` → `c.set('member')`;失敗 401 `unauthorized`)、`requireStaff`(403 `forbidden`)、`requireOwner(loadEvent)`(`event.owner_id !== member.id` → 403;活動不存在 → 404)
 - [ ] T014 [P] 📅9/19 先寫 `tests/domain/validate.test.js` → 實作 `src/domain/validate.js`,規則照 `data-model.md`「驗證規則」表逐條:email 有 `@`、≤ 254、小寫;password ≥ 8;nickname 1–50;name 1–100;時間欄整數毫秒且 `opens_at < deadline_at`;`price_cents` 整數 ≥ 0;`capacity` 整數 ≥ 0;`group_min_qty ≥ 2`;pct 0–100;`hold_ttl_minutes` 5–30;`seat_nos` 非空、去重後長度不變、每個符合 `^[A-J](10|[1-9])$`、≤ 100;`promo_code` 1–32 存大寫。錯誤一律回 `{ error: 'invalid_input' }`
@@ -232,8 +233,8 @@ US2 只是讓主辦不用下 SQL;US3 的 refresh 是安全性;US4 / US5 是兩�
 | 9/15 | 一 | T002–T006 | `openapi.yaml` 進 repo 根(契約先行 commit);契約測試 501 階段綠;clock 注入 | Day 23 |
 | 9/16 | 二 | T007 🖐 | **schema.sql 作者手寫**,`test:schema` 8/8 | Day 22 |
 | 9/17 | 三 | T008 🖐、T009 | AI 版 schema 比對;seed.sql | Day 22 |
-| 9/18 | 四 | T010、T011 | password、JWT(`subtle.verify`) | Day 24 |
-| 9/19 | 五 | T012–T014 | members / refresh-tokens SQL、auth middleware、validate | Day 24 |
+| 9/18 | 四 | T010、T011 🖐 | password;**作者寫 JWT 六個測試並 commit** | Day 24 |
+| 9/19 | 五 | T011b 🖐、T012–T014 | **乾淨 session 出 JWT 實作,跑七項**;members / refresh-tokens SQL、auth middleware、validate | Day 24 |
 | 9/20 | 六 | T015–T017 | states、auth helper、CORS、**註冊 / 登入上線** —— Phase 2 checkpoint | Day 24 |
 | 9/21 | 日 | T024、T025 | US2 紅測試 | — |
 | 9/22 | 一 | T026、T027 | events / ticket-types SQL(Σ capacity、capacity < sold 都在 SQL 裡) | — |
