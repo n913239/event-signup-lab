@@ -1,7 +1,7 @@
 # 實驗 Day 04:AI 寫的架構文件,有幾成是編的
 
 日期:**2026-09-10**
-模型:Claude(Claude Code 的 general-purpose subagent,乾淨 session)
+模型:Claude Opus 5(Claude Code 的 general-purpose subagent,乾淨 session)
 有沒有給 `CLAUDE.md`:**沒有**
 標的:`apple/container` @ `d6de5694`
 
