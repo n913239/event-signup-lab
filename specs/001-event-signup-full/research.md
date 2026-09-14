@@ -125,7 +125,7 @@ quote({
 **決定**:SwiftPM 專案 `ios/EventSignup`,iOS 17+,SwiftUI;`swift-openapi-generator` 以 build plugin 從 `openapi.yaml` 產 `Client`,`swift-openapi-urlsession` 當 transport;
 token 存 Keychain;bearer 由 `ClientMiddleware` 注入,401 → refresh 一次;
 離線快取 = 最後一次 `GET /orders` 的原始 JSON 存 `Application Support/orders.json`,離線時讀它並顯示「離線資料」標籤;寫入操作(登出)離線時直接顯示需要連線。
-QR 用 `CoreImage.CIFilter.qrCodeGenerator()` 畫 `qr_payload`。兩個畫面:登入、票券列表 → 明細。
+QR 用 `CoreImage.CIFilter.qrCodeGenerator()` 畫 `qr_payload`。三個畫面:登入、活動列表(唯讀,`GET /events?status=on_sale`,點進去畫 100 席狀態但不可點)、票券列表 → 明細。活動列表不做離線快取(只有票券需要)。
 
 **放棄**:手寫 `URLSession` client(C2 說從 OpenAPI 產生);SwiftData / CoreData 做快取(非目標 8 只要讀取快取,一個 JSON 檔就夠)。
 

@@ -10,7 +10,7 @@
 ## Summary
 
 17 條 endpoint 的活動報名 API(Workers + Hono + D1)、一份 OpenAPI 契約、一個 Pages 前端(五個畫面)、
-一個 SwiftUI 骨架(兩個畫面)。核心是售票規則:限量名額、多座 hold 全有全無、保留逾時三方競態、
+一個 SwiftUI 骨架(三個畫面)。核心是售票規則:限量名額、多座 hold 全有全無、保留逾時三方競態、
 先乘後減的整數折扣、確認後金額快照。技術上的關鍵限制只有一個:**D1 沒有 `SELECT … FOR UPDATE`**,
 併發只能靠條件式寫入 + `changes` + `CHECK`,而 `db.batch()` 只在**拋錯**時回滾,`changes = 0` 不回滾。
 
@@ -39,7 +39,7 @@
 
 **Constraints**: 五條硬規則(見 Constitution Check);15 條非目標;無 rate limit、錯誤訊息不友善、無 log 聚合(刻意保留的醜);免費額度
 
-**Scale/Scope**: 17 endpoint + `/health`;8 張表上限(`tests/schema.test.js` ⑦ 的白名單);每活動 100 席;web 5 畫面;iOS 2 畫面;十天
+**Scale/Scope**: 17 endpoint + `/health`;8 張表上限(`tests/schema.test.js` ⑦ 的白名單);每活動 100 席;web 5 畫面;iOS 3 畫面;十天
 
 ## Constitution Check
 
@@ -198,7 +198,7 @@ scripts/                     # 已有;要動的:
 | 7 | **併發** `lib/db/holds.js`(createHold / confirm / sweep)作者手寫 → `concurrency.test.js` 重跑 5 次 → 無菌室版 | 作者 | Day 27 |
 | 8 | hold 3 條 + 訂單 3 條 endpoint;`smoke.sh`、`race.sh` 填實 | 本 session | |
 | 9 | web 五畫面 | 本 session | Day 28 |
-| 10 | iOS 兩畫面 + OpenAPI client;SC-007 兩端比對、SC-008 讀取次數 | 本 session | Day 29 |
+| 10 | iOS 三畫面 + OpenAPI client;SC-007 三端比對(`GET /events`、`GET /orders`)、SC-008 讀取次數 | 本 session | Day 29 |
 | 11 | `docs/verified.md` 更新;CI 帳本 | 本 session | Day 30 |
 
 > 步 2、4、5、7 的「AI 版」**不能由本 session 產**(它看過考題)。tasks.md 裡這幾項要標「作者手寫」。

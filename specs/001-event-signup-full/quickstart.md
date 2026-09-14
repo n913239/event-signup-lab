@@ -107,7 +107,7 @@ cd web && npm ci && npm run dev   # http://localhost:5173,proxy → 8788
 ```bash
 cp openapi.yaml ios/EventSignup/Sources/openapi.yaml && open ios/EventSignup   # build plugin 產 Client
 ```
-登入 → 票券列表 → 明細(QR)。同一帳號與 web 逐欄比對 `GET /orders`。
+登入 → 活動列表(唯讀)→ 票券列表 → 明細(QR)。同一帳號與 web、`curl` 逐欄比對 `GET /events` 與 `GET /orders`。
 飛航模式重開 app:顯示快取 + 「離線資料」標籤;登出按鈕提示需要連線。
 
 SC-008:`wrangler dev` 的 D1 log 或 `meta.rows_read` 記 `GET /orders` 一次載入的讀取數,寫進 `docs/verified.md`。

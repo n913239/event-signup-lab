@@ -127,9 +127,9 @@ repo 根:`src/`(API)、`tests/`、`scripts/`、`web/`(Pages)、`ios/EventSignup/
 
 ## Phase 6: User Story 4 - 我的票券與歷史(web 與 iOS)(Priority: P4)
 
-**Goal**: `GET /orders`、`GET /orders/:id`(含 `qr_payload`)、web 五畫面(Pages + daisyUI)、iOS 兩畫面(OpenAPI client、離線讀取快取);兩端對同一個 GET 顯示同一份資料;讀取次數有量。
+**Goal**: `GET /orders`、`GET /orders/:id`(含 `qr_payload`)、web 五畫面(Pages + daisyUI)、iOS 三畫面(OpenAPI client、離線讀取快取);兩端對同一個 GET 顯示同一份資料;讀取次數有量。
 
-**Independent Test**: 同一帳號在 web 與 iOS 各載入「我的票券」,逐欄與 `curl GET /orders` 比對;`docs/verified.md` 記 rows_read。
+**Independent Test**: 同一帳號在 web 與 iOS 各載入「活動列表」與「我的票券」,逐欄與 `curl GET /events` / `GET /orders` 比對;`docs/verified.md` 記 rows_read。
 
 ### API 側
 
@@ -150,9 +150,10 @@ repo 根:`src/`(API)、`tests/`、`scripts/`、`web/`(Pages)、`ios/EventSignup/
 
 - [ ] T047 📅10/7 [US4] 建 `ios/EventSignup/`(SwiftPM,iOS 17,SwiftUI);`Package.swift` 加 `swift-openapi-generator`(plugin)、`swift-openapi-runtime`、`swift-openapi-urlsession`;`Sources/EventSignup/openapi.yaml` 由 repo 根複製(加 `scripts/sync-openapi.sh` 一行 `cp`);`openapi-generator-config.yaml`(`generate: [types, client]`);build 通過、`Client` 型別出現
 - [ ] T048 📅10/8 [US4] `ios/EventSignup/Sources/EventSignup/Auth/LoginView.swift` + `Auth/TokenStore.swift`(Keychain)+ `Auth/BearerMiddleware.swift`(`ClientMiddleware`,401 → refresh 一次重試)
-- [ ] T049 📅10/9 [US4] `ios/EventSignup/Sources/EventSignup/Tickets/TicketListView.swift`、`Tickets/TicketDetailView.swift`(CoreImage `CIFilter.qrCodeGenerator()` 畫 `qr_payload`;金額顯示集中 `Tickets/Money.swift`)、`Cache/OrdersCache.swift`(最後一次 `GET /orders` 原始 JSON 存 Application Support;離線時讀並顯示「離線資料」;登出離線時提示需連線)
+- [ ] T049a 📅10/9 [US4] `ios/EventSignup/Sources/EventSignup/Events/EventListView.swift`(`GET /events?status=on_sale`,daisyUI card 的對應:名稱、開賣 / 截止、票種與剩餘)+ `Events/EventDetailView.swift`(`GET /events/:id`,畫 100 席 `free/held/sold/mine` 四色,**唯讀不可點**;FR-071 不做選位);不做離線快取
+- [ ] T049b 📅10/9 [US4] `ios/EventSignup/Sources/EventSignup/Tickets/TicketListView.swift`、`Tickets/TicketDetailView.swift`(CoreImage `CIFilter.qrCodeGenerator()` 畫 `qr_payload`;金額顯示集中 `Tickets/Money.swift`)、`Cache/OrdersCache.swift`(最後一次 `GET /orders` 原始 JSON 存 Application Support;離線時讀並顯示「離線資料」;登出離線時提示需連線)
 
-**Checkpoint**: 同一帳號 web / iOS / curl 三者 `GET /orders` 逐欄一致(SC-007);rows_read 已記(SC-008)。
+**Checkpoint**: 同一帳號 web / iOS / curl 三者 `GET /events` 與 `GET /orders` 各自逐欄一致(SC-007);rows_read 已記(SC-008)。
 
 ---
 
@@ -174,7 +175,7 @@ repo 根:`src/`(API)、`tests/`、`scripts/`、`web/`(Pages)、`ios/EventSignup/
 - [ ] T052 📅10/3 部署:`wrangler d1 create signup` 換掉 `wrangler.toml` 的 placeholder id、`wrangler secret put JWT_SECRET / QR_SECRET`、`wrangler d1 execute signup --remote --file=schema.sql`、`wrangler deploy`;`BASE_URL=<worker> npm run smoke`
 - [ ] T053 📅10/3 `scripts/race.sh` 填實:對遠端 Worker 用 `xargs -P 20 curl` 打同一座位 20 次與同票種名額 + 5 次,統計 201 / 409 數量,寫 `devlog/raw/race-<date>.txt`;結果進 `docs/verified.md` ✅「真實併發」
 - [ ] T054 [P] 📅10/10 Pages 部署:`web/` 連 Pages 專案、`VITE_API_BASE` 指向 Worker、Worker 的 `CORS_ORIGIN` 改成 Pages 網域;線上走一遍五畫面
-- [ ] T055 [P] 📅10/10 SC-007 / SC-008 實測:同帳號 web、iOS、curl 三份 `GET /orders` 逐欄 diff;`rows_read` 數字;寫進 `docs/verified.md` ✅ 欄(有輸出可貼的才進)
+- [ ] T055 [P] 📅10/10 SC-007 / SC-008 實測:同帳號 web、iOS、curl 三份 `GET /events` 與三份 `GET /orders` 各自逐欄 diff;`rows_read` 數字;寫進 `docs/verified.md` ✅ 欄(有輸出可貼的才進)
 - [ ] T056 📅10/11 `docs/verified.md` 全面對帳:❌ 欄逐項移到 ✅ 或留著(JWT 七項若外部清單沒跑,留著);「已知的坑」補這 30 天踩到的
 - [ ] T057 [P] 📅10/11 CLAUDE.md 與 `.specify/memory/constitution.md` 規則 V 的註記改為「另一半由 `tests/schema.test.js` ⑥ 裁判」(research.md 末段);`/speckit-constitution` 走 PATCH 版本
 - [ ] T058 [P] 📅10/12 `README.md`「現在的狀態」改寫:尺與被量的東西都有了;指令表補 `web`、`ios`、`race`
@@ -254,7 +255,7 @@ US2 只是讓主辦不用下 SQL;US3 的 refresh 是安全性;US4 / US5 是兩�
 | 10/6 | 一 | T045、T046 | 票券 + QR;check-money 擴掃 web —— **web 五畫面完成** | Day 28 |
 | 10/7 | 二 | T047 | iOS 專案 + OpenAPI client 產生 | Day 29 |
 | 10/8 | 三 | T048 | iOS 登入 + Keychain | Day 29 |
-| 10/9 | 四 | T049 | iOS 票券列表 / 明細 / 離線快取 —— **iOS 兩畫面完成** | Day 29 |
+| 10/9 | 四 | T049a、T049b | iOS 活動列表(唯讀)+ 票券列表 / 明細 / 離線快取 —— **iOS 三畫面完成**(當天兩個 task) | Day 29 |
 | 10/10 | 五 | T054、T055 | Pages 上線;SC-007 三端逐欄比對、SC-008 rows_read | Day 29 |
 | 10/11 | 六 | T056、T057 | `verified.md` 對帳;constitution 規則 V 註記更新 | Day 30 |
 | 10/12 | 日 | T058、T059 | README、CI 帳本(量了幾次 / 擋下幾次) | Day 30 |

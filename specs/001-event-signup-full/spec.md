@@ -22,7 +22,7 @@
 ### Session 2026-09-14
 
 - Q: web 前端的頁面範圍? → A: 登入/註冊、活動列表、活動頁(10×10 選位)、保留倒數與確認、我的票券(含 QR)。全部用 Pages + daisyUI。(C1)
-- Q: iOS「骨架」的畫面範圍? → A: 登入 + 我的票券列表與明細(對同一個 GET);client 從 OpenAPI 產生;不做選位。(C2)
+- Q: iOS「骨架」的畫面範圍? → A: 登入 + 活動列表(唯讀,含座位圖狀態,不可點選)+ 我的票券列表與明細(各對同一個 GET);client 從 OpenAPI 產生;不做選位。(C2;2026-09-14 由兩畫面改為三畫面,對齊作者原施工表)
 - Q: 票種名額、活動名額、座位數三者關係;hold 帶不帶票種? → A: 10×10 固定 100 席 = 活動總容量;票種各有名額,總和 ≤ 100;hold 綁「座位 + 票種」(每個座位一個票種);售出以座位為準,票種名額是第二道上限。(C3)
 - Q: 「主辦」= 建活動的 staff,還是任何 staff? → A: 主辦 = 建立該活動的 staff(`events.owner_id`);其他 staff 對別人的活動一律 403。(C4)
 - Q: 「座位配置」固定 10×10 還是可指定;有無無座位活動? → A: 固定 10×10;不做無座位活動。(C5)
@@ -140,18 +140,19 @@ refresh 會輪替且舊 refresh 立刻失效;重放舊 refresh 會撤銷該成�
 
 成員在 web(Cloudflare Pages + daisyUI)與 iOS 骨架上看到自己的票券與歷史;兩個前端對同一個 GET 顯示同一份資料。
 web 另含登入/註冊、活動列表、活動頁(10×10 選位)、保留倒數與確認。
-iOS 只做登入與票券列表 / 明細,client 由 OpenAPI 產生,不做選位;只做離線讀取快取,寫入一律要連線。
+iOS 做登入、活動列表(唯讀)、票券列表 / 明細三個畫面,client 由 OpenAPI 產生,不做選位;只做離線讀取快取,寫入一律要連線。
 票券顯示 QR:訂單 id + HMAC 簽章的短字串,不含個資。
 
 **Why this priority**: 做完定義是「web 與 iOS 對同一個 GET 顯示同一份資料,且 D1 讀取次數有算過」。
 一份契約餵兩個前端 —— 契約錯的時候,兩邊各自都是對的。
 
-**Independent Test**: 同一帳號在 web 與 iOS 各載入「我的票券」,逐欄比對與 API 回傳一致;
+**Independent Test**: 同一帳號在 web 與 iOS 各載入「活動列表」與「我的票券」,逐欄比對與 API 回傳一致;
 記錄一次載入的資料庫讀取次數。
 
 **Acceptance Scenarios**:
 
 1. **Given** 成員有 N 張票,**When** 開「我的票券」,**Then** web 與 iOS 都列出同樣的 N 筆、同樣的欄位值。
+1b. **Given** 有 M 場 `on_sale` 活動,**When** 開「活動列表」,**Then** web 與 iOS 都列出同樣的 M 場、同樣的欄位值;iOS 點進活動只看座位圖狀態,不能選位。
 2. **Given** 成員開自己的訂單明細,**Then** 看得到金額快照與 QR。
 3. **Given** 主辦開該活動任一訂單明細,**Then** 看得到;**Given** 非本人非主辦,**Then** 被拒。
 4. **Given** iOS 曾成功載入,**When** 離線再開,**Then** 顯示快取的讀取資料;任何寫入操作要求連線。
@@ -276,7 +277,7 @@ iOS 只做登入與票券列表 / 明細,client 由 OpenAPI 產生,不做選位;
 
 #### iOS 骨架
 
-- **FR-070**: iOS MUST 含兩個畫面:登入、我的票券列表與明細;票券資料與 web 對同一個 GET 顯示同一份。
+- **FR-070**: iOS MUST 含三個畫面:登入、活動列表(唯讀,含座位圖狀態)、我的票券列表與明細;活動與票券資料各與 web 對同一個 GET 顯示同一份。
 - **FR-071**: iOS client MUST 從 OpenAPI 契約產生;MUST NOT 做選位。
 - **FR-072**: iOS MUST 只做離線讀取快取;寫入一律要連線;MUST NOT 做離線編輯與衝突合併。
 - **FR-073**: MUST NOT 上架 App Store / TestFlight;MUST NOT 做 APNs 推播(改用清單 + 拉取)。
@@ -314,7 +315,7 @@ iOS 只做登入與票券列表 / 明細,client 由 OpenAPI 產生,不做選位;
   `closed` 建 hold、過 `deadline_at`、未到 `opens_at`、過期 hold 確認、改價後金額不變、
   非主辦 403、`cancelled` 終態、不超賣、座位不重複。
 - **SC-006**: 非主辦(含其他 staff)對活動 / 票種的每一條寫入操作都被拒(測試證明越權被拒)。
-- **SC-007**: web 與 iOS 對「我的票券」同一個 GET 顯示同一份資料(逐欄相同)。
+- **SC-007**: web 與 iOS 對「活動列表」與「我的票券」各自同一個 GET 顯示同一份資料(逐欄相同);以 `curl` 為第三方基準。
 - **SC-008**: 「我的票券」一次載入的資料庫讀取次數有量測並記錄。
 - **SC-009**: 舊 refresh 重放被拒且該成員全部 refresh 失效;logout 後的 refresh 被拒;JWT 七項邊界外部清單全過。
 - **SC-010**: 五支靜態檢查(`check-money` / `check-time-injection` / `check-concurrency` /
