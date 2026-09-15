@@ -69,7 +69,7 @@ cd clean-room-day04 && git checkout d6de5694
 | `Sources/Services` 16k 行 | 16,166 | ✅ |
 | Plugins 各 84–180 行 | 最小 84、最大 180 | ✅ |
 | K8s 是唯一沒有 `servicesConfig` 的 | 其餘四個都有 | ✅ |
-| `XPCKeys` 一百多個 case | 119 | ✅ |
+| `XPCKeys` 一百多個 case | ~~119 ✅~~ → **82**(同檔 `XPCRoute` 36,合計 118) | ❌ 它把兩個 enum 加在一起算,沒標不確定 |
 | DNS 2053 / 1053 | `APIServer+Start.swift:39-40` | ✅ |
 | 記憶體下限 200 MiB | `ContainersService.swift:328` | ✅ |
 | init image 512 MiB / 一般 512 GiB | `SnapshotStore.swift:45,47` | ✅ |
@@ -77,7 +77,10 @@ cd clean-room-day04 && git checkout d6de5694
 | `openat(O_NOFOLLOW)` 擋路徑穿越 | `BuildPipelineHandler.swift:46` | ✅ |
 | euid 比對是唯一安全邊界 | `XPCServer.swift:178` | ✅ |
 
-**編造 1 處,而那一處它自己標記了。**
+**編造 2 處:`container-k8s` 它自己標記了;`XPCKeys` case 數沒標。**
+
+> ⚠️ 2026-09-16 更正:`XPCKeys` 那列 9/10 原記 ✅(119),是數了整個 `XPC+.swift` 的 `case` 行(還多算一行註解)。
+> 重數 `enum XPCKeys` 本體(L22–146)為 82 個 case,`XPCRoute`(L148–191)36 個。編造率由 1/16 改為 2/16。
 
 ## 誰對,以及為什麼
 
