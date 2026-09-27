@@ -65,6 +65,14 @@ describe.skipIf(!has)('併發', () => {
     expect(await seatsTaken(s.w, s.ev.id)).toEqual([])
   })
 
+  it('座位衝突與名額不足同時發生 → seat_taken(作者定:先檢查座位)', async () => {
+    s = await setup({ capacity: 2 })
+    await s.hold(s.users[0], ['A1'])                  // 剩 1 名額,A1 已被佔
+    const r = await s.hold(s.users[1], ['A1', 'A2'])  // 座位衝突 + 名額不足
+    expect(r.status).toBe(409)
+    expect((await r.json()).error).toBe('seat_taken')
+  })
+
   it('SC-004 三方競態(到期那一刻:原持有人確認 / 別人搶同座 / sweep),重跑 5 次結果一樣,座位不會同時屬於兩個人', async () => {
     const { sweepExpired } = await import('../src/lib/db/holds.js')
     const outcomes = []
