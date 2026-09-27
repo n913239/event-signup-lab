@@ -21,7 +21,9 @@ async function setup({ capacity = 60, members = 8 } = {}) {
 const seatsTaken = async (w, evId) => (await w.db.prepare(
   "SELECT seat_no, member_id, status FROM seat_holds WHERE event_id = ? AND status IN ('holding','confirmed') ORDER BY seat_no").bind(evId).all()).results
 
-describe.skipIf(!has)('併發', () => {
+// 逾時 30 秒:這一檔每條都重跑 5 次;GitHub runner 比本機慢,SC-004 在 7dd0817 那次 CI 跑到 5010ms 被 vitest 預設 5 秒判逾時 ——
+// 程式是對的、閘門卻紅了。一支會對正確程式碼亮紅燈的閘門,最後一定會被繞過去(LEDGER)。
+describe.skipIf(!has)('併發', { timeout: 30_000 }, () => {
   let s
   afterEach(() => s?.w.dispose())
 
