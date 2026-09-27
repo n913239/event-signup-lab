@@ -13,7 +13,17 @@
 
 讀最多的前幾句(`wrangler d1 insights signup --timePeriod 1d --sort-by reads`):建 hold 前的「還名額」UPDATE 1,059 列 / 152 次、活動列表 456 列 / 279 次、sweep 369 列 / 66 次。
 
-Workers 請求數 wrangler 查不到(要 Cloudflare analytics API 或 dashboard)—— 待作者從 dashboard 抄。
+## 1b. Workers(Cloudflare dashboard → event-signup → 指標,過去 24 小時,作者 2026-09-27 截圖抄錄)
+
+| | 免費額度 | 用掉 | 佔比 |
+|---|---:|---:|---:|
+| 請求(執行次數) | 100,000 / 日 | 530 | 0.53% |
+| 錯誤 | — | 0 | — |
+| CPU 時間 | 每次 10 ms 上限 | 中位數 2.96 ms(現行版本 `2d20da2b`) | — |
+| 峰值 | — | 0.2 req/sec | — |
+
+530 次分散在 6 個部署版本(`2d20da2b` 352、`7ef21e84` 117、`90b1f82d` 35、`db410ffa` 17、`c5001901` 5、`b46cfb9f` 4)。
+wrangler 查不到 Workers 請求數(要 analytics API 的 token 或 dashboard),所以這張是作者從 dashboard 抄的。
 
 ## 2. 「我的票券」:一次 JOIN vs N+1(`n-plus-1.mjs`,遠端 D1 實跑)
 
