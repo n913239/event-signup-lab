@@ -1,10 +1,11 @@
 import { Hono } from 'hono'
-import { notImplemented } from './_stub.js'
 import { requireMember, requireStaff, requireOwner } from './_auth.js'
 import * as validate from '../domain/validate.js'
 import * as events from '../lib/db/events.js'
 import * as ticketTypes from '../lib/db/ticket-types.js'
 import * as present from '../presentation/events.js'
+import { canHold } from '../domain/time-rules.js'
+import * as holds from '../lib/db/holds.js'
 
 export const events_ = new Hono()
 export { events_ as events }
@@ -74,4 +75,20 @@ events_.post('/:id/ticket-types', requireOwner, async (c) => {   // 僅主辦:�
   return c.json(t, 201)
 })
 
-events_.post('/:id/holds', notImplemented)   // 選位 + 保留,seat_nos 全有全無(T033)
+// 選位 + 保留:seat_nos 全有全無;名額在這一刻扣(作者定)
+events_.post('/:id/holds', async (c) => {
+  const v = validate.hold(await body(c))
+  if (!v.ok) return err(c, 400, v.error)
+  const now = c.get('now')
+  const me = c.get('member').id
+  const e = await events.findById(c.env.DB, c.req.param('id'), now)
+  if (!e || (e.status === 'draft' && e.owner_id !== me)) return err(c, 404, 'not_found')
+  if (!canHold(e, now).ok) return err(c, 409, 'not_on_sale')   // status 與時間兩個真相來源,契約只有一個代碼
+  const tt = await ticketTypes.findById(c.env.DB, v.value.ticket_type_id)
+  if (!tt || tt.event_id !== e.id) return err(c, 404, 'not_found')
+  const r = await holds.createHold(c.env.DB, {
+    eventId: e.id, memberId: me, ticketTypeId: tt.id, seatNos: v.value.seat_nos, ttlMinutes: e.hold_ttl_minutes,
+  }, now)
+  if (r.error) return err(c, 409, r.error)
+  return c.json({ ...r.hold, server_now: now }, 201)
+})
