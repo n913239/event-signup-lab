@@ -88,6 +88,11 @@ describe('hold', () => {
     expect(hold({ ticket_type_id: '1', seat_nos: ['A0'] })).toEqual(BAD)
   })
   it('缺 ticket_type_id', () => expect(hold({ seat_nos: ['A1'] })).toEqual(BAD))
+  it('H1 一次最多 10 席:10 過、11 擋', () => {
+    const seats = (n) => Array.from({ length: n }, (_, i) => `A${i + 1}`).slice(0, 10).concat(n > 10 ? ['B1'] : [])
+    expect(hold({ ticket_type_id: '1', seat_nos: seats(10) }).ok).toBe(true)
+    expect(hold({ ticket_type_id: '1', seat_nos: seats(11) })).toEqual(BAD)
+  })
 })
 
 describe('promoCode', () => {

@@ -69,7 +69,7 @@ export function ticketTypePatch(b) {
 export function hold(b) {
   if (!isObj(b) || !str(b.ticket_type_id, 1, 64)) return BAD
   const seats = b.seat_nos
-  if (!Array.isArray(seats) || seats.length === 0 || seats.length > 100) return BAD
+  if (!Array.isArray(seats) || seats.length === 0 || seats.length > 10) return BAD   // H1:一次最多 10 席
   if (!seats.every((s) => typeof s === 'string' && SEAT.test(s))) return BAD
   if (new Set(seats).size !== seats.length) return BAD
   return ok({ ticket_type_id: b.ticket_type_id, seat_nos: [...seats] })
