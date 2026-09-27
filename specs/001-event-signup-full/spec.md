@@ -41,9 +41,11 @@
 - Q: access / refresh 效期? → A: access token 15 分鐘、refresh token 30 天。(C16)
 - Q: refresh 重放偵測後的處置範圍? → A: 撤銷該成員全部 refresh token,強制重新登入。(C17)
 - Q: 「JWT 七項邊界」內容不在 repo 內,是否納入驗收? → A: 納入驗收,但內容刻意放在 repo 外(實驗設計);spec 只寫「七項,由外部驗收清單裁定」,不展開。(C18)
+  - **2026-09-27 作者改定:外部清單不再作為驗收** —— 由 repo 內 `tests/jwt.test.js` 六個測試 + `scripts/check-jwt-timing.sh` 裁定(T037 結案)。
 - Q: hold 10 分鐘「預設」可否覆寫? → A: 可由活動設定 `hold_ttl_minutes`,預設 10,範圍 5–30。(C19)
 - Q: 活動列表不帶篩選時是否含 `draft`;成員能否看到 `draft`? → A: 列表預設不含 `draft`;成員看不到 `draft`;主辦看得到自己的 `draft`。(C20)
 - Q: 票券 QR 內容? → A: 訂單 id + HMAC 簽章的短字串,不含任何個資;查驗端用同一把 key 驗。(C21)
+  - 查驗端不在本專案範圍(非目標 13):本專案只**簽**不**驗**;日後寫查驗端 MUST 用 `crypto.subtle.verify`(硬規則 IV)。
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -71,9 +73,12 @@
 3. **Given** 票種 T 剩餘名額 1,**When** 成員送出 hold 帶票種 T 與兩個空座位,**Then** 4xx(票種名額是第二道上限)。
 4. **Given** 成員在此活動已有一個有效 hold,**When** 再送一次 hold,**Then** 4xx。
 5. **Given** 有效 hold,**When** 本人在到期前確認(不帶優惠碼),**Then** 建立訂單,
-   金額 = 確認當下各座票價小計 → 套早鳥 % → 套團體 %(整數分),明細存價格快照。
-6. **Given** 有效 hold 與對此活動有效的優惠碼,**When** 本人確認並帶該碼,**Then** 金額於百分比之後再減優惠碼面額一次。
-7. **Given** 優惠碼過期、不適用此活動、或本人在此活動已用過,**When** 確認帶該碼,**Then** 4xx,不建訂單、不靜默忽略。
+   金額 = 確認當下各座票價小計,早鳥 % 與團體 % **擇一**套用(讓應付最低的那個;平手早鳥優先),整數分;明細存價格快照。
+   例:小計 100000、早鳥 10、團體 10 → 90000(不是疊加的 81000)。(2026-09-27 回寫:作者改定,見 docs/spec.md)
+6. **Given** 有效 hold 與對此活動有效的優惠碼,**When** 本人確認並帶該碼,**Then** 優惠碼與早鳥、團體三者擇優,
+   只套一種;平手依序 優惠碼 → 早鳥 → 團體。沒被選中的碼不算用掉(FR-052/053)。(2026-09-27 回寫:作者改定,見 docs/spec.md)
+7. **Given** 優惠碼過期、不適用此活動、或本人在此活動已用過,**When** 確認帶該碼,
+   **Then** 若它本來會被選中、或沒有別的折扣可套 → 409,不建訂單;別的折扣一樣好或更好 → 忽略碼,照擇優結果建單(FR-056)。(2026-09-27 回寫:作者改定,見 docs/spec.md)
 8. **Given** hold 建立後主辦改了票價,**When** 本人確認,**Then** 以新價計算(hold 不鎖價)。
 9. **Given** hold 已過到期時間,**When** 本人確認,**Then** 4xx,且座位已釋放。
 10. **Given** hold 已過到期時間,**When** 另一成員對同一座位送出 hold,
@@ -86,7 +91,7 @@
 15. **Given** 活動 `status` 仍為 `on_sale` 但時間已過 `deadline_at`,**When** 建 hold,**Then** 4xx。
 16. **Given** 時間尚未到 `opens_at`,**When** 建 hold,**Then** 4xx。
 17. **Given** 有效 hold,**When** 本人主動放棄,**Then** 座位釋放。
-18. **Given** 有效 hold,**When** 非本人放棄或確認,**Then** 被拒。
+18. **Given** 有效 hold,**When** 非本人放棄或確認,**Then** 404(不透露 hold 是否存在)。
 
 ---
 
@@ -134,7 +139,7 @@ refresh 會輪替且舊 refresh 立刻失效;重放舊 refresh 會撤銷該成�
 5. **Given** 已被輪替掉的舊 refresh,**When** 再拿來 refresh,**Then** 被拒,且該成員所有 refresh token 一併撤銷,必須重新登入。
 6. **Given** 已登入成員,**When** logout,**Then** 當前 refresh 被撤銷,再用 → 被拒。
 7. **Given** 任何 endpoint,**When** 嘗試設定或改角色,**Then** 不存在這樣的 endpoint。
-8. **Given** JWT 七項邊界的外部驗收清單,**When** 逐項執行,**Then** 七項全過(清單內容在 repo 外,由該清單裁定)。
+8. **Given** repo 內 `tests/jwt.test.js` 六個測試與 `scripts/check-jwt-timing.sh`,**When** 執行,**Then** 全過。(2026-09-27 回寫:作者改定,見 docs/spec.md)
 
 ---
 
@@ -156,7 +161,7 @@ iOS 做登入、活動列表(唯讀)、票券列表 / 明細三個畫面,client 
 1. **Given** 成員有 N 張票,**When** 開「我的票券」,**Then** web 與 iOS 都列出同樣的 N 筆、同樣的欄位值。
 1b. **Given** 有 M 場 `on_sale` 活動,**When** 開「活動列表」,**Then** web 與 iOS 都列出同樣的 M 場、同樣的欄位值;iOS 點進活動只看座位圖狀態,不能選位。
 2. **Given** 成員開自己的訂單明細,**Then** 看得到金額快照與 QR。
-3. **Given** 主辦開該活動任一訂單明細,**Then** 看得到;**Given** 非本人非主辦,**Then** 被拒。
+3. **Given** 主辦開該活動任一訂單明細,**Then** 看得到;**Given** 非本人非主辦,**Then** 404(不透露訂單是否存在)。
 4. **Given** iOS 曾成功載入,**When** 離線再開,**Then** 顯示快取的**票券**;活動列表需要連線;任何寫入操作要求連線。
 5. **Given** web 活動頁,**When** 成員點選座位並送出,**Then** 進入保留倒數畫面,倒數歸零前可確認。
 6. **Given** 一張票的 QR,**When** 用同一把 key 驗簽章,**Then** 得到訂單 id;QR 內容不含 email、暱稱或任何個資。
@@ -175,7 +180,7 @@ iOS 做登入、活動列表(唯讀)、票券列表 / 明細三個畫面,client 
 
 1. **Given** 本人的 `confirmed` 訂單,**When** 取消,**Then** 狀態變 `cancelled`,其座位釋放、可被他人 hold。
 2. **Given** `cancelled` 訂單,**When** 轉任何狀態,**Then** 4xx。
-3. **Given** 非本人,**When** 取消,**Then** 被拒。
+3. **Given** 非本人,**When** 取消,**Then** 404(不透露訂單是否存在)。
 4. **Given** `checked_in` 訂單,**When** 取消,**Then** 4xx。
 
 ---
@@ -197,7 +202,7 @@ iOS 做登入、活動列表(唯讀)、票券列表 / 明細三個畫面,client 
 - 改票價後,既有確認訂單金額不變;尚未確認的 hold 在確認時以新價計。
 - 提前截止只擋新 hold,既有有效 hold 仍可在到期前確認。
 - 票種名額改到小於已售出 → 4xx;新增票種使名額總和 > 100 → 4xx。
-- 優惠碼不適用(活動不符、過期、本人此活動已用過)→ 4xx,不靜默忽略。
+- 優惠碼不適用(活動不符、過期、本人此活動已用過):它本來會被選中、或沒有別的折扣時 → 409;別的折扣一樣好或更好時忽略碼(FR-056)。(2026-09-27 回寫:作者改定,見 docs/spec.md)
 - `hold_ttl_minutes` 超出 5–30 → 4xx。
 - 活動 `finished` 只由排程或 SQL 進入;`draft` 只由 SQL 進出;訂單 `checked_in` 只由 SQL 標記 —— 三者都沒有 endpoint。
 - refresh 重放:被拒之外,該成員全部 refresh 失效。
@@ -213,17 +218,16 @@ iOS 做登入、活動列表(唯讀)、票券列表 / 明細三個畫面,client 
 - **FR-003**: 系統 MUST 提供 refresh:每次輪替發新的一組,舊 refresh 立刻失效;重放舊 refresh MUST 被偵測、拒絕,並撤銷該成員全部 refresh token(強制重新登入)。
 - **FR-004**: 系統 MUST 提供 logout,撤銷當前 refresh;不帶 `refresh_token` → 400。
 - **FR-008**: 登入 MUST 在連續失敗 5 次後鎖定 5 → 10 → 20 → 40 → 60 分鐘(上限 1 小時),成功歸零;鎖定中一律 401 `unauthorized`,不透露、不累計(L1)。(2026-09-27 回寫:作者改定,見 docs/spec.md)
-- **FR-038**: 系統 MUST 提供 `POST /holds/:id/quote` 試算:回原價、套用的折扣、應付、`promo_status`(none / applied / not_better / invalid);不建訂單、不用掉碼;與確認共用同一套算法。(2026-09-27 回寫:作者改定,見 docs/spec.md)
 - **FR-005**: refresh token MUST 以雜湊儲存,不存原值;MUST 記錄所屬成員、到期時間、撤銷時間。
 - **FR-006**: 角色(`member` | `staff`)MUST 只能用 SQL 改;系統 MUST NOT 提供任何設定角色的 endpoint。
-- **FR-007**: 簽章驗證 MUST 是常數時間比對(硬規則 IV)。「JWT 七項邊界」MUST 納入驗收;七項內容刻意放在 repo 外,由外部驗收清單裁定,本 spec 不展開。
+- **FR-007**: 簽章驗證 MUST 是常數時間比對(硬規則 IV)。JWT 邊界由 repo 內 `tests/jwt.test.js` 六個測試 + `scripts/check-jwt-timing.sh` 裁定。(2026-09-27 回寫:作者改定,見 docs/spec.md)
 
 #### 活動(5 條 endpoint)
 
 - **FR-010**: staff MUST 能建立活動:名稱、開賣時間、截止時間、`group_min_qty`(預設 4)、`group_pct`(預設 10)、`hold_ttl_minutes`(預設 10,範圍 5–30);座位固定 10×10 共 100 席 = 活動總容量,不做無座位活動;建立後狀態直接為 `on_sale`,建立者記為主辦(`owner_id`)。
 - **FR-011**: 成員 MUST 能列出活動,可用 `?status=on_sale` 篩選;預設不含 `draft`;一般成員看不到 `draft`,主辦看得到自己的 `draft`。
 - **FR-012**: 成員 MUST 能讀單一活動:含票種、剩餘名額、座位狀態。
-- **FR-013**: 僅主辦 MUST 能改活動名額與時間;名額改到小於已售出 → 4xx。
+- **FR-013**: 僅主辦 MUST 能改活動時間與各票種名額 —— 都透過 `PATCH /events/:id`(名額帶在 `ticket_types[].capacity`;活動本身固定 100 席,沒有獨立名額)。名額改到小於已售出 → 409 `capacity_below_sold`;改完總和 > 100 → 409 `capacity_exceeded`;任一項不合法整個 PATCH 不寫入(全有全無)。(2026-09-27 回寫:作者改定,見 docs/spec.md)
 - **FR-014**: 僅主辦 MUST 能手動提前截止,活動狀態轉 `closed`;只擋新 hold,既有有效 hold 仍可在到期前確認。
 - **FR-015**: 活動狀態機 MUST 為 `draft → on_sale → closed → finished`;`draft` 只由 SQL 進出;`finished` 只由排程或 SQL 進入;**不做活動 `cancelled` 狀態**。
 - **FR-016**: 「主辦」MUST 定義為建立該活動的 staff;其他 staff 對別人的活動 MUST 一律 403。
@@ -272,6 +276,7 @@ iOS 做登入、活動列表(唯讀)、票券列表 / 明細三個畫面,client 
 - **FR-056**: 優惠碼 MUST 有:`code`、折扣值(整數分)、`valid_until`、`event_id`(可為 NULL = 全站);
   同一個碼可多人用,每人每活動 MUST 只能用一次(只算有效訂單,取消後可再用,M2);有效期看確認時間(M4)。
   無效(不適用該活動、過期、已用過、不存在)時:它本來會嚴格更便宜、或沒有別的折扣 → 409;別的折扣一樣好或更好 → 忽略碼,訂單照樣成立。(2026-09-27 回寫:作者改定,見 docs/spec.md)
+- **FR-057**: 系統 MUST 提供 `POST /holds/:id/quote` 試算:回原價、套用的折扣、應付、`promo_status`(none / applied / not_better / invalid);不建訂單、不用掉碼;與確認共用同一套算法。(原編號 FR-038 與座位保護重複,2026-09-27 改號)(2026-09-27 回寫:作者改定,見 docs/spec.md)
 
 #### web 前端(Cloudflare Pages)
 
@@ -322,10 +327,11 @@ iOS 做登入、活動列表(唯讀)、票券列表 / 明細三個畫面,client 
 - **SC-006**: 非主辦(含其他 staff)對活動 / 票種的每一條寫入操作都被拒(測試證明越權被拒)。
 - **SC-007**: web 與 iOS 對「活動列表」與「我的票券」各自同一個 GET 顯示同一份資料(逐欄相同);以 `curl` 為第三方基準。
 - **SC-008**: 「我的票券」一次載入的資料庫讀取次數有量測並記錄。
-- **SC-009**: 舊 refresh 重放被拒且該成員全部 refresh 失效;logout 後的 refresh 被拒;JWT 七項邊界外部清單全過。
+- **SC-009**: 舊 refresh 重放被拒且該成員全部 refresh 失效;logout 後的 refresh 被拒;`tests/jwt.test.js` 六個測試與 `check-jwt-timing.sh` 全過。(2026-09-27 回寫:作者改定,見 docs/spec.md)
 - **SC-010**: 五支靜態檢查(`check-money` / `check-time-injection` / `check-concurrency` /
   `check-jwt-timing` / `check-price-snapshot`)在完整實作上全部綠燈,`self-test.sh` 全過。
 - **SC-011**: 優惠碼無效且它本來會被選中、或沒有別的折扣時 409;別的折扣一樣好或更好時忽略碼;同一人同一活動有效訂單已用過同一碼 → 視同無效。(2026-09-27 回寫:作者改定,見 docs/spec.md)
+- **SC-012**: 登入連續失敗 5 次後鎖定,鎖定時間 5 → 10 → 20 → 40 → 60 分鐘,成功歸零;鎖定中一律 401 `unauthorized`(L1,`tests/routes/login-lockout.test.js`)。(2026-09-27 回寫:作者改定,見 docs/spec.md)
 
 ## 範圍邊界(非目標,不可協商)
 

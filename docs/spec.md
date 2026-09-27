@@ -97,7 +97,7 @@
 | 座位不重複 | 併發搶同一座位,只有一個成功 |
 | 提前截止不影響既有 hold | `closed` 後,截止前建立的 hold 在 `expires_at` 前 confirm → 201 |
 
-JWT 七項邊界:納入驗收,清單在 repo 外(實驗設計),由該清單裁定,此處不展開。
+JWT 邊界:由 repo 內 `tests/jwt.test.js` 六個測試 + `scripts/check-jwt-timing.sh` 裁定(2026-09-27 作者改定;原本的「七項清單放 repo 外」不再作為驗收)。
 
 > ⚠️ 第二、三條最容易漏:`status` 與 `opens_at`/`deadline_at` 是**兩個真相來源**,
 > 兩個都要檢查,而且**每個邊界的測試分開寫**。

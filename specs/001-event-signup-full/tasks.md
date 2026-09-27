@@ -50,8 +50,8 @@ repo 根:`src/`(API)、`tests/`、`scripts/`、`web/`(Pages)、`ios/EventSignup/
 - [x] T011b 📅9/19 🖐 乾淨 session(空目錄 + brief:「在 Cloudflare Workers 上實作 JWT 登入,要有 refresh token」,不給 CLAUDE.md / 規則 IV / 測試)出 `src/lib/jwt.js` 與 auth 路由 → 原文存 `devlog/raw/exp-05-jwt/` → 放進 repo 跑六個測試 + `check-jwt-timing.sh` → 七項逐一記結果(Day 24 的表)。access 15 分 / refresh 30 天 / 重放撤全部(C16、C17)是驗收標準,不是給它的提示
 - [x] T012 📅9/19 `src/lib/db/members.js`(`create`、`findByEmail`、`findById`)與 `src/lib/db/refresh-tokens.js`(`insert`、`rotate(db, hash, now)` 一個 batch:`UPDATE … SET revoked_at = ? WHERE token_hash = ? AND revoked_at IS NULL AND expires_at > ?` + `INSERT`,回 `changes`;`revokeAllForMember`、`revoke`);每個函式吃 `(db, params, now)`
 - [x] T013 📅9/19 `src/routes/_auth.js`:`requireMember`(Bearer → `verify(token, key, c.get('now'))` → `c.set('member')`;失敗 401 `unauthorized`)、`requireStaff`(403 `forbidden`)、`requireOwner(loadEvent)`(`event.owner_id !== member.id` → 403;活動不存在 → 404)
-- [x] T014 [P] 📅9/19 先寫 `tests/domain/validate.test.js` → 實作 `src/domain/validate.js`,規則照 `data-model.md`「驗證規則」表逐條:email 有 `@`、≤ 254、小寫;password ≥ 8;nickname 1–50;name 1–100;時間欄整數毫秒且 `opens_at < deadline_at`;`price_cents` 整數 ≥ 0;`capacity` 整數 ≥ 0;`group_min_qty ≥ 2`;pct 0–100;`hold_ttl_minutes` 5–30;`seat_nos` 非空、去重後長度不變、每個符合 `^[A-J](10|[1-9])$`、≤ 100;`promo_code` 1–32 存大寫。錯誤一律回 `{ error: 'invalid_input' }`
-- [x] T015 [P] 📅9/20 先寫 `tests/domain/states.test.js` → 實作 `src/domain/states.js`:活動 `draft→on_sale→closed→finished`(無 cancelled)、hold/訂單 `holding→confirmed→checked_in`、`holding→expired|cancelled`、`confirmed→cancelled`、`checked_in`/`cancelled`/`expired` 終態;`canTransition(kind, from, to)` 純函式
+- [x] T014 [P] 📅9/19 先寫 `tests/domain/validate.test.js` → 實作 `src/domain/validate.js`,規則照 `data-model.md`「驗證規則」表逐條:email 有 `@`、≤ 254、小寫;password ≥ 8;nickname 1–50;name 1–100;時間欄整數毫秒且 `opens_at < deadline_at`;`price_cents` 整數 ≥ 0;`capacity` 整數 ≥ 0;`group_min_qty ≥ 2`;pct 0–100;`hold_ttl_minutes` 5–30;`seat_nos` 非空、去重後長度不變、每個符合 `^[A-J](10|[1-9])$`、≤ 100;`promo_code` 1–32 存大寫。錯誤一律回 `{ error: 'invalid_input' }` **〔2026-09-27 更正:`seat_nos` 上限改為 ≤ 10(H1),程式碼 `validate.js` 已是 10〕**
+- [x] T015 [P] 📅9/20 先寫 `tests/domain/states.test.js` → 實作 `src/domain/states.js`:活動 `draft→on_sale→closed→finished`(無 cancelled)、hold/訂單 `holding→confirmed→checked_in`、`holding→expired|cancelled`、`confirmed→cancelled`、`checked_in`/`cancelled`/`expired` 終態;`canTransition(kind, from, to)` 純函式 **〔2026-09-27 更正:hold 與訂單拆成兩台狀態機(FR-043):hold `holding→confirmed|expired|cancelled`、`confirmed→cancelled`;訂單 `confirmed→checked_in|cancelled`〕**
 - [x] T016 [P] 📅9/20 `tests/helpers/auth.js`:`register(app, env, {email, nickname})`、`login(app, env, {email})` 回 `{ access, refresh }`、`makeStaff(db, memberId)` 直接 `UPDATE members SET role='staff'`(角色只能 SQL 改,測試也一樣)
 - [x] T017 📅9/20 `src/app.js` 掛 `hono/cors`(`origin: env.CORS_ORIGIN`、`allowHeaders: ['authorization','content-type']`、`exposeHeaders: ['x-server-now']`);實作 `POST /auth/register`(400 / 409 `email_taken` / 201 `Member`)與 `POST /auth/login`(401 / 200 `TokenPair`,access 15 分鐘 `exp`,refresh 30 天存 hash)於 `src/routes/auth.js`;對應 `tests/routes/auth.test.js` 先紅後綠;從 `tests/app.test.js` 的 501 清單移除這兩條
 
@@ -69,7 +69,7 @@ repo 根:`src/`(API)、`tests/`、`scripts/`、`web/`(Pages)、`ios/EventSignup/
 
 ### 金額引擎(實驗二)
 
-- [x] T018 📅9/24 🖐 [US1] **作者手寫 `src/domain/money.js`,AI 不得先出版本**。介面照 `research.md` R4:`applyPct(cents, pct)` = `Math.floor((cents * (100 - pct) + 50) / 100)`;`quote({ unit_price_cents, qty, early_bird_pct, group_min_qty, group_pct, promo_cents })` → `{ subtotal_cents, after_early_bird_cents, after_group_cents, promo_cents, total_cents }`,先乘後減、整筆小計不逐座、`total_cents` 下限 0。**先寫紅的 `tests/domain/money.test.js`**:向量 100000/10/10/10000 → 71000;反向探針 72900、70000 不得出現;33333×3 早鳥 10 → 89999;5000 − 6000 → 0;`qty < group_min_qty` 不套團體。`npm run check:money` 綠。commit「AI 尚未介入」
+- [x] T018 📅9/24 🖐 [US1] **作者手寫 `src/domain/money.js`,AI 不得先出版本**。介面照 `research.md` R4:`applyPct(cents, pct)` = `Math.floor((cents * (100 - pct) + 50) / 100)`;`quote({ unit_price_cents, qty, early_bird_pct, group_min_qty, group_pct, promo_cents })` → `{ subtotal_cents, after_early_bird_cents, after_group_cents, promo_cents, total_cents }`,先乘後減、整筆小計不逐座、`total_cents` 下限 0。**先寫紅的 `tests/domain/money.test.js`**:向量 100000/10/10/10000 → 71000;反向探針 72900、70000 不得出現;33333×3 早鳥 10 → 89999;5000 − 6000 → 0;`qty < group_min_qty` 不套團體。`npm run check:money` 綠。commit「AI 尚未介入」 **〔2026-09-27 更正:折扣改為擇優、不疊加,71000 向量與「先乘後減」已被 T072 / SC-003(90000)取代;程式由寫作 session 寫、作者定規則〕**
 - [x] T019 📅9/25 🖐 [US1] 乾淨 session 出 AI 版金額引擎(prompt 只給折扣三層與順序,不給硬規則)→ `devlog/raw/exp-02-money/` → 用同一份 `tests/domain/money.test.js` 與 `check-money.sh` 量 → 差異寫 devlog,另外 commit
 
 ### 時間判定(實驗三)
@@ -79,15 +79,15 @@ repo 根:`src/`(API)、`tests/`、`scripts/`、`web/`(Pages)、`ios/EventSignup/
 
 ### 併發(實驗四)—— 測試先於機制
 
-- [x] T022 📅9/28 [US1] 先寫 `tests/concurrency.test.js`(此時全紅):用 `tests/helpers/gate.js` 的 `runConcurrently`,(a) SC-001 名額 M = 3、N = 8 個成員各 hold 1 座不同座位並 confirm → 成功數 = 3、成功 + 失敗 = 8;(b) SC-002 N = 8 搶 `A1` → 恰一個 201,其餘 409 `seat_taken`;(c) SC-004 三方競態:hold 到期瞬間 `clock.set(expires_at)`,原持有人 confirm、他人 hold 同座、`sweepExpired` 三者閘門同放 → 斷言結果集合,並在檔頭註解「哪個贏是 T030 的決定,此測試只釘住每次一樣」;(d) 多座全有全無:`["A1","A2"]` 其中 `A2` 已被佔 → 409 且 `A1` 未留下;(e) 票種名額不足 → 409 `sold_out` 且座位未留下。CI 的 `hashFiles` 條件會自動啟用「重跑 5 次」
+- [x] T022 📅9/28 [US1] 先寫 `tests/concurrency.test.js`(此時全紅):用 `tests/helpers/gate.js` 的 `runConcurrently`,(a) SC-001 名額 M = 3、N = 8 個成員各 hold 1 座不同座位並 confirm → 成功數 = 3、成功 + 失敗 = 8;(b) SC-002 N = 8 搶 `A1` → 恰一個 201,其餘 409 `seat_taken`;(c) SC-004 三方競態:hold 到期瞬間 `clock.set(expires_at)`,原持有人 confirm、他人 hold 同座、`sweepExpired` 三者閘門同放 → 斷言結果集合,並在檔頭註解「哪個贏是 T030 的決定,此測試只釘住每次一樣」;(d) 多座全有全無:`["A1","A2"]` 其中 `A2` 已被佔 → 409 且 `A1` 未留下;(e) 票種名額不足 → 409 `sold_out` 且座位未留下。CI 的 `hashFiles` 條件會自動啟用「重跑 5 次」 **〔2026-09-27 更正:(c) 「哪個贏由 T030 決定」已被 SC-004 取代:到期那一刻原持有人一律輸(T077 補斷言)〕**
 - [x] T023 [P] 📅9/28 [US1] 先寫 `tests/routes/holds.test.js`(紅):`closed` → 409 `not_on_sale`;只推時間過 `deadline_at` → 409;未到 `opens_at` → 409;已有有效 hold → 409 `hold_exists`;非本人 DELETE / confirm → 404;過期後 confirm → 409 `hold_expired` 且座位可被他人 hold;主動放棄 → 204 且座位釋放;`hold_ttl_minutes` 生效(`expires_at = now + ttl`);回應帶 `server_now`
-- [x] T030 📅9/29 🖐 [US1] **作者手寫 `src/lib/db/holds.js`,AI 不得先出版本**。`createHold(db, { eventId, memberId, ticketTypeId, seatNos, ttlMinutes }, now)`:一個 `db.batch()`,第一句翻過期(`UPDATE seat_holds SET status='expired' WHERE event_id=? AND seat_no IN (…) AND status='holding' AND expires_at <= ?`),然後名額與座位裁決 —— **⚠️1 的三個候選(R6 a/b/c)在這裡選,plan 沒選**;裸 `INSERT` 靠部分唯一索引拋錯回滾;`SQLITE_CONSTRAINT` 映射到 409 `seat_taken` / `hold_exists` / `sold_out`。`releaseHold(db, {holdId, memberId}, now)`:`UPDATE … WHERE hold_id=? AND member_id=? AND status='holding'` 看 `changes`。`sweepExpired(db, now)`:一句 `UPDATE … WHERE status='holding' AND expires_at <= ?` 回 `changes`。驗收:T022 (b)(c)(d)(e) + T023 綠,`for i in 1 2 3 4 5; do npm run test:race; done` 一致;`npm run check:race` 綠。commit「AI 尚未介入」
+- [x] T030 📅9/29 🖐 [US1] **作者手寫 `src/lib/db/holds.js`,AI 不得先出版本**。`createHold(db, { eventId, memberId, ticketTypeId, seatNos, ttlMinutes }, now)`:一個 `db.batch()`,第一句翻過期(`UPDATE seat_holds SET status='expired' WHERE event_id=? AND seat_no IN (…) AND status='holding' AND expires_at <= ?`),然後名額與座位裁決 —— **⚠️1 的三個候選(R6 a/b/c)在這裡選,plan 沒選**;裸 `INSERT` 靠部分唯一索引拋錯回滾;`SQLITE_CONSTRAINT` 映射到 409 `seat_taken` / `hold_exists` / `sold_out`。`releaseHold(db, {holdId, memberId}, now)`:`UPDATE … WHERE hold_id=? AND member_id=? AND status='holding'` 看 `changes`。`sweepExpired(db, now)`:一句 `UPDATE … WHERE status='holding' AND expires_at <= ?` 回 `changes`。驗收:T022 (b)(c)(d)(e) + T023 綠,`for i in 1 2 3 4 5; do npm run test:race; done` 一致;`npm run check:race` 綠。commit「AI 尚未介入」 **〔2026-09-27 更正:sweep 與放棄都要把名額還給票種(H4),`holds.js` 已照做,T078 補測試;程式由寫作 session 寫、作者定規則〕**
 - [x] T031 📅9/30 🖐 [US1] 乾淨 session 出 AI 版 `holds.js`(prompt 只給行為契約 FR-030–035,不給 R6、不給「WHERE 裡」)→ `devlog/raw/exp-04-concurrency/` → 同一份 `concurrency.test.js` 重跑 5 次量 → devlog,另外 commit
 
 ### hold 與確認 endpoint
 
-- [x] T032 📅10/1 [US1] `src/lib/db/ticket-types.js` 補 `findById`、`src/lib/db/promo-codes.js`(`findByCode`、`usedBy(db, {memberId, eventId, code})`)、`src/lib/db/orders.js` 的 `insertConfirmed(db, { hold, quote, items, promoCode }, now)`:一個 batch —— `UPDATE seat_holds SET status='confirmed' WHERE hold_id=? AND member_id=? AND status='holding' AND expires_at > ?`(看 `changes`,0 → 409 `hold_expired`)+ `INSERT orders`(所有 `*_cents` 一次寫入,之後**永不 UPDATE**)+ N 個 `INSERT order_items(unit_price_cents 快照)`;`npm run check:snapshot` 綠
-- [x] T033 📅10/1 [US1] 實作 `POST /events/:id/holds`、`DELETE /holds/:id`、`POST /holds/:id/confirm` 於 `src/routes/holds.js` 與 `src/routes/events.js`:confirm 流程 = 讀 hold(非本人 → 404)→ **只查 `isHoldExpired`,不再查活動狀態**(C13 推論)→ 讀票種現價(C10)→ `isEarlyBird` → `quote()` → 優惠碼(`valid_until`、`event_id` 相符或 NULL、未用過,否則 409 `promo_rejected`)→ `insertConfirmed` → 201 `Order`(含 `qr_payload`,T045 之前先回空字串並在契約測試標 todo);T022、T023 全綠;從 `tests/app.test.js` 501 清單移除三條
+- [x] T032 📅10/1 [US1] `src/lib/db/ticket-types.js` 補 `findById`、`src/lib/db/promo-codes.js`(`findByCode`、`usedBy(db, {memberId, eventId, code})`)、`src/lib/db/orders.js` 的 `insertConfirmed(db, { hold, quote, items, promoCode }, now)`:一個 batch —— `UPDATE seat_holds SET status='confirmed' WHERE hold_id=? AND member_id=? AND status='holding' AND expires_at > ?`(看 `changes`,0 → 409 `hold_expired`)+ `INSERT orders`(所有 `*_cents` 一次寫入,之後**永不 UPDATE**)+ N 個 `INSERT order_items(unit_price_cents 快照)`;`npm run check:snapshot` 綠 **〔2026-09-27 更正:`changes` 不足時先重讀 hold:已 confirmed → 200 回同一張訂單(H7),否則 409 `hold_expired`(T080)〕**
+- [x] T033 📅10/1 [US1] 實作 `POST /events/:id/holds`、`DELETE /holds/:id`、`POST /holds/:id/confirm` 於 `src/routes/holds.js` 與 `src/routes/events.js`:confirm 流程 = 讀 hold(非本人 → 404)→ **只查 `isHoldExpired`,不再查活動狀態**(C13 推論)→ 讀票種現價(C10)→ `isEarlyBird` → `quote()` → 優惠碼(`valid_until`、`event_id` 相符或 NULL、未用過,否則 409 `promo_rejected`)→ `insertConfirmed` → 201 `Order`(含 `qr_payload`,T045 之前先回空字串並在契約測試標 todo);T022、T023 全綠;從 `tests/app.test.js` 501 清單移除三條 **〔2026-09-27 更正:早鳥看**建 hold 的時間**(M1),不是確認時間;優惠碼改為擇優 + FR-056 條件式 409(T073)〕**
 - [x] T034 📅10/1 [US1] `src/worker.js` 的 `scheduled()` 接 `ctx.waitUntil(sweepExpired(env.DB, Date.now()))`,`console.log` 清掉幾筆(給 `wrangler tail`);`tests/worker.test.js` 用 `clock` 推過期後呼叫一次,斷言 `changes`
 
 **Checkpoint**: MVP —— seed 活動上能 hold → confirm → 讀回訂單;`test:race` 5 次一致;五支裁判綠。
@@ -141,7 +141,7 @@ repo 根:`src/`(API)、`tests/`、`scripts/`、`web/`(Pages)、`ios/EventSignup/
 
 - [x] T041 📅10/4 [US4] 建 `web/`:`npm create vite@latest web -- --template vanilla`、Tailwind v4 + daisyUI v5(`@import "tailwindcss"; @plugin "daisyui";`)、`vite.config.js` 的 `server.proxy['/api'] → http://127.0.0.1:8788`(rewrite 去掉 `/api`);`web/src/api.js`(bearer、401 自動 refresh 一次、讀 `x-server-now` 更新 `serverNow`);`web/src/lib/money.js`(**web 唯一分 → 元**);`web/src/lib/countdown.js`(以 `server_now` 校正的倒數)
 - [x] T042 📅10/4 [US4] `web/src/pages/login.js`(登入 / 註冊表單,token 存 memory + `localStorage.refresh`)與 `web/src/pages/events.js`(列表,`?status=on_sale` 切換,daisyUI card)
-- [x] T043 📅10/5 [US4] `web/src/pages/event.js`:10×10 座位格(`seats[]` 的 `free/held/sold/mine` 四色,daisyUI btn)、票種選單、多選 → `POST /events/:id/holds`;409 各代碼顯示原始 `error` 字串(錯誤訊息不友善是刻意的)
+- [x] T043 📅10/5 [US4] `web/src/pages/event.js`:10×10 座位格(`seats[]` 的 `free/held/sold/mine` 四色,daisyUI btn)、票種選單、多選 → `POST /events/:id/holds`;409 各代碼顯示原始 `error` 字串(錯誤訊息不友善是刻意的) **〔2026-09-27 更正:409 改由 web 端翻成中文顯示(FR-081 作者改定,API 仍只回代碼)〕**
 - [x] T044 📅10/5 [US4] `web/src/pages/hold.js`:倒數(`countdown.js`)、優惠碼輸入、確認 → `POST /holds/:id/confirm`、放棄 → `DELETE`;倒數歸零改顯示已過期並回活動頁
 - [x] T045 📅10/6 [US4] `web/src/pages/tickets.js`:`GET /orders` 列表 + 明細,`qrcode` npm 套件畫 `qr_payload`,金額經 `lib/money.js`;取消按鈕(US5 的 T050 之後接上)
 - [x] T046 📅10/6 [US4] `scripts/check-money.sh` 掃描範圍加 `web/src`、排除 `web/src/lib/money.js`;`scripts/self-test.sh` 加兩筆探針(web 裡裸 `/100` 要紅、`lib/money.js` 裡不誤報);`sh scripts/self-test.sh` 全綠
@@ -163,7 +163,7 @@ repo 根:`src/`(API)、`tests/`、`scripts/`、`web/`(Pages)、`ios/EventSignup/
 
 **Independent Test**: `tests/routes/orders.test.js` 的取消段:取消 → 同座位他人 hold 201 → 再取消 → 409。
 
-- [x] T050 📅10/2 [US5] `tests/routes/orders.test.js` 補(紅):取消 → 200 `status=cancelled`、`total_cents` 不變(只改 status);同座位他人 hold → 201;再取消 → 409 `terminal_state`;SQL 把訂單改 `checked_in` 後取消 → 409;非本人 → 404 → 實作 `src/lib/db/orders.js` 的 `cancel(db, {orderId, memberId}, now)`:一個 batch —— `UPDATE orders SET status='cancelled' WHERE id=? AND member_id=? AND status='confirmed'`(看 `changes`)+ `UPDATE seat_holds SET status='cancelled' WHERE hold_id=? AND status='confirmed'`;**不碰任何 `*_cents`**;`POST /orders/:id/cancel` 於 `src/routes/orders.js`;501 清單清空(17/17 移除);`npm run check:snapshot` 綠
+- [x] T050 📅10/2 [US5] `tests/routes/orders.test.js` 補(紅):取消 → 200 `status=cancelled`、`total_cents` 不變(只改 status);同座位他人 hold → 201;再取消 → 409 `terminal_state`;SQL 把訂單改 `checked_in` 後取消 → 409;非本人 → 404 → 實作 `src/lib/db/orders.js` 的 `cancel(db, {orderId, memberId}, now)`:一個 batch —— `UPDATE orders SET status='cancelled' WHERE id=? AND member_id=? AND status='confirmed'`(看 `changes`)+ `UPDATE seat_holds SET status='cancelled' WHERE hold_id=? AND status='confirmed'`;**不碰任何 `*_cents`**;`POST /orders/:id/cancel` 於 `src/routes/orders.js`;501 清單清空(17/17 移除);`npm run check:snapshot` 綠 **〔2026-09-27 更正:取消時也要把名額還給票種(H4),`orders.js` 的 cancel batch 已照做〕**
 
 **Checkpoint**: 17 條 endpoint 全部脫離 501;`npm run test:contract` 綠。(2026-09-27 達成,同日加第 18 條試算)
 
@@ -171,12 +171,12 @@ repo 根:`src/`(API)、`tests/`、`scripts/`、`web/`(Pages)、`ios/EventSignup/
 
 ## Phase 8: Polish & Cross-Cutting(10/3、10/10–10/13)
 
-- [ ] T051 📅10/3 `scripts/smoke.sh` 填實:照 `quickstart.md` 第 3 節的 curl 流程(註冊 → 登入 → 建活動 → 票種 → 4 座 hold → 帶 `WELCOME` 確認 → 斷言 `total_cents = 314000` → 改價 → 重讀不變 → 取消 → 重 hold A1 → 201);`npm run smoke` 對 `wrangler dev`
+- [ ] T051 📅10/3 `scripts/smoke.sh` 填實:照 `quickstart.md` 第 3 節的 curl 流程(註冊 → 登入 → 建活動 → 票種 → 4 座 hold → 帶 `WELCOME` 確認 → 斷言 `total_cents = 360000` 且 `promo_code = null`(擇優選早鳥,WELCOME 沒被用掉;2026-09-27 更正,原本寫 314000) → 改價 → 重讀不變 → 取消 → 重 hold A1 → 201);`npm run smoke` 對 `wrangler dev`
 - [x] T052 📅10/3 部署(2026-09-27 完成:D1 建立與建表、secret、deploy、/health 200;遠端不跑 seed):`wrangler d1 create signup` 換掉 `wrangler.toml` 的 placeholder id、`wrangler secret put JWT_SECRET / QR_SECRET`、`wrangler d1 execute signup --remote --file=schema.sql`、`wrangler deploy`;`BASE_URL=<worker> npm run smoke`
 - [ ] T053 📅10/3 `scripts/race.sh` 填實:對遠端 Worker 用 `xargs -P 20 curl` 打同一座位 20 次與同票種名額 + 5 次,統計 201 / 409 數量,寫 `devlog/raw/race-<date>.txt`;結果進 `docs/verified.md` ✅「真實併發」
 - [x] T054 [P] 📅10/10 Pages 部署:`web/` 連 Pages 專案、`VITE_API_BASE` 指向 Worker、Worker 的 `CORS_ORIGIN` 改成 Pages 網域;線上走一遍五畫面
 - [ ] T055 [P] 📅10/10 SC-007 / SC-008 實測:同帳號 web、iOS、curl 三份 `GET /events` 與三份 `GET /orders` 各自逐欄 diff;`rows_read` 數字;寫進 `docs/verified.md` ✅ 欄(有輸出可貼的才進)
-- [ ] T056 📅10/11 `docs/verified.md` 全面對帳:❌ 欄逐項移到 ✅ 或留著(JWT 七項若外部清單沒跑,留著);「已知的坑」補這 30 天踩到的
+- [ ] T056 📅10/11 `docs/verified.md` 全面對帳:❌ 欄逐項移到 ✅ 或留著(JWT 由 repo 內六個測試 + `check-jwt-timing.sh` 裁定,2026-09-27 改定;外部清單不再是驗收);「已知的坑」補這 30 天踩到的
 - [ ] T057 [P] 📅10/11 CLAUDE.md 與 `.specify/memory/constitution.md` 規則 V 的註記改為「另一半由 `tests/schema.test.js` ⑥ 裁判」(research.md 末段);`/speckit-constitution` 走 PATCH 版本
 - [ ] T058 [P] 📅10/12 `README.md`「現在的狀態」改寫:尺與被量的東西都有了;指令表補 `web`、`ios`、`race`
 - [ ] T059 📅10/12 CI 帳本:從 `.github/workflows/ci.yml` 的 job summary 數「量了幾次、擋下幾次」,寫 `devlog/LEDGER`(Day 30 素材)
@@ -271,3 +271,13 @@ US2 只是讓主辦不用下 SQL;US3 的 refresh 是安全性;US4 / US5 是兩�
 - [x] T074 [US1] `POST /holds/:id/quote` 試算(第 18 條)+ web 保留頁「套用」按鈕;`tests/routes/quote.test.js`
 - [x] T075 [US3] 登入失敗鎖定 L1:members 加 `failed_logins` / `locked_until`;`tests/routes/login-lockout.test.js` 7 個
 - [x] T076 [US3] logout 不帶 refresh_token → 400;`tests/routes/auth.test.js`(T035)
+
+## 追加:/speckit-converge(回寫後那一輪)抓到的,2026-09-27
+
+原文見 `devlog/raw/exp-speckit-rerun/a-converge-tasks.diff`。先寫紅測試(`906cc4c`)再修。
+
+- [x] T077 [US1] SC-004 補斷言:到期那一刻原持有人的 confirm → 409 `hold_expired`,A1 不屬於原持有人(`tests/concurrency.test.js`)
+- [x] T078 [US1] `tests/worker.test.js`:sweep 翻 `expired`、列不刪、名額還回票種(H4);`worker.scheduled()` 走 `ctx.waitUntil`
+- [x] T079 smoke 的金額斷言改 360000 + `promo_code = null` —— 已併進 T051 的描述
+- [x] T080 [US1] H7 併發版:同一 hold 兩個 confirm 同時到 → `[200, 201]` 同一張訂單。實測修之前輸的一方是 **500**(撞 `orders.hold_id` 唯一索引),不是 converge 說的 409;修法是訂單 INSERT 條件改 `WHERE changes() = 座位數`,輸的一方重讀 hold
+- [x] T081 [US2] `PATCH /events/:id` 全有全無:先驗全部票種名額,再把活動欄位與名額放進同一個 `db.batch`(`tests/routes/events.test.js`)

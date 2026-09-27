@@ -11,7 +11,7 @@
 
 18 條 endpoint(2026-09-27 加試算 `POST /holds/:id/quote`)的活動報名 API(Workers + Hono + D1)、一份 OpenAPI 契約、一個 Pages 前端(五個畫面)、
 一個 SwiftUI 骨架(三個畫面)。核心是售票規則:限量名額、多座 hold 全有全無、保留逾時三方競態、
-先乘後減的整數折扣、確認後金額快照。技術上的關鍵限制只有一個:**D1 沒有 `SELECT … FOR UPDATE`**,
+擇優不疊加的整數折扣(2026-09-27 作者改定)、確認後金額快照。技術上的關鍵限制只有一個:**D1 沒有 `SELECT … FOR UPDATE`**,
 併發只能靠條件式寫入 + `changes` + `CHECK`,而 `db.batch()` 只在**拋錯**時回滾,`changes = 0` 不回滾。
 
 **這份 plan 有兩種區域**(`docs/EXPERIMENT-PROTOCOL.md`,順序不可逆):
@@ -53,8 +53,8 @@
 |---|---|
 | API 內外全部用 `*_cents` 整數;OpenAPI 所有金額欄 `type: integer` | ✅ 契約已如此寫(`contracts/openapi.yaml`) |
 | 折扣公式 `floor((cents × (100 − pct) + 50) / 100)` 是裁判認可的唯一 `/100` 寫法 | ✅ 引擎屬作者手寫區,plan 只規定簽章與範例(`research.md` R4) |
-| 顯示轉換只在 `src/presentation/` | ✅ API 側成立 |
-| **web 前端的分 → 元** | ⚠️ `web/` 不在 `check-money.sh` 掃描範圍(它只掃 `src/`)。設計:web 的金額顯示集中在**一個檔** `web/src/lib/money.js`,並**擴大 `check-money.sh` 掃 `web/src`、排除該檔**;裁判改了要補 `self-test.sh` 探針。iOS 同理,但 Swift 不在任何裁判範圍 —— 只能靠 code review,記在 `docs/verified.md` ❌ 欄 |
+| 顯示轉換只在三個允許的位置 | ✅ API `src/presentation/`、web `web/src/lib/money.js`、iOS `Tickets/Money.swift`,三處都在 `check-money.sh` 範圍內(2026-09-27) |
+| **web 前端的分 → 元** | ⚠️ `web/` 不在 `check-money.sh` 掃描範圍(它只掃 `src/`)。設計:web 的金額顯示集中在**一個檔** `web/src/lib/money.js`,並**擴大 `check-money.sh` 掃 `web/src`、排除該檔**;裁判改了要補 `self-test.sh` 探針。iOS 同理 —— 2026-09-27 起 `check-money.sh` 也掃 `ios/`,Swift 只准在 `Tickets/Money.swift` 做換算 |
 
 ### II. 時間是參數,不是副作用 —— 裁判 `scripts/check-time-injection.sh`
 
@@ -115,7 +115,7 @@ specs/001-event-signup-full/
 ├── data-model.md        # Phase 1:實體、不變條件、狀態轉換 —— 不含 DDL
 ├── quickstart.md        # Phase 1:端到端驗證流程
 ├── contracts/
-│   └── openapi.yaml     # Phase 1:17 條 + /health 的契約草案(實作時搬到 repo 根)
+│   └── openapi.yaml     # Phase 1:17 條 + /health 的契約草案(實作時搬到 repo 根;2026-09-27 加 quote 成 18 條,以 repo 根為準)
 └── tasks.md             # Phase 2(/speckit-tasks)
 ```
 
@@ -191,18 +191,19 @@ scripts/                     # 已有;要動的:
 |---|---|---|---|
 | 0 | 作者回寫 `docs/spec.md`(`spec-writeback.md`) | 作者 | commit「作者決定」 |
 | 1 | `openapi.yaml` 到 repo 根 + `tests/contract.test.js` 骨架(全部 501 也要對得上 error schema) | 本 session | 契約先行的 commit |
-| 2 | **schema.sql** 作者手寫 → `npm run test:schema` 8/8 → 無菌室 AI 版 → 比對 | 作者 → 乾淨 session | Day 22 |
+| 2 | **schema.sql** 作者起稿、寫作 session 補三處、作者審 → `npm run test:schema` 8/8 → 無菌室 AI 版 → 比對 | 作者起稿 + 本 session → 乾淨 session | Day 22 |
 | 3 | JWT + password + refresh 輪替 + `_auth.js` + 4 條 auth endpoint | 本 session | Day 24 |
-| 4 | **金額引擎** `domain/money.js` 作者手寫 → 無菌室版 → 比對 | 作者 | Day 25 |
-| 5 | **時間判定** `domain/time-rules.js` 作者手寫 → 無菌室版 | 作者 | Day 26 |
+| 4 | **金額引擎** `domain/money.js` 作者定規則 → 本 session 寫 → 無菌室版 → 比對 | 作者定規則 + 本 session | Day 25 |
+| 5 | **時間判定** `domain/time-rules.js` 作者定規則 → 本 session 寫 → 無菌室版 | 作者定規則 + 本 session | Day 26 |
 | 6 | 活動 5 條 + 票種 2 條 endpoint(接 3、5 的產物) | 本 session | |
-| 7 | **併發** `lib/db/holds.js`(createHold / confirm / sweep)作者手寫 → `concurrency.test.js` 重跑 5 次 → 無菌室版 | 作者 | Day 27 |
+| 7 | **併發** `lib/db/holds.js`(createHold / confirm / sweep)作者定規則(16 條)→ 本 session 寫 → `concurrency.test.js` 重跑 5 次 → 無菌室版 | 作者定規則 + 本 session | Day 27 |
 | 8 | hold 3 條 + 訂單 3 條 endpoint;`smoke.sh`、`race.sh` 填實 | 本 session | |
 | 9 | web 五畫面 | 本 session | Day 28 |
 | 10 | iOS 三畫面 + OpenAPI client;SC-007 三端比對(`GET /events`、`GET /orders`)、SC-008 讀取次數 | 本 session | Day 29 |
 | 11 | `docs/verified.md` 更新;CI 帳本 | 本 session | Day 30 |
 
-> 步 2、4、5、7 的「AI 版」**不能由本 session 產**(它看過考題)。tasks.md 裡這幾項要標「作者手寫」。
+> 步 2、4、5、7 的「AI 版」**不能由本 session 產**(它看過考題)。
+> 2026-09-27 分工改定:作者只定規則與商業邏輯,程式由本 session 寫、作者審;「無菌室版」仍由乾淨 session 產,比對的是「看過規則的 session」與「只拿到一句話的 session」。
 
 ## Complexity Tracking
 
