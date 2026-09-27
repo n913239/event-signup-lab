@@ -44,7 +44,7 @@ for f in $FILES; do
   # 'UPDATE failed for ' 這種也會中(2026-09-10 實測)
   if printf '%s' "$SRC" | tr '\n' ' ' | sed 's/UPDATE[[:space:]]/\
 &/g' | grep -qE '^UPDATE[[:space:]]+[A-Za-z_"[].*[Ss][Ee][Tt]' &&
-     ! printf '%s' "$SRC" | grep -qE '\.changes[^A-Za-z_]|\{[^}]*\bchanges\b[^}]*\}[[:space:]]*='; then
+     ! printf '%s' "$SRC" | grep -qE '\.changes([^A-Za-z_]|$)|\{[^}]*\bchanges\b[^}]*\}[[:space:]]*='; then
     echo "❌ $f:有 UPDATE 卻沒有檢查 changes"
     echo "   條件式寫入要看 res.meta.changes,0 列被改代表沒搶到"
     RC=1

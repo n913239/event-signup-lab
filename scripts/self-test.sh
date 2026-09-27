@@ -89,6 +89,10 @@ export const v = (k,s,d) => crypto.subtle.verify('HMAC', k, s, d)"
 allow "註解提到 Date.now"   check-time-injection.sh "// don't call Date.now() here — now comes in as a parameter
 export const ok = (e, now) => now < e.deadline_at"
 allow "new Date(now) 帶參數" check-time-injection.sh "export const at = (now) => new Date(now).toISOString()"
+allow "行尾的 return r.meta.changes(2026-09-27)" check-concurrency.sh "export const f = async (db) => {
+  const r = await db.prepare('UPDATE t SET x = 1 WHERE id = 1').run()
+  return r.meta.changes
+}"
 allow "規格認可的整數百分比"  check-money.sh "export const p = (c, pct) => Math.floor((c * (100 - pct) + 50) / 100)"
 check "浮點乘法 c * 0.9"    check-money.sh "export const p = (c) => Math.round(c * 0.9)"
 check "schema NUMERIC 型別" check-money.sh "total_cents NUMERIC" "src/domain/__probe.sql"
