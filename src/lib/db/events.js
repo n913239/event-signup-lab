@@ -77,3 +77,14 @@ export async function findActiveHold(db, eventId, memberId, now) {
   const h = r.results[0]
   return { id: h.hold_id, event_id: eventId, ticket_type_id: h.ticket_type_id, seat_nos: r.results.map((x) => x.seat_no), status: 'holding', expires_at: h.expires_at }
 }
+
+// 排程:過了 deadline_at + hold_ttl_minutes 的活動轉 finished(Q24,作者 2026-09-27 定)。
+// 狀態機沒有 on_sale → finished,所以先把 on_sale 的 close,再把 closed 的 finish,同一個 batch。回轉成 finished 的數量。
+export async function finishPastDeadline(db, now) {
+  const past = 'deadline_at + hold_ttl_minutes * 60000 <= ?'
+  const [, finish] = await db.batch([
+    db.prepare(`UPDATE events SET status = 'closed' WHERE status = 'on_sale' AND ${past}`).bind(now),
+    db.prepare(`UPDATE events SET status = 'finished' WHERE status = 'closed' AND ${past}`).bind(now),
+  ])
+  return finish.meta.changes
+}
