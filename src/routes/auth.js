@@ -73,8 +73,7 @@ auth.post('/refresh', async (c) => {
 
 auth.post('/logout', requireMember, async (c) => {
   const b = await body(c)
-  if (typeof b?.refresh_token === 'string') {
-    await refreshTokens.revoke(c.env.DB, await sha256Hex(b.refresh_token), c.get('now'))
-  }
+  if (typeof b?.refresh_token !== 'string' || b.refresh_token === '') return err(c, 400, 'invalid_input')   // 契約:requestBody required
+  await refreshTokens.revoke(c.env.DB, await sha256Hex(b.refresh_token), c.get('now'))
   return c.body(null, 204)
 })

@@ -117,6 +117,7 @@ paths:
                 refresh_token: { type: string }
       responses:
         '204': { description: 已撤銷 }
+        '400': { $ref: '#/components/responses/BadRequest' }
         '401': { $ref: '#/components/responses/Unauthorized' }
 
   # ── 活動(5)─────────────────────────────────────────────
