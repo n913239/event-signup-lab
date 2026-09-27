@@ -1,9 +1,5 @@
-71000    ours=71000 ai=71000 promo ours=10000 ai=10000
+71000    ours=90000 ai=71000 promo ours=10000 ai=10000
 89999    ours=89999 ai=89999 promo ours=0 ai=0
 promo > 應付 ours=0 ai=0 promo ours=5000 ai=5000
 未達團體門檻   ours=300000 ai=300000 promo ours=0 ai=0
-fuzz 20000 組:不同 12 組,最大差 1 {"o":{"unit_price_cents":24345,"qty":7,"early_bird_pct":0,"group_min_qty":4,"group_pct":10,"promo_cents":12000},"ours":141374,"ai":141373}
-
-
-❌ 金額路徑出現裸的 /100 —— 顯示轉換應放 src/presentation/;
-   整數百分比要寫成 Math.floor((cents * pct + 50) / 100)
+fuzz 20000 組:不同 3938 組,最大差 309061 {"o":{"unit_price_cents":223008,"qty":9,"early_bird_pct":25,"group_min_qty":4,"group_pct":20,"promo_cents":8000},"ours":1505304,"ai":1196243}
