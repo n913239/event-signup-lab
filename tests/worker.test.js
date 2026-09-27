@@ -39,8 +39,37 @@ describe.skipIf(!existsSync('schema.sql'))('排程清掃', () => {
     const waits = []
     await worker.scheduled({}, w.env, { waitUntil: (p) => waits.push(p) })
     await Promise.all(waits)
-    expect(waits).toHaveLength(1)
+    expect(waits).toHaveLength(2)   // 清 hold + 結束活動(Q24)
     const rows = (await w.db.prepare('SELECT status FROM seat_holds').all()).results
     expect(rows.every((r) => r.status === 'expired')).toBe(true)   // 真實時鐘遠晚於 T0,早就過期
+    expect((await w.db.prepare('SELECT status FROM events WHERE id = ?').bind(ev.id).first()).status).toBe('finished')
+  })
+})
+
+// Q24(作者 2026-09-27 定):過了截止時間由排程轉 finished。
+// 時間點 = deadline_at + hold_ttl_minutes:截止前一刻建的保留還能確認完,轉了也不影響確認(確認不看活動狀態,C13)。
+// 狀態機沒有 on_sale → finished,所以 on_sale 的先 close 再 finish(同一個 batch)。
+describe.skipIf(!existsSync('schema.sql'))('排程結束活動(Q24)', () => {
+  let staff
+  const status = async (id) => (await w.db.prepare('SELECT status FROM events WHERE id = ?').bind(id).first()).status
+  beforeEach(async () => {
+    w = await world()
+    staff = await userWith(w.app, w.env, w.db, 's@example.com', { staff: true })
+  })
+  afterEach(() => w.dispose())
+
+  it('截止 + 保留時長之前不動;到了 on_sale 與 closed 都轉 finished;draft 不動', async () => {
+    const { finishPastDeadline } = await import('../src/lib/db/events.js')
+    const a = await (await w.call('/events', jsonReq('POST', { name: 'a', opens_at: T0 - DAY, deadline_at: T0 + DAY }, staff.access))).json()
+    const b = await (await w.call('/events', jsonReq('POST', { name: 'b', opens_at: T0 - DAY, deadline_at: T0 + DAY }, staff.access))).json()
+    await w.db.prepare("UPDATE events SET status = 'closed' WHERE id = ?").bind(b.id).run()
+    const d = await (await w.call('/events', jsonReq('POST', { name: 'd', opens_at: T0 - DAY, deadline_at: T0 + DAY }, staff.access))).json()
+    await w.db.prepare("UPDATE events SET status = 'draft' WHERE id = ?").bind(d.id).run()
+    const end = T0 + DAY + 10 * MIN                                   // hold_ttl_minutes 預設 10
+    expect(await finishPastDeadline(w.db, end - 1)).toBe(0)
+    expect([await status(a.id), await status(b.id)]).toEqual(['on_sale', 'closed'])
+    expect(await finishPastDeadline(w.db, end)).toBe(2)
+    expect([await status(a.id), await status(b.id), await status(d.id)]).toEqual(['finished', 'finished', 'draft'])
+    expect(await finishPastDeadline(w.db, end + DAY)).toBe(0)         // 再跑一次不重複
   })
 })
