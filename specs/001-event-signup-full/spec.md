@@ -11,7 +11,7 @@
 > **來源與邊界。** 本文件的內容範圍等於 `docs/spec.md` + `docs/non-goals.md`,
 > 硬規則見 `.specify/memory/constitution.md`(照抄自 `CLAUDE.md`)。
 > 原文沒寫清楚的 21 處,由作者於 2026-09-14 決定(見 Clarifications),原則是「選市場上最常見的做法」。
-> 這 21 個決定**尚未回寫** `docs/spec.md`;回寫指引見 `spec-writeback.md`。回寫前,本 spec 與原文不一致處以本 spec 的 Clarifications 為準。
+> 這 21 個決定已於 2026-09-27 回寫 `docs/spec.md`(依 `spec-writeback.md`);以 `docs/spec.md` 為唯一真相來源。
 
 ## 一句話
 
