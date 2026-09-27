@@ -39,8 +39,16 @@ auth.post('/register', async (c) => {
 auth.post('/login', async (c) => {
   const v = validate.login(await body(c))
   if (!v.ok) return err(c, 400, v.error)
+  const now = c.get('now')
   const m = await members.findByEmail(c.env.DB, v.value.email)
-  if (!m || !(await verifyPassword(v.value.password, m.password_hash))) return err(c, 401, 'unauthorized')
+  if (!m) return err(c, 401, 'unauthorized')
+  // 鎖定中一律 401,不驗密碼、不透露被鎖了(作者定:錯 5 次開始鎖,5 → 60 分鐘)
+  if (m.locked_until != null && now < m.locked_until) return err(c, 401, 'unauthorized')
+  if (!(await verifyPassword(v.value.password, m.password_hash))) {
+    await members.recordLoginFailure(c.env.DB, m.id, now)
+    return err(c, 401, 'unauthorized')
+  }
+  if (m.failed_logins > 0) await members.clearLoginFailures(c.env.DB, m.id)
   return c.json(await issue(c, m), 200)
 })
 

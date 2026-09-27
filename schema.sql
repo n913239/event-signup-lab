@@ -10,7 +10,11 @@ CREATE TABLE members (
     CHECK (length(nickname) BETWEEN 1 AND 50),
   role TEXT NOT NULL DEFAULT 'member'
     CHECK (role IN ('member', 'staff')),
-  created_at INTEGER NOT NULL
+  created_at INTEGER NOT NULL,
+  -- 登入失敗鎖定(作者 2026-09-27 定):連續失敗次數與鎖到何時;成功登入歸零
+  failed_logins INTEGER NOT NULL DEFAULT 0
+    CHECK (failed_logins >= 0),
+  locked_until INTEGER
 ) STRICT;
 
 CREATE TABLE refresh_tokens (

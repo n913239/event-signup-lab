@@ -44,3 +44,6 @@ npm run check:all         # 五支靜態檢查
 - `docs/EXPERIMENT-PROTOCOL.md` —— schema 與四個實驗的順序**不可逆**
 - `docs/verified.md` —— ✅ 跑過的 / ❌ 沒跑過的,**❌ 欄不准寫成結果**
 - `docs/non-goals.md` —— 15 條不做的事
+
+
+> ⚠️ **`seed.sql` 只給本機開發用**:兩個帳號的密碼都是 `password123`。**永遠不要對遠端跑 `db:seed`**(`--remote`)—— 那等於把 staff 帳號公開。線上帳號自己註冊,staff 用 `wrangler d1 execute signup --remote --command "UPDATE members SET role='staff' WHERE email='…'"` 升級。
