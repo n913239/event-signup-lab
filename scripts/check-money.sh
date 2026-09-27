@@ -25,4 +25,13 @@ if ! scan "金額除法" "$DIV" src > /tmp/_div_hits 2>&1; then
   fi
 fi
 rm -f /tmp/_div_hits
-echo "✅ 金額路徑零浮點"
+
+# 2026-09-27(T046):web 端也要管。web 的分 → 元只准在 web/src/lib/money.js。
+export SCAN_EXCLUDE= SCAN_EXCLUDE_FILE=web/src/lib/money.js
+if ! scan "web 金額浮點" "$FLOAT" web/src; then
+  echo ""; echo "❌ web 出現浮點運算 —— 金額顯示一律經 web/src/lib/money.js"; exit 1
+fi
+if ! scan "web 金額除法" "$DIV" web/src; then
+  echo ""; echo "❌ web 出現裸的 /100 —— 分 → 元只准在 web/src/lib/money.js"; exit 1
+fi
+echo "✅ 金額路徑零浮點(src + web/src)"

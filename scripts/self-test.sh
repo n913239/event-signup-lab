@@ -8,8 +8,9 @@ cd "$(dirname "$0")/.."
 
 PROBE=src/domain/__self_test_probe.js
 PROBE_LIB=src/lib/__self_test_probe.js
+PROBE_WEB=web/src/__self_test_probe.js
 FAIL=0
-cleanup() { rm -f "$PROBE" "$PROBE_LIB"; rmdir src/lib 2>/dev/null || true; }
+cleanup() { rm -f "$PROBE" "$PROBE_LIB" "$PROBE_WEB"; rmdir src/lib 2>/dev/null || true; }
 trap cleanup EXIT
 
 # check <名稱> <腳本> <程式碼> [探針路徑]
@@ -91,10 +92,12 @@ allow "new Date(now) 帶參數" check-time-injection.sh "export const at = (now)
 allow "規格認可的整數百分比"  check-money.sh "export const p = (c, pct) => Math.floor((c * (100 - pct) + 50) / 100)"
 check "浮點乘法 c * 0.9"    check-money.sh "export const p = (c) => Math.round(c * 0.9)"
 check "schema NUMERIC 型別" check-money.sh "total_cents NUMERIC" "src/domain/__probe.sql"
+check "web 裸 /100(T046)"      check-money.sh "export const yuan = (c) => c / 100" "$PROBE_WEB"
+check "web toFixed(T046)"       check-money.sh "export const y = (c) => (c / 100).toFixed(2)" "$PROBE_WEB"
 
 echo ""
 echo "=== 乾淨狀態應全過 ==="
-sh scripts/check-money.sh          >/dev/null && echo "✅ 金額"
+sh scripts/check-money.sh          >/dev/null && echo "✅ 金額(含 web/src/lib/money.js 不誤報)"
 sh scripts/check-time-injection.sh >/dev/null && echo "✅ 時間"
 sh scripts/check-jwt-timing.sh     >/dev/null && echo "✅ 簽章"
 sh scripts/check-concurrency.sh    >/dev/null && echo "✅ 併發"

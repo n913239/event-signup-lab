@@ -45,6 +45,10 @@ scan() {
     if [ -n "${SCAN_EXCLUDE:-}" ]; then
       case "$_f" in */"$SCAN_EXCLUDE"/*) continue ;; esac
     fi
+    # SCAN_EXCLUDE_FILE:要跳過的單一檔案(路徑結尾比對)。2026-09-27 為了 web/src/lib/money.js 加的。
+    if [ -n "${SCAN_EXCLUDE_FILE:-}" ]; then
+      case "$_f" in *"$SCAN_EXCLUDE_FILE") continue ;; esac
+    fi
     if [ "${SCAN_ICASE:-}" = "1" ]; then
       _hit=$(strip_comments "$_f" | grep -inE "$_pattern" 2>&1)
     else
