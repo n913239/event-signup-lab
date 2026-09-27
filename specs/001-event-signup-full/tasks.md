@@ -27,7 +27,7 @@ repo 根:`src/`(API)、`tests/`、`scripts/`、`web/`(Pages)、`ios/EventSignup/
 
 **Purpose**: 回寫規格、契約先行、測試基礎設施補齊。全部是本 session 可做的(除了 T001 是作者)。
 
-- [ ] T001 📅9/14 🖐 作者回寫 `docs/spec.md`:依 `specs/001-event-signup-full/spec-writeback.md` 十一節逐條回寫(規格層決定表 7 → 14 列、活動狀態機拿掉 `cancelled`、折扣節補 C6–C10、前端新節);commit message 寫明「作者決定」
+- [x] T001 📅9/14 🖐 作者回寫 `docs/spec.md`:依 `specs/001-event-signup-full/spec-writeback.md` 十一節逐條回寫(規格層決定表 7 → 14 列、活動狀態機拿掉 `cancelled`、折扣節補 C6–C10、前端新節);commit message 寫明「作者決定」
 - [x] T002 📅9/15 把 `specs/001-event-signup-full/contracts/openapi.yaml` 複製到 repo 根 `openapi.yaml`,單獨一個 commit(契約先行的證據,要早於任何回 200 的 handler)
 - [x] T003 [P] 📅9/15 新增 `.dev.vars.example`(`JWT_SECRET=`、`QR_SECRET=`、`CORS_ORIGIN=http://localhost:5173`),`.gitignore` 已排除 `.dev.vars`;`wrangler.toml` 補 `[triggers] crons = ["*/5 * * * *"]` 與 `[vars] CORS_ORIGIN`
 - [x] T004 [P] 📅9/15 `package.json` devDependencies 加 `yaml`、`ajv`、`ajv-formats`;寫 `tests/contract.test.js`:讀 `openapi.yaml`,對 18 條 operation 各打一次 `app.request()`,驗回應 status 在契約列出的 codes 內、body 符合對應 schema —— **501 階段也要綠**(`not_implemented` 在 `Error.error` enum 裡)
@@ -46,7 +46,7 @@ repo 根:`src/`(API)、`tests/`、`scripts/`、`web/`(Pages)、`ios/EventSignup/
 - [ ] T008 📅9/17 🖐 開乾淨 session(不給 CLAUDE.md / 本 specs / EXPERIMENT-PROTOCOL)出 AI 版 schema → 存 `devlog/raw/exp-01-schema/`(prompt 逐字、輸出原文)→ `SCHEMA=devlog/raw/exp-01-schema/schema.sql npm run test:schema` → 差異寫進 devlog;另外 commit
 - [ ] T009 [P] 📅9/17 寫 `seed.sql`(R11):staff `staff@example.com` / member `member@example.com`(密碼 `password123`,雜湊由 T010 的 `lib/password.js` 先算好貼上)、1 個 `on_sale` 活動(`hold_ttl_minutes` 10、團體 4/10)、票種「一般」100000 分 × 60、「VIP」200000 分 × 40(早鳥 10%、7 天)、全站優惠碼 `WELCOME` 10000 分;`npm run db:init && npm run db:seed` 可重跑
 - [x] T010 [P] 📅9/18 先寫 `tests/lib/password.test.js`(雜湊格式 `pbkdf2$100000$<salt>$<hash>`、同密碼不同 salt、錯密碼 false)→ 實作 `src/lib/password.js`:`hash(pw)`、`verify(pw, stored)` 用 `crypto.subtle.deriveBits` PBKDF2-SHA256 100,000 次,比對用 `crypto.subtle.timingSafeEqual`
-- [ ] T011 📅9/18 🖐 **JWT 是第五個實驗(2026-09-14 加入 EXPERIMENT-PROTOCOL)**。作者手寫 `tests/jwt.test.js`:六個分開的 `it`(過期 / 簽章竄改 / alg none 或換演算法 / 重放 / 輪替後失效 / 格式異常回 401 不是 500)+ 第 7 項由 `scripts/check-jwt-timing.sh` 裁判;commit message 寫「AI 尚未介入」。**本 session 不寫測試也不寫實作。**
+- [ ] T011 📅9/18 ~~🖐~~ **(2026-09-27 改:寫作 session 起草、作者審)** **JWT 是第五個實驗(2026-09-14 加入 EXPERIMENT-PROTOCOL)**。作者手寫 `tests/jwt.test.js`:六個分開的 `it`(過期 / 簽章竄改 / alg none 或換演算法 / 重放 / 輪替後失效 / 格式異常回 401 不是 500)+ 第 7 項由 `scripts/check-jwt-timing.sh` 裁判;commit message 寫「AI 尚未介入」。**本 session 不寫測試也不寫實作。**
 - [ ] T011b 📅9/19 🖐 乾淨 session(空目錄 + brief:「在 Cloudflare Workers 上實作 JWT 登入,要有 refresh token」,不給 CLAUDE.md / 規則 IV / 測試)出 `src/lib/jwt.js` 與 auth 路由 → 原文存 `devlog/raw/exp-05-jwt/` → 放進 repo 跑六個測試 + `check-jwt-timing.sh` → 七項逐一記結果(Day 24 的表)。access 15 分 / refresh 30 天 / 重放撤全部(C16、C17)是驗收標準,不是給它的提示
 - [ ] T012 📅9/19 `src/lib/db/members.js`(`create`、`findByEmail`、`findById`)與 `src/lib/db/refresh-tokens.js`(`insert`、`rotate(db, hash, now)` 一個 batch:`UPDATE … SET revoked_at = ? WHERE token_hash = ? AND revoked_at IS NULL AND expires_at > ?` + `INSERT`,回 `changes`;`revokeAllForMember`、`revoke`);每個函式吃 `(db, params, now)`
 - [ ] T013 📅9/19 `src/routes/_auth.js`:`requireMember`(Bearer → `verify(token, key, c.get('now'))` → `c.set('member')`;失敗 401 `unauthorized`)、`requireStaff`(403 `forbidden`)、`requireOwner(loadEvent)`(`event.owner_id !== member.id` → 403;活動不存在 → 404)
@@ -74,7 +74,7 @@ repo 根:`src/`(API)、`tests/`、`scripts/`、`web/`(Pages)、`ios/EventSignup/
 
 ### 時間判定(實驗三)
 
-- [ ] T020 📅9/26 🖐 [US1] **作者手寫 `src/domain/time-rules.js`,AI 不得先出版本**。介面照 R5:`canHold(event, now)` → `{ ok, reason }`,`status !== 'on_sale'` 回 `not_on_sale`、`now < opens_at` 回 `not_open_yet`、`now >= deadline_at` 回 `deadline_passed`(**兩個真相來源分開回**);`isEarlyBird(ticketType, now)`(`early_bird_until` 為 null → false);`isHoldExpired(hold, now)`(`expires_at <= now`);`holdExpiresAt(now, ttlMinutes)`。**先寫紅的 `tests/domain/time-rules.test.js`**:每個邊界一條,含「剛好等於 `opens_at`」「剛好等於 `deadline_at`」「剛好等於 `expires_at`」。`npm run check:time` 綠。commit「AI 尚未介入」
+- [ ] T020 📅9/26 ~~🖐~~ [US1] **(2026-09-27 改:寫作 session 寫、作者審)** **作者手寫 `src/domain/time-rules.js`,AI 不得先出版本**。介面照 R5:`canHold(event, now)` → `{ ok, reason }`,`status !== 'on_sale'` 回 `not_on_sale`、`now < opens_at` 回 `not_open_yet`、`now >= deadline_at` 回 `deadline_passed`(**兩個真相來源分開回**);`isEarlyBird(ticketType, now)`(`early_bird_until` 為 null → false);`isHoldExpired(hold, now)`(`expires_at <= now`);`holdExpiresAt(now, ttlMinutes)`。**先寫紅的 `tests/domain/time-rules.test.js`**:每個邊界一條,含「剛好等於 `opens_at`」「剛好等於 `deadline_at`」「剛好等於 `expires_at`」。`npm run check:time` 綠。commit「AI 尚未介入」
 - [ ] T021 📅9/27 🖐 [US1] 乾淨 session 出 AI 版時間判定 → `devlog/raw/exp-03-time/` → 同一份測試量(預期它會自己 `Date.now()`,那正是 A3 實驗要抓的)→ devlog,另外 commit
 
 ### 併發(實驗四)—— 測試先於機制
