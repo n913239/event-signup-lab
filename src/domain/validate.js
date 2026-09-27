@@ -39,10 +39,16 @@ export function eventCreate(b) {
 // PATCH 只驗有給的欄位;opens_at < deadline_at 要跟現有值合併後才能判斷,由 route 再檢一次。
 export function eventPatch(b) {
   if (!isObj(b)) return BAD
-  const v = pick(b, ['name', 'opens_at', 'deadline_at', 'hold_ttl_minutes'])
-  if (Object.keys(v).length === 0) return BAD
+  const v = pick(b, ['name', 'opens_at', 'deadline_at', 'hold_ttl_minutes', 'group_min_qty', 'group_pct'])
   for (const [k, val] of Object.entries(v)) if (!EVENT_FIELDS[k](val)) return BAD
   if (v.opens_at !== undefined && v.deadline_at !== undefined && v.opens_at >= v.deadline_at) return BAD
+  if (b.ticket_types !== undefined) {
+    // 改名額:每項只能動 capacity(契約)
+    if (!Array.isArray(b.ticket_types) || b.ticket_types.length === 0) return BAD
+    if (!b.ticket_types.every((x) => isObj(x) && str(x.id, 1, 64) && int(x.capacity, 0, 100))) return BAD
+    v.ticket_types = b.ticket_types.map((x) => ({ id: x.id, capacity: x.capacity }))
+  }
+  if (Object.keys(v).length === 0) return BAD
   return ok(v)
 }
 

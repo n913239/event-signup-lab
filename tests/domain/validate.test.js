@@ -53,6 +53,12 @@ describe('eventCreate / eventPatch', () => {
     expect(eventPatch({})).toEqual(BAD)
     expect(eventPatch({ hold_ttl_minutes: 40 })).toEqual(BAD)
   })
+  it('patch 可改名額(每項只給 id + capacity)', () => {
+    expect(eventPatch({ ticket_types: [{ id: 't1', capacity: 30, price_cents: 1 }] }))
+      .toEqual({ ok: true, value: { ticket_types: [{ id: 't1', capacity: 30 }] } })
+    expect(eventPatch({ ticket_types: [] })).toEqual(BAD)
+    expect(eventPatch({ ticket_types: [{ id: 't1', capacity: -1 }] })).toEqual(BAD)
+  })
 })
 
 describe('ticketTypeCreate / ticketTypePatch', () => {
