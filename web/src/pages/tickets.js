@@ -4,6 +4,12 @@ import { formatCents } from '../lib/money.js'
 import { esc, errorBox, fmtTime } from './ui.js'
 
 // 我的票券:列表 + 明細(金額快照、QR)。金額一律經 lib/money.js。
+// 折扣不疊加、擇優:一張訂單只會有一種折扣,只顯示實際套用的那一種。
+const discountText = (o) =>
+  o.promo_code ? `優惠碼 ${esc(o.promo_code)} −${formatCents(o.promo_cents)}`
+  : o.early_bird_pct ? `早鳥 ${o.early_bird_pct}% off`
+  : o.group_pct ? `團體 ${o.group_pct}% off`
+  : '無折扣'
 export async function ticketsPage(el) {
   let orders
   try { ({ orders } = await api('GET', '/orders')) } catch (e) { el.innerHTML = errorBox(e); return }
@@ -12,7 +18,7 @@ export async function ticketsPage(el) {
     <div class="card bg-base-100 shadow mb-3"><div class="card-body">
       <h3 class="card-title">${esc(o.event_name)} <span class="badge">${esc(o.status)}</span></h3>
       <p class="text-sm">${o.items.map((i) => `${esc(i.seat_no)} ${esc(i.ticket_type_name)} ${formatCents(i.unit_price_cents)}`).join('、')}</p>
-      <p class="text-sm">小計 ${formatCents(o.subtotal_cents)}・早鳥 ${o.early_bird_pct}%・團體 ${o.group_pct}%${o.promo_code ? `・${esc(o.promo_code)} −${formatCents(o.promo_cents)}` : ''}</p>
+      <p class="text-sm">小計 ${formatCents(o.subtotal_cents)}・${discountText(o)}</p>
       <p class="font-bold">總計 ${formatCents(o.total_cents)}・確認於 ${fmtTime(o.confirmed_at)}</p>
       ${o.qr_payload ? `<canvas data-qr="${esc(o.qr_payload)}"></canvas>` : ''}
       ${o.status === 'confirmed' ? `<button data-cancel="${esc(o.id)}" class="btn btn-sm btn-error btn-outline w-fit">取消訂單</button>` : ''}
