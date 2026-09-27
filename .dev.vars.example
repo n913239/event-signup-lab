@@ -1,0 +1,4 @@
+# 本機開發用。複製成 .dev.vars(已被 .gitignore 排除)再填值;正式環境用 wrangler secret put。
+JWT_SECRET=
+QR_SECRET=
+CORS_ORIGIN=http://localhost:5173

@@ -6,3 +6,10 @@ compatibility_date = "2026-09-01"
 binding = "DB"
 database_name = "signup"
 database_id = "local-dev-placeholder"   # 手動:wrangler d1 create signup 之後換成真的 id
+
+# 每 5 分鐘清一次沒人來搶的過期 hold(worker.js 的 scheduled)
+[triggers]
+crons = ["*/5 * * * *"]
+
+[vars]
+CORS_ORIGIN = "http://localhost:5173"
