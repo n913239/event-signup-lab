@@ -1,0 +1,95 @@
+{
+ "duration_api_ms": 41192,
+ "stop_reason": "end_turn",
+ "total_cost_usd": 0.22807120000000003,
+ "usage": {
+  "input_tokens": 10,
+  "cache_creation_input_tokens": 16936,
+  "cache_read_input_tokens": 110916,
+  "output_tokens": 3518,
+  "output_tokens_details": {
+   "thinking_tokens": 789
+  },
+  "server_tool_use": {
+   "web_search_requests": 0,
+   "web_fetch_requests": 0
+  },
+  "service_tier": "standard",
+  "cache_creation": {
+   "ephemeral_1h_input_tokens": 16936,
+   "ephemeral_5m_input_tokens": 0
+  },
+  "inference_geo": "not_available",
+  "iterations": [
+   {
+    "input_tokens": 2,
+    "output_tokens": 851,
+    "cache_read_input_tokens": 26700,
+    "cache_creation_input_tokens": 354,
+    "cache_creation": {
+     "ephemeral_5m_input_tokens": 0,
+     "ephemeral_1h_input_tokens": 354
+    },
+    "type": "message"
+   }
+  ],
+  "speed": "standard"
+ },
+ "modelUsage": {
+  "claude-opus-5-5": {
+   "inputTokens": 10,
+   "outputTokens": 3518,
+   "cacheReadInputTokens": 110916,
+   "cacheCreationInputTokens": 16936,
+   "webSearchRequests": 0,
+   "costUSD": 0.22807120000000003,
+   "contextWindow": 1000000,
+   "maxOutputTokens": 128000,
+   "thinkingTokens": 789,
+   "canonicalModel": "claude-opus-5-5",
+   "provider": "firstParty",
+   "costBasis": "list"
+  }
+ },
+ "permission_denials": [],
+ "terminal_reason": "completed",
+ "fast_mode_state": "off",
+ "fast_mode_disabled_reason": "sdk_opt_in_required",
+ "subagent_stats": {
+  "spawned": 0,
+  "requested": {
+   "background": 0,
+   "foreground": 0,
+   "unset": 0
+  },
+  "started_in_background": 0,
+  "max_depth": 0,
+  "spawned_by_subagents": 0,
+  "completed": 0,
+  "failed": 0,
+  "killed": {
+   "parent": 0,
+   "user": 0,
+   "system": 0
+  },
+  "refused": {
+   "depth_limit": 0,
+   "concurrency_limit": 0,
+   "budget": 0
+  },
+  "by_type": {}
+ },
+ "is_error": false,
+ "num_turns": 5,
+ "subtype": "success",
+ "api_error_status": null,
+ "result": "我寫好了 `money.js`,裡面只有一個 `quote(input)`。沒有建測試檔,只用 node 手動跑了兩組數字,結果正確(見下表)。之後我改了一行錯誤訊息的寫法,這一行改完沒有再跑過。\n\n**回傳的欄位:** `subtotal`、`early_bird_discount`、`group_discount`、`group_applied`、`promo_discount`、`discount_total`、`total`\n\n**計算順序:**\n1. 小計 = 票價 × 張數\n2. 早鳥折扣:從小計打折\n3. 團體折扣:張數達到門檻才打,以扣掉早鳥之後的金額為基準\n4. 優惠碼:最後才扣。折抵超過剩餘金額時只扣到 0,應付金額不會是負數\n\n| 範例 | 結果 |\n|---|---|\n| 1000 元 × 10 張,早鳥 10%,滿 10 張團體 95 折,優惠碼 300 | 10000 − 1000 − 450 − 300 = **8250** |\n| 333 元 × 1 張,早鳥 15%,優惠碼 9999 | 早鳥扣 50,優惠碼只扣剩下的 283,**total = 0** |\n\n**幾個需要你確認的地方,規格沒寫,我先自己定了:**\n- **早鳥和團體折扣會疊加。** 目前是先打早鳥、再用剩下的金額打團體折扣。如果業務規則是「兩個只能用一個」或「擇優」,要改的是 `quote` 裡計算 `groupDiscount` 的那段。\n- **金額用整數元計算。** 每一筆折扣各自四捨五入到元,所以「小計 − 各項折扣」一定剛好等於 `total`。票價、優惠碼金額如果傳小數,會直接丟錯誤。\n- **不合法的輸入會直接丟錯誤,不會悄悄修正:** 張數小於 1 或不是整數、折扣百分比不在 0–100 之間、傳入負數、傳入非數字,都會丟 `TypeError` 或 `RangeError`。\n- 早鳥、團體、優惠碼這幾個欄位沒傳的話,都當成 0,也就是不套用。",
+ "ttft_ms": 4367,
+ "type": "result",
+ "duration_ms": 41784,
+ "ttft_stream_ms": 1714,
+ "time_to_request_ms": 78,
+ "first_content_frame_ms": 1714,
+ "queued_turn_count": 0,
+ "result_index": 0
+}
