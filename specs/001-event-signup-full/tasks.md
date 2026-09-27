@@ -70,7 +70,7 @@ repo 根:`src/`(API)、`tests/`、`scripts/`、`web/`(Pages)、`ios/EventSignup/
 ### 金額引擎(實驗二)
 
 - [x] T018 📅9/24 🖐 [US1] **作者手寫 `src/domain/money.js`,AI 不得先出版本**。介面照 `research.md` R4:`applyPct(cents, pct)` = `Math.floor((cents * (100 - pct) + 50) / 100)`;`quote({ unit_price_cents, qty, early_bird_pct, group_min_qty, group_pct, promo_cents })` → `{ subtotal_cents, after_early_bird_cents, after_group_cents, promo_cents, total_cents }`,先乘後減、整筆小計不逐座、`total_cents` 下限 0。**先寫紅的 `tests/domain/money.test.js`**:向量 100000/10/10/10000 → 71000;反向探針 72900、70000 不得出現;33333×3 早鳥 10 → 89999;5000 − 6000 → 0;`qty < group_min_qty` 不套團體。`npm run check:money` 綠。commit「AI 尚未介入」
-- [ ] T019 📅9/25 🖐 [US1] 乾淨 session 出 AI 版金額引擎(prompt 只給折扣三層與順序,不給硬規則)→ `devlog/raw/exp-02-money/` → 用同一份 `tests/domain/money.test.js` 與 `check-money.sh` 量 → 差異寫 devlog,另外 commit
+- [x] T019 📅9/25 🖐 [US1] 乾淨 session 出 AI 版金額引擎(prompt 只給折扣三層與順序,不給硬規則)→ `devlog/raw/exp-02-money/` → 用同一份 `tests/domain/money.test.js` 與 `check-money.sh` 量 → 差異寫 devlog,另外 commit
 
 ### 時間判定(實驗三)
 
