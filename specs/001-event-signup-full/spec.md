@@ -6,7 +6,7 @@
 
 **Status**: Draft
 
-**Input**: User description: "活動報名系統的完整功能,範圍以 docs/spec.md(17 條 endpoint、狀態機、七條「通用做法」決定、折扣順序)與 docs/non-goals.md 為準,一個字都不要擴張。這份 spec 要涵蓋後續十天要做完的全部:認證、活動與票種、保留/確認、訂單、web 前端(Cloudflare Pages)、iOS 骨架。原文沒寫清楚的地方用 [NEEDS CLARIFICATION] 標出來,不要自己決定;spec 用繁體中文。"
+**Input**: User description: "活動報名系統的完整功能,範圍以 docs/spec.md(17 條 endpoint —— 2026-09-27 加試算成 18 條、狀態機、七條「通用做法」決定、折扣順序)與 docs/non-goals.md 為準,一個字都不要擴張。這份 spec 要涵蓋後續十天要做完的全部:認證、活動與票種、保留/確認、訂單、web 前端(Cloudflare Pages)、iOS 骨架。原文沒寫清楚的地方用 [NEEDS CLARIFICATION] 標出來,不要自己決定;spec 用繁體中文。"
 
 > **來源與邊界。** 本文件的內容範圍等於 `docs/spec.md` + `docs/non-goals.md`,
 > 硬規則見 `.specify/memory/constitution.md`(照抄自 `CLAUDE.md`)。
@@ -29,7 +29,9 @@
 - Q: 團體折扣門檻與百分比? → A: 同一 hold ≥ 4 座打 10%;數值存在活動上(`group_min_qty`、`group_pct`),建活動時給,預設 4 / 10。(C6)
 - Q: 早鳥折扣百分比存哪、誰設? → A: 存在票種上(`ticket_types.early_bird_pct`),主辦建票種時設;`early_bird_until` 已有。(C7)
 - Q: 優惠碼在哪一步輸入;可否重複用;不適用時拒絕還是忽略? → A: 在確認那一步輸入(confirm 的 body);同一個碼可多人用,每人每活動一次;不適用或過期 → 4xx 拒絕,不靜默忽略。(C8)
+  - **2026-09-27 作者改定**:無效的碼只在「它本來會嚴格更便宜」或「沒有別的折扣」時 409;別的折扣一樣好或更好 → 忽略碼、訂單照樣成立。取消的訂單用過的碼可再用(M2)。
 - Q: 多座 hold 的折扣是逐座還是總價? → A: 以整筆小計計算:早鳥與團體百分比套在小計上(先乘後減),優惠碼減總額一次;不逐座。(C9)
+  - **2026-09-27 作者改定:折扣不疊加,擇優** —— 三種只套讓應付最低的一種,平手依序 優惠碼 → 早鳥 → 團體;仍以整筆小計計算、不逐座。
 - Q: 改票價後,未確認的 hold 在確認時用哪個價? → A: 確認當下的票價(hold 不鎖價);改價前建的 hold 確認時以新價計。(C10)
 - Q: 取消訂單後座位是否釋放? → A: 釋放、可再售。(C11)
 - Q: `checked_in` 能否取消? → A: 不可取消。(C12)
@@ -140,7 +142,7 @@ refresh 會輪替且舊 refresh 立刻失效;重放舊 refresh 會撤銷該成�
 
 成員在 web(Cloudflare Pages + daisyUI)與 iOS 骨架上看到自己的票券與歷史;兩個前端對同一個 GET 顯示同一份資料。
 web 另含登入/註冊、活動列表、活動頁(10×10 選位)、保留倒數與確認。
-iOS 做登入、活動列表(唯讀)、票券列表 / 明細三個畫面,client 由 OpenAPI 產生,不做選位;只做離線讀取快取,寫入一律要連線。
+iOS 做登入、活動列表(唯讀)、票券列表 / 明細三個畫面,client 由 OpenAPI 產生,不做選位;只做離線讀取快取(**票券**),寫入一律要連線。
 票券顯示 QR:訂單 id + HMAC 簽章的短字串,不含個資。
 
 **Why this priority**: 做完定義是「web 與 iOS 對同一個 GET 顯示同一份資料,且 D1 讀取次數有算過」。
@@ -155,7 +157,7 @@ iOS 做登入、活動列表(唯讀)、票券列表 / 明細三個畫面,client 
 1b. **Given** 有 M 場 `on_sale` 活動,**When** 開「活動列表」,**Then** web 與 iOS 都列出同樣的 M 場、同樣的欄位值;iOS 點進活動只看座位圖狀態,不能選位。
 2. **Given** 成員開自己的訂單明細,**Then** 看得到金額快照與 QR。
 3. **Given** 主辦開該活動任一訂單明細,**Then** 看得到;**Given** 非本人非主辦,**Then** 被拒。
-4. **Given** iOS 曾成功載入,**When** 離線再開,**Then** 顯示快取的讀取資料;任何寫入操作要求連線。
+4. **Given** iOS 曾成功載入,**When** 離線再開,**Then** 顯示快取的**票券**;活動列表需要連線;任何寫入操作要求連線。
 5. **Given** web 活動頁,**When** 成員點選座位並送出,**Then** 進入保留倒數畫面,倒數歸零前可確認。
 6. **Given** 一張票的 QR,**When** 用同一把 key 驗簽章,**Then** 得到訂單 id;QR 內容不含 email、暱稱或任何個資。
 
@@ -209,7 +211,9 @@ iOS 做登入、活動列表(唯讀)、票券列表 / 明細三個畫面,client 
 - **FR-001**: 系統 MUST 提供註冊:email(唯一、識別鍵)+ 密碼(≥ 8 字元)+ 暱稱;建立單一組織內的成員,預設角色 `member`;不做 email 驗證。
 - **FR-002**: 系統 MUST 提供登入,回傳 access token(效期 15 分鐘)與 refresh token(效期 30 天)。
 - **FR-003**: 系統 MUST 提供 refresh:每次輪替發新的一組,舊 refresh 立刻失效;重放舊 refresh MUST 被偵測、拒絕,並撤銷該成員全部 refresh token(強制重新登入)。
-- **FR-004**: 系統 MUST 提供 logout,撤銷當前 refresh。
+- **FR-004**: 系統 MUST 提供 logout,撤銷當前 refresh;不帶 `refresh_token` → 400。
+- **FR-008**: 登入 MUST 在連續失敗 5 次後鎖定 5 → 10 → 20 → 40 → 60 分鐘(上限 1 小時),成功歸零;鎖定中一律 401 `unauthorized`,不透露、不累計(L1)。(2026-09-27 回寫:作者改定,見 docs/spec.md)
+- **FR-038**: 系統 MUST 提供 `POST /holds/:id/quote` 試算:回原價、套用的折扣、應付、`promo_status`(none / applied / not_better / invalid);不建訂單、不用掉碼;與確認共用同一套算法。(2026-09-27 回寫:作者改定,見 docs/spec.md)
 - **FR-005**: refresh token MUST 以雜湊儲存,不存原值;MUST 記錄所屬成員、到期時間、撤銷時間。
 - **FR-006**: 角色(`member` | `staff`)MUST 只能用 SQL 改;系統 MUST NOT 提供任何設定角色的 endpoint。
 - **FR-007**: 簽章驗證 MUST 是常數時間比對(硬規則 IV)。「JWT 七項邊界」MUST 納入驗收;七項內容刻意放在 repo 外,由外部驗收清單裁定,本 spec 不展開。
@@ -228,13 +232,13 @@ iOS 做登入、活動列表(唯讀)、票券列表 / 明細三個畫面,client 
 
 - **FR-020**: 僅主辦 MUST 能為活動新增票種:名稱、價格、名額、`early_bird_until`、`early_bird_pct`;活動內票種名額總和 MUST ≤ 100,超過 → 4xx。
 - **FR-021**: 僅主辦 MUST 能改票種價格。
-- **FR-022**: 早鳥條件 MUST 用截止時間 `early_bird_until` 表示;`now < 該時間` 即符合早鳥,套用該票種的 `early_bird_pct`。
+- **FR-022**: 早鳥條件 MUST 用截止時間 `early_bird_until` 表示;**建立 hold 的時間** < 該時間即符合早鳥(M1,寬限由 hold 時效限制),套用該票種的 `early_bird_pct`。(2026-09-27 回寫:作者改定,見 docs/spec.md)
 - **FR-023**: hold MUST 綁「座位 + 票種」:每個座位對應一個票種;售出以座位為準(座位唯一是第一道),票種名額是第二道上限。
 
 #### 保留與確認(3 條 endpoint)
 
 - **FR-030**: 成員 MUST 能對 `on_sale` 且在 `opens_at` ≤ now < `deadline_at` 的活動建立 hold,
-  帶票種與 `seat_nos` 陣列,一次可鎖多個座位,全部成功或全部失敗(座位衝突或票種名額不足都算失敗)。
+  帶票種與 `seat_nos` 陣列,一次最多 10 席(H1),全部成功或全部失敗(座位衝突或票種名額不足都算失敗;兩者同時 → `seat_taken`)。名額在建 hold 時扣,放棄、過期、取消訂單時還回去(H4)。(2026-09-27 回寫:作者改定,見 docs/spec.md)
 - **FR-031**: hold 到期時間 MUST = 建立時間 + 活動的 `hold_ttl_minutes`(預設 10,範圍 5–30)。
 - **FR-032**: 同一成員在同一活動 MUST 只能有一個有效 hold;已有時再建 → 4xx。
 - **FR-033**: hold 過期後,座位 MUST 能被別人搶到;釋放與搶到 MUST 在同一次搶位操作內成立,不依賴背景排程。
@@ -250,7 +254,7 @@ iOS 做登入、活動列表(唯讀)、票券列表 / 明細三個畫面,client 
 - **FR-040**: 成員 MUST 能列出自己的票券。
 - **FR-041**: 本人或主辦 MUST 能讀訂單明細,含金額快照與票券 QR。
 - **FR-042**: 僅本人 MUST 能取消 `confirmed` 訂單;取消後座位釋放、可再售;`cancelled` 為終態,從 `cancelled` 轉任何狀態 → 4xx;`checked_in` MUST NOT 能取消。
-- **FR-043**: 訂單狀態機 MUST 為 `holding → confirmed → checked_in`;`holding` 可轉 `expired` 或 `cancelled`;`confirmed` 可轉 `cancelled`;`checked_in` 只由 staff 以 SQL 標記,沒有 endpoint。
+- **FR-043**: hold(座位)狀態 MUST 為 `holding → confirmed | expired | cancelled`,`confirmed → cancelled`;訂單狀態 MUST 為 `confirmed → checked_in | cancelled`;`checked_in` 只由 staff 以 SQL 標記,沒有 endpoint。同一個 hold 確認兩次 → 回同一張訂單(H7)。(2026-09-27 回寫:作者改定,見 docs/spec.md)
 - **FR-044**: 確認後訂單金額 MUST 不可變;明細 MUST 存價格快照,不靠票種 JOIN 即時算(硬規則 V)。
 - **FR-045**: 退款金額 MUST NOT 計算(刻意保留的醜)。
 - **FR-046**: 票券 QR MUST 為「訂單 id + HMAC 簽章」的短字串,MUST NOT 含任何個資;查驗端用同一把 key 驗。
@@ -259,14 +263,15 @@ iOS 做登入、活動列表(唯讀)、票券列表 / 明細三個畫面,client 
 
 - **FR-050**: 金額 MUST 一律用整數最小單位(分);顯示轉換只在 presentation 層(硬規則 I)。
 - **FR-051**: 折扣 MUST 為三層:早鳥(時間)、團體(數量)、優惠碼(輸入)。
-- **FR-052**: 套用順序 MUST 為:早鳥 × 團體 → 再減優惠碼(先乘後減)。百分比折扣以整數百分比表示,
-  每層計算為 `floor((cents × (100 − pct) + 50) / 100)`;優惠碼是現金券,直接減整數分,不被百分比稀釋。
-  範例:原價 100000 分、早鳥 10%、團體 10%、優惠碼 10000 分 → 71000 分。
-- **FR-053**: 折扣 MUST 以整筆小計計算,不逐座:小計 = 各座位票種現價加總;早鳥 % 與團體 % 套在小計上;優惠碼減總額一次。
+- **FR-052**: 三種折扣 MUST **不疊加,只套讓應付最低的一種**;平手依序 優惠碼 → 早鳥 → 團體。百分比以整數表示,
+  計算為 `floor((cents × (100 − pct) + 50) / 100)`;優惠碼是現金券,直接減整數分,最多折到 0,訂單記實際折抵。
+  範例:小計 100000 分、早鳥 10%、團體 10%(已達門檻)、優惠碼 10000 分 → 三個候選都是 90000 分,平手選優惠碼 → 90000 分。(2026-09-27 回寫:作者改定,見 docs/spec.md)
+- **FR-053**: 折扣 MUST 以整筆小計計算,不逐座:小計 = 各座位票種現價加總;三個候選(早鳥 %、團體 %、優惠碼)都從小計算起,取最低。訂單只記被套用的那一種(其餘記 0)。(2026-09-27 回寫:作者改定,見 docs/spec.md)
 - **FR-054**: 團體折扣 MUST 以 hold 的 `seat_nos.length` 為依據:座位數 ≥ 活動的 `group_min_qty` 時套 `group_pct`。
 - **FR-055**: 票價 MUST 取確認當下的票種價格;hold 不鎖價。
 - **FR-056**: 優惠碼 MUST 有:`code`、折扣值(整數分)、`valid_until`、`event_id`(可為 NULL = 全站);
-  同一個碼可多人用,每人每活動 MUST 只能用一次;不適用該活動、過期、或已用過 → 4xx,MUST NOT 靜默忽略。
+  同一個碼可多人用,每人每活動 MUST 只能用一次(只算有效訂單,取消後可再用,M2);有效期看確認時間(M4)。
+  無效(不適用該活動、過期、已用過、不存在)時:它本來會嚴格更便宜、或沒有別的折扣 → 409;別的折扣一樣好或更好 → 忽略碼,訂單照樣成立。(2026-09-27 回寫:作者改定,見 docs/spec.md)
 
 #### web 前端(Cloudflare Pages)
 
@@ -279,19 +284,19 @@ iOS 做登入、活動列表(唯讀)、票券列表 / 明細三個畫面,client 
 
 - **FR-070**: iOS MUST 含三個畫面:登入、活動列表(唯讀,含座位圖狀態)、我的票券列表與明細;活動與票券資料各與 web 對同一個 GET 顯示同一份。
 - **FR-071**: iOS client MUST 從 OpenAPI 契約產生;MUST NOT 做選位。
-- **FR-072**: iOS MUST 只做離線讀取快取;寫入一律要連線;MUST NOT 做離線編輯與衝突合併。
+- **FR-072**: iOS MUST 只做**票券**的離線讀取快取;寫入一律要連線;MUST NOT 做離線編輯與衝突合併。
 - **FR-073**: MUST NOT 上架 App Store / TestFlight;MUST NOT 做 APNs 推播(改用清單 + 拉取)。
 
 #### 通用
 
 - **FR-080**: 領域邏輯的「現在時間」MUST 從參數傳入;取現在時間是路由 / worker 的責任(硬規則 II)。
-- **FR-081**: 沒有 rate limit、錯誤訊息不友善、沒有 log 聚合 —— 這三項是刻意保留的醜,MUST NOT 主動補。
+- **FR-081**: 錯誤訊息不友善(API 只回代碼)、沒有 log 聚合 —— 刻意保留的醜,MUST NOT 主動補。**2026-09-27 作者改定**:登入失敗鎖定(L1,見 FR-008);web 端把錯誤代碼翻成中文顯示(作者要求的 UX,API 仍只回代碼);其餘端點仍沒有限速。
 
 ### Key Entities *(include if feature involves data)*
 
 原文提過的欄位 + 本次 Clarifications 新增的欄位(後者以 ★ 標記,回寫時要加進 `docs/spec.md`):
 
-- **成員(member)**:email(唯一、識別鍵)★、密碼雜湊 ★、暱稱 ★;`role` = `member` | `staff`,只能用 SQL 改。
+- **成員(member)**:email(唯一、識別鍵)★、密碼雜湊 ★、暱稱 ★;`role` = `member` | `staff`,只能用 SQL 改。連續登入失敗次數與鎖到何時(L1,2026-09-27)。
 - **refresh token**:`token_hash`(不存原值)、`member_id`、`expires_at`(30 天)、`revoked_at`。
 - **活動(event)**:名稱、`opens_at`、`deadline_at`、`owner_id` ★、`group_min_qty` ★(預設 4)、`group_pct` ★(預設 10)、
   `hold_ttl_minutes` ★(預設 10,5–30)、狀態(`draft` / `on_sale` / `closed` / `finished`);座位固定 10×10 = 100 席。
@@ -309,8 +314,8 @@ iOS 做登入、活動列表(唯讀)、票券列表 / 明細三個畫面,client 
 
 - **SC-001**: 併發 N 次搶同一票種,售出數 ≤ 名額,且成功數 + 失敗數 = N;重跑 5 次結果一致。
 - **SC-002**: 併發搶同一座位,恰好一人成功;重跑 5 次結果一致。
-- **SC-003**: 金額路徑零浮點 —— `scripts/check-money.sh` 綠燈,且折扣範例算出 71000 分。
-- **SC-004**: 保留逾時的三方競態(確認 / 搶位 / 清掃)有測試釘住行為,結果可重現。
+- **SC-003**: 金額路徑零浮點 —— `scripts/check-money.sh` 綠燈,且擇優範例算出 90000 分(不是疊加的 71000)。(2026-09-27 回寫:作者改定,見 docs/spec.md)
+- **SC-004**: 保留逾時的三方競態(確認 / 搶位 / 清掃)有測試釘住行為,結果可重現;到期那一刻原持有人的確認一律輸(作者定)。
 - **SC-005**: 狀態與時間邊界九條規則各有一條獨立測試且全過:
   `closed` 建 hold、過 `deadline_at`、未到 `opens_at`、過期 hold 確認、改價後金額不變、
   非主辦 403、`cancelled` 終態、不超賣、座位不重複。
@@ -320,7 +325,7 @@ iOS 做登入、活動列表(唯讀)、票券列表 / 明細三個畫面,client 
 - **SC-009**: 舊 refresh 重放被拒且該成員全部 refresh 失效;logout 後的 refresh 被拒;JWT 七項邊界外部清單全過。
 - **SC-010**: 五支靜態檢查(`check-money` / `check-time-injection` / `check-concurrency` /
   `check-jwt-timing` / `check-price-snapshot`)在完整實作上全部綠燈,`self-test.sh` 全過。
-- **SC-011**: 優惠碼不適用時 4xx(不靜默忽略);同一人同一活動第二次使用同一碼 → 4xx。
+- **SC-011**: 優惠碼無效且它本來會被選中、或沒有別的折扣時 409;別的折扣一樣好或更好時忽略碼;同一人同一活動有效訂單已用過同一碼 → 視同無效。(2026-09-27 回寫:作者改定,見 docs/spec.md)
 
 ## 範圍邊界(非目標,不可協商)
 
@@ -356,10 +361,11 @@ iOS 做登入、活動列表(唯讀)、票券列表 / 明細三個畫面,client 
 - 早鳥用截止時間而非「前 N 張」(通用做法 5)。
 - 一人一活動一個有效 hold(通用做法 6)。
 - 一個 hold 可鎖多座,全有全無;團體折扣以座位數計(hold 粒度定案)。
-- 折扣順序:早鳥 × 團體 → 減優惠碼,整數運算(折扣順序定案)。
+- 折扣:~~早鳥 × 團體 → 減優惠碼~~ → 2026-09-27 作者改定為**不疊加、擇優**,整數運算。
 - **解讀(C3 + C9)**:C3 說「hold 綁座位 + 票種(每個座位一個票種)」,C9 說「早鳥 % 套在小計上」。
   若一個 hold 可混多個票種,而各票種 `early_bird_pct` 不同,「套在小計上」就沒有單一百分比可套。
   本 spec 因此採**一個 hold 一個票種、N 個座位**(每個座位都對應那一個票種)。
-  這是唯一一處本 spec 自行收斂的解讀,回寫 `docs/spec.md` 時請作者確認或改掉。
+  這是唯一一處本 spec 自行收斂的解讀;**作者 2026-09-27 已確認**(docs/spec.md 寫明一個 hold 一個票種)。
 - 依賴:schema、金額引擎與折扣順序、時間判定、併發是 `docs/EXPERIMENT-PROTOCOL.md` 的實驗對象,
   必須作者先手寫;骨架階段資料層只留介面。本 spec 不改變這個順序。
+  **2026-09-27 改定**:作者只定規則與商業邏輯,程式碼由寫作 session 寫;AI 對照版照舊由乾淨 session 出(EXPERIMENT-PROTOCOL)。

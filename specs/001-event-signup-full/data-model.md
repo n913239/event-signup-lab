@@ -21,6 +21,8 @@
 | nickname | 非空 |
 | role | `member` \| `staff`,CHECK;**只由 SQL 改**(通用做法 1) |
 | created_at | |
+| failed_logins | 連續登入失敗次數,成功歸零(L1,2026-09-27) |
+| locked_until | 鎖到何時(epoch 毫秒);NULL = 沒鎖 |
 
 ### RefreshToken
 | 欄位 | 約束 |

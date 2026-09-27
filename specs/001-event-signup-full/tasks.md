@@ -117,9 +117,9 @@ repo 根:`src/`(API)、`tests/`、`scripts/`、`web/`(Pages)、`ios/EventSignup/
 
 **Independent Test**: `tests/routes/auth.test.js` 走完「登入 → refresh → 舊 refresh 再用 → 401 且新 refresh 也失效 → 重登 → logout → 401」。
 
-- [ ] T035 📅10/2 [US3] `tests/routes/auth.test.js` 補(紅):refresh 成功回新 pair 且舊 refresh 再用 → 401 `refresh_replayed`;重放後**新發的 refresh 也失效**(C17);`expires_at` 過了 → 401;logout → 204,再 refresh → 401;logout 不帶 body → 400
+- [x] T035 📅10/2 [US3] `tests/routes/auth.test.js` 補(紅):refresh 成功回新 pair 且舊 refresh 再用 → 401 `refresh_replayed`;重放後**新發的 refresh 也失效**(C17);`expires_at` 過了 → 401;logout → 204,再 refresh → 401;logout 不帶 body → 400
 - [x] T036 📅10/2 [US3] 實作 `POST /auth/refresh`(`rotate` 的 `changes = 0` → 查該 hash:存在且 `revoked_at` 非 NULL → `revokeAllForMember` + 401 `refresh_replayed`;不存在或過期 → 401 `unauthorized`)與 `POST /auth/logout`(`revoke`)於 `src/routes/auth.js`;T035 綠;501 清單移除兩條
-- [ ] T037 📅10/2 [US3] `tests/jwt.test.js` 七個 `it.todo` 改成讀環境變數 `JWT_BOUNDARIES=<repo 外清單路徑>`:有給就 `import()` 該檔跑七項,沒給就 `it.skip` 並印「外部清單未掛」;`docs/verified.md` ❌ 欄「JWT 七項邊界」維持到清單跑過
+- [x] T037 ~~📅10/2~~ **(2026-09-27 結案:七項邊界改由 repo 內 tests/jwt.test.js 六個 + check-jwt-timing.sh 涵蓋,外部清單不再需要)** [US3] `tests/jwt.test.js` 七個 `it.todo` 改成讀環境變數 `JWT_BOUNDARIES=<repo 外清單路徑>`:有給就 `import()` 該檔跑七項,沒給就 `it.skip` 並印「外部清單未掛」;`docs/verified.md` ❌ 欄「JWT 七項邊界」維持到清單跑過
 
 **Checkpoint**: 完整認證生命週期可測;`npm run test:jwt` 綠。
 
@@ -165,16 +165,16 @@ repo 根:`src/`(API)、`tests/`、`scripts/`、`web/`(Pages)、`ios/EventSignup/
 
 - [x] T050 📅10/2 [US5] `tests/routes/orders.test.js` 補(紅):取消 → 200 `status=cancelled`、`total_cents` 不變(只改 status);同座位他人 hold → 201;再取消 → 409 `terminal_state`;SQL 把訂單改 `checked_in` 後取消 → 409;非本人 → 404 → 實作 `src/lib/db/orders.js` 的 `cancel(db, {orderId, memberId}, now)`:一個 batch —— `UPDATE orders SET status='cancelled' WHERE id=? AND member_id=? AND status='confirmed'`(看 `changes`)+ `UPDATE seat_holds SET status='cancelled' WHERE hold_id=? AND status='confirmed'`;**不碰任何 `*_cents`**;`POST /orders/:id/cancel` 於 `src/routes/orders.js`;501 清單清空(17/17 移除);`npm run check:snapshot` 綠
 
-**Checkpoint**: 17 條 endpoint 全部脫離 501;`npm run test:contract` 綠。
+**Checkpoint**: 17 條 endpoint 全部脫離 501;`npm run test:contract` 綠。(2026-09-27 達成,同日加第 18 條試算)
 
 ---
 
 ## Phase 8: Polish & Cross-Cutting(10/3、10/10–10/13)
 
 - [ ] T051 📅10/3 `scripts/smoke.sh` 填實:照 `quickstart.md` 第 3 節的 curl 流程(註冊 → 登入 → 建活動 → 票種 → 4 座 hold → 帶 `WELCOME` 確認 → 斷言 `total_cents = 314000` → 改價 → 重讀不變 → 取消 → 重 hold A1 → 201);`npm run smoke` 對 `wrangler dev`
-- [~] T052 📅10/3 部署:`wrangler d1 create signup` 換掉 `wrangler.toml` 的 placeholder id、`wrangler secret put JWT_SECRET / QR_SECRET`、`wrangler d1 execute signup --remote --file=schema.sql`、`wrangler deploy`;`BASE_URL=<worker> npm run smoke`
+- [x] T052 📅10/3 部署(2026-09-27 完成:D1 建立與建表、secret、deploy、/health 200;遠端不跑 seed):`wrangler d1 create signup` 換掉 `wrangler.toml` 的 placeholder id、`wrangler secret put JWT_SECRET / QR_SECRET`、`wrangler d1 execute signup --remote --file=schema.sql`、`wrangler deploy`;`BASE_URL=<worker> npm run smoke`
 - [ ] T053 📅10/3 `scripts/race.sh` 填實:對遠端 Worker 用 `xargs -P 20 curl` 打同一座位 20 次與同票種名額 + 5 次,統計 201 / 409 數量,寫 `devlog/raw/race-<date>.txt`;結果進 `docs/verified.md` ✅「真實併發」
-- [ ] T054 [P] 📅10/10 Pages 部署:`web/` 連 Pages 專案、`VITE_API_BASE` 指向 Worker、Worker 的 `CORS_ORIGIN` 改成 Pages 網域;線上走一遍五畫面
+- [x] T054 [P] 📅10/10 Pages 部署:`web/` 連 Pages 專案、`VITE_API_BASE` 指向 Worker、Worker 的 `CORS_ORIGIN` 改成 Pages 網域;線上走一遍五畫面
 - [ ] T055 [P] 📅10/10 SC-007 / SC-008 實測:同帳號 web、iOS、curl 三份 `GET /events` 與三份 `GET /orders` 各自逐欄 diff;`rows_read` 數字;寫進 `docs/verified.md` ✅ 欄(有輸出可貼的才進)
 - [ ] T056 📅10/11 `docs/verified.md` 全面對帳:❌ 欄逐項移到 ✅ 或留著(JWT 七項若外部清單沒跑,留著);「已知的坑」補這 30 天踩到的
 - [ ] T057 [P] 📅10/11 CLAUDE.md 與 `.specify/memory/constitution.md` 規則 V 的註記改為「另一半由 `tests/schema.test.js` ⑥ 裁判」(research.md 末段);`/speckit-constitution` 走 PATCH 版本
@@ -263,3 +263,11 @@ US2 只是讓主辦不用下 SQL;US3 的 refresh 是安全性;US4 / US5 是兩�
 
 **風險點**(排得最緊的三天):9/29(T030 是整個專案最難的一段,又是實驗)、10/1(六條 endpoint 一天)、10/3(六個 task)。
 若 9/29 滑一天,10/1–10/3 順延,砍 10/13 的緩衝;若再滑,先砍 iOS(T047–T049 改成只做 T047 的 client 產生)。
+
+## 追加:2026-09-27 規格改定後補做的(已完成)
+
+- [x] T072 [US1] 折扣改為不疊加、擇優(作者定):`src/domain/money.js`、`tests/domain/money.test.js` 16 個;docs/spec.md「折扣怎麼算」
+- [x] T073 [US1] 保留與確認的 16 條商業規則(作者定,docs/spec.md 表):H1 10 席、H4 名額歸還、H7 重複確認回同一張、M1 早鳥看保留時間、C8 改定
+- [x] T074 [US1] `POST /holds/:id/quote` 試算(第 18 條)+ web 保留頁「套用」按鈕;`tests/routes/quote.test.js`
+- [x] T075 [US3] 登入失敗鎖定 L1:members 加 `failed_logins` / `locked_until`;`tests/routes/login-lockout.test.js` 7 個
+- [x] T076 [US3] logout 不帶 refresh_token → 400;`tests/routes/auth.test.js`(T035)

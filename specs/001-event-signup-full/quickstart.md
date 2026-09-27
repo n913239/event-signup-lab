@@ -18,7 +18,7 @@ cp .dev.vars.example .dev.vars   # JWT_SECRET、QR_SECRET(任務階段補這個 
 sh scripts/self-test.sh          # 40/40:五支裁判抓得到、不誤報
 npm run test:schema:selftest     # 9/9:schema 裁判自己被驗過
 npm run check:all                # 五支裁判在目前 src/ 上綠燈
-npm test                         # 骨架:17 條路由 501、/health、閘門 helper
+npm test                         # 全部測試(2026-09-27:18 條 endpoint 皆已實作)
 ```
 
 ## 1. schema(作者手寫後)
@@ -61,8 +61,9 @@ H=$(curl -s $B/events/$EV/holds -H "authorization: Bearer $MEM" -H 'content-type
 curl -s $B/holds/$H/confirm -H "authorization: Bearer $MEM" -H 'content-type: application/json' -d '{"promo_code":"WELCOME"}' | jq .
 ```
 
-期望:`subtotal_cents = 400000`、`early_bird_pct = 10`、`group_pct = 10`、`promo_cents = 10000`,
-`total_cents = applyPct(applyPct(400000,10),10) − 10000 = 324000 − 10000 = 314000`。**不是** 315900(先減後乘)也不是 310000(並聯)。
+期望(2026-09-27 改定:折扣不疊加、擇優):候選 優惠碼 390000、早鳥 360000、團體 360000 → 早鳥與團體平手,依序選早鳥 →
+`subtotal_cents = 400000`、`early_bird_pct = 10`、`group_pct = 0`、`promo_code = null`、`promo_cents = 0`、`total_cents = 360000`。
+**不是**疊加的 314000。WELCOME 沒被選中,不算用掉。
 
 再驗:
 - `curl -s $B/orders -H "authorization: Bearer $MEM"` 兩張票同一份資料(SC-007 的 API 端)。

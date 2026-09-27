@@ -9,7 +9,7 @@
 
 ## Summary
 
-17 條 endpoint 的活動報名 API(Workers + Hono + D1)、一份 OpenAPI 契約、一個 Pages 前端(五個畫面)、
+18 條 endpoint(2026-09-27 加試算 `POST /holds/:id/quote`)的活動報名 API(Workers + Hono + D1)、一份 OpenAPI 契約、一個 Pages 前端(五個畫面)、
 一個 SwiftUI 骨架(三個畫面)。核心是售票規則:限量名額、多座 hold 全有全無、保留逾時三方競態、
 先乘後減的整數折扣、確認後金額快照。技術上的關鍵限制只有一個:**D1 沒有 `SELECT … FOR UPDATE`**,
 併發只能靠條件式寫入 + `changes` + `CHECK`,而 `db.batch()` 只在**拋錯**時回滾,`changes = 0` 不回滾。
@@ -39,7 +39,7 @@
 
 **Constraints**: 五條硬規則(見 Constitution Check);15 條非目標;無 rate limit、錯誤訊息不友善、無 log 聚合(刻意保留的醜);免費額度
 
-**Scale/Scope**: 17 endpoint + `/health`;8 張表上限(`tests/schema.test.js` ⑦ 的白名單);每活動 100 席;web 5 畫面;iOS 3 畫面;十天
+**Scale/Scope**: 18 endpoint(原 17,2026-09-27 加試算)+ `/health`;8 張表上限(`tests/schema.test.js` ⑦ 的白名單);每活動 100 席;web 5 畫面;iOS 3 畫面;十天
 
 ## Constitution Check
 
@@ -95,7 +95,7 @@
 
 | 檢查 | 結果 |
 |---|---|
-| 沒有新 endpoint(17 + `/health`) | ✅ |
+| 沒有新 endpoint(17 + `/health`) | ✅(2026-09-27 作者要求加試算,成 18 條) |
 | 表在 `schema.test.js` ⑦ 白名單內(8 張) | ✅ |
 | 新欄位只有 spec Clarifications ★ 標的那些(作者決定) | ✅ |
 | 目錄 | ⚠️ CLAUDE.md 只列 `domain / routes / presentation`。plan 新增 `src/lib/`(JWT、HMAC、DB 存取)—— 因為 JWT 用 `crypto.subtle` 是 I/O 且 async,不該進 `domain/`;SQL 也不該散在 `routes/`。**要補進 CLAUDE.md 目錄表**,否則等於偷加。 |
@@ -171,6 +171,7 @@ ios/EventSignup/             # SwiftUI 骨架
 ├── Package.swift / xcodeproj
 ├── openapi.yaml → 由 repo 根複製(build phase),swift-openapi-generator 產 Client
 ├── Auth/                    # 登入畫面、Keychain 存 token
+├── Events/                  # 活動列表(唯讀)+ 100 席座位圖(T049a)
 ├── Tickets/                 # 列表 + 明細(含 QR)
 └── Cache/                   # 最後一次 GET /orders 的 JSON 落地,離線讀
 
