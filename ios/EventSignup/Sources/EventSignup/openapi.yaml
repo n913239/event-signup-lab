@@ -1,0 +1,524 @@
+openapi: 3.1.0
+info:
+  title: 活動報名系統 API
+  version: 0.1.0
+  description: |
+    17 條 endpoint + /health。一份契約餵 web(Pages)與 iOS(swift-openapi-generator)。
+    慣例:金額一律整數「分」(*_cents);時間一律 epoch 毫秒整數;每個 JSON 回應帶 x-server-now header;
+    錯誤一律 { error, server_now }。狀態碼:400 輸入、401 身分、403 權限、404 不存在或不屬於你、409 規則擋下。
+servers:
+  - url: http://127.0.0.1:8788
+    description: wrangler dev --local
+
+security:
+  - bearerAuth: []
+
+tags:
+  - name: auth
+  - name: events
+  - name: ticket-types
+  - name: holds
+  - name: orders
+
+paths:
+  /health:
+    get:
+      security: []
+      summary: 健康檢查與伺服器時間
+      responses:
+        '200':
+          description: ok
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [ok, server_now]
+                properties:
+                  ok: { type: boolean, const: true }
+                  server_now: { $ref: '#/components/schemas/EpochMs' }
+
+  # ── 認證(4)─────────────────────────────────────────────
+  /auth/register:
+    post:
+      tags: [auth]
+      security: []
+      summary: 建立成員(單一組織,角色 member)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email, password, nickname]
+              properties:
+                email: { type: string, format: email, maxLength: 254 }
+                password: { type: string, minLength: 8 }
+                nickname: { type: string, minLength: 1, maxLength: 50 }
+      responses:
+        '201': { description: 已建立, content: { application/json: { schema: { $ref: '#/components/schemas/Member' } } } }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '409': { $ref: '#/components/responses/Conflict' }
+
+  /auth/login:
+    post:
+      tags: [auth]
+      security: []
+      summary: 登入,回 access(15 分鐘)+ refresh(30 天)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email, password]
+              properties:
+                email: { type: string }
+                password: { type: string }
+      responses:
+        '200': { description: ok, content: { application/json: { schema: { $ref: '#/components/schemas/TokenPair' } } } }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+
+  /auth/refresh:
+    post:
+      tags: [auth]
+      security: []
+      summary: 輪替 refresh;舊的立刻失效;重放 → 撤銷該成員全部 refresh
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [refresh_token]
+              properties:
+                refresh_token: { type: string }
+      responses:
+        '200': { description: ok, content: { application/json: { schema: { $ref: '#/components/schemas/TokenPair' } } } }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+
+  /auth/logout:
+    post:
+      tags: [auth]
+      summary: 撤銷當前 refresh
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [refresh_token]
+              properties:
+                refresh_token: { type: string }
+      responses:
+        '204': { description: 已撤銷 }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+
+  # ── 活動(5)─────────────────────────────────────────────
+  /events:
+    post:
+      tags: [events]
+      summary: 建活動(staff);直接 on_sale;建立者為主辦;座位固定 10×10
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [name, opens_at, deadline_at]
+              properties:
+                name: { type: string, minLength: 1, maxLength: 100 }
+                opens_at: { $ref: '#/components/schemas/EpochMs' }
+                deadline_at: { $ref: '#/components/schemas/EpochMs' }
+                group_min_qty: { type: integer, minimum: 2, default: 4 }
+                group_pct: { $ref: '#/components/schemas/Pct' }
+                hold_ttl_minutes: { type: integer, minimum: 5, maximum: 30, default: 10 }
+      responses:
+        '201': { description: 已建立, content: { application/json: { schema: { $ref: '#/components/schemas/Event' } } } }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+    get:
+      tags: [events]
+      summary: 活動列表;預設不含 draft;主辦看得到自己的 draft
+      parameters:
+        - in: query
+          name: status
+          schema: { $ref: '#/components/schemas/EventStatus' }
+      responses:
+        '200':
+          description: ok
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [events, server_now]
+                properties:
+                  events: { type: array, items: { $ref: '#/components/schemas/EventSummary' } }
+                  server_now: { $ref: '#/components/schemas/EpochMs' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+
+  /events/{id}:
+    parameters: [{ $ref: '#/components/parameters/Id' }]
+    get:
+      tags: [events]
+      summary: 活動詳情:票種、剩餘名額、100 席座位狀態
+      responses:
+        '200': { description: ok, content: { application/json: { schema: { $ref: '#/components/schemas/EventDetail' } } } }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+    patch:
+      tags: [events]
+      summary: 僅主辦:改時間 / 改名額(票種名額改到 < 已售 → 409)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              minProperties: 1
+              properties:
+                name: { type: string, minLength: 1, maxLength: 100 }
+                opens_at: { $ref: '#/components/schemas/EpochMs' }
+                deadline_at: { $ref: '#/components/schemas/EpochMs' }
+                hold_ttl_minutes: { type: integer, minimum: 5, maximum: 30 }
+                group_min_qty: { type: integer, minimum: 2 }
+                group_pct: { $ref: '#/components/schemas/Pct' }
+                ticket_types:
+                  description: 改名額;每項只能動 capacity
+                  type: array
+                  items:
+                    type: object
+                    required: [id, capacity]
+                    properties:
+                      id: { $ref: '#/components/schemas/Id' }
+                      capacity: { type: integer, minimum: 0 }
+      responses:
+        '200': { description: ok, content: { application/json: { schema: { $ref: '#/components/schemas/Event' } } } }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409': { $ref: '#/components/responses/Conflict' }
+
+  /events/{id}/close:
+    parameters: [{ $ref: '#/components/parameters/Id' }]
+    post:
+      tags: [events]
+      summary: 僅主辦:手動提前截止(只擋新 hold;既有 hold 仍可確認)
+      responses:
+        '200': { description: ok, content: { application/json: { schema: { $ref: '#/components/schemas/Event' } } } }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409': { $ref: '#/components/responses/Conflict' }
+
+  # ── 票種(2)─────────────────────────────────────────────
+  /events/{id}/ticket-types:
+    parameters: [{ $ref: '#/components/parameters/Id' }]
+    post:
+      tags: [ticket-types]
+      summary: 僅主辦:新增票種(同活動名額總和 ≤ 100)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [name, price_cents, capacity]
+              properties:
+                name: { type: string, minLength: 1, maxLength: 100 }
+                price_cents: { $ref: '#/components/schemas/Cents' }
+                capacity: { type: integer, minimum: 0, maximum: 100 }
+                early_bird_until: { $ref: '#/components/schemas/EpochMsNullable' }
+                early_bird_pct: { $ref: '#/components/schemas/Pct' }
+      responses:
+        '201': { description: 已建立, content: { application/json: { schema: { $ref: '#/components/schemas/TicketType' } } } }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409': { $ref: '#/components/responses/Conflict' }
+
+  /ticket-types/{id}:
+    parameters: [{ $ref: '#/components/parameters/Id' }]
+    patch:
+      tags: [ticket-types]
+      summary: 僅主辦:改價格(既有訂單不受影響;未確認 hold 以新價計)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [price_cents]
+              properties:
+                price_cents: { $ref: '#/components/schemas/Cents' }
+      responses:
+        '200': { description: ok, content: { application/json: { schema: { $ref: '#/components/schemas/TicketType' } } } }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+
+  # ── 保留與確認(3)───────────────────────────────────────
+  /events/{id}/holds:
+    parameters: [{ $ref: '#/components/parameters/Id' }]
+    post:
+      tags: [holds]
+      summary: 選位 + 保留(一個票種、N 個座位,全有全無;一人一活動一個有效 hold)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [ticket_type_id, seat_nos]
+              properties:
+                ticket_type_id: { $ref: '#/components/schemas/Id' }
+                seat_nos:
+                  type: array
+                  minItems: 1
+                  maxItems: 100
+                  uniqueItems: true
+                  items: { $ref: '#/components/schemas/SeatNo' }
+      responses:
+        '201': { description: 已保留, content: { application/json: { schema: { $ref: '#/components/schemas/Hold' } } } }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409':
+          description: seat_taken / hold_exists / sold_out / not_on_sale
+          content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } }
+
+  /holds/{id}:
+    parameters: [{ $ref: '#/components/parameters/Id' }]
+    delete:
+      tags: [holds]
+      summary: 僅本人:主動放棄(座位釋放)
+      responses:
+        '204': { description: 已放棄 }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409': { $ref: '#/components/responses/Conflict' }
+
+  /holds/{id}/confirm:
+    parameters: [{ $ref: '#/components/parameters/Id' }]
+    post:
+      tags: [holds]
+      summary: 僅本人:確認 → 建訂單(以確認當下票價與折扣計;可帶優惠碼)
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                promo_code: { type: string, minLength: 1, maxLength: 32 }
+      responses:
+        '201': { description: 訂單成立, content: { application/json: { schema: { $ref: '#/components/schemas/Order' } } } }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409':
+          description: hold_expired / promo_rejected / terminal_state
+          content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } }
+
+  # ── 訂單(3)─────────────────────────────────────────────
+  /orders:
+    get:
+      tags: [orders]
+      summary: 我的票券(web 與 iOS 對同一份資料)
+      responses:
+        '200':
+          description: ok
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [orders, server_now]
+                properties:
+                  orders: { type: array, items: { $ref: '#/components/schemas/Order' } }
+                  server_now: { $ref: '#/components/schemas/EpochMs' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+
+  /orders/{id}:
+    parameters: [{ $ref: '#/components/parameters/Id' }]
+    get:
+      tags: [orders]
+      summary: 本人或主辦:明細,含金額快照與 qr_payload
+      responses:
+        '200': { description: ok, content: { application/json: { schema: { $ref: '#/components/schemas/Order' } } } }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+
+  /orders/{id}/cancel:
+    parameters: [{ $ref: '#/components/parameters/Id' }]
+    post:
+      tags: [orders]
+      summary: 僅本人:取消 confirmed 訂單(座位釋放;checked_in / cancelled → 409)
+      responses:
+        '200': { description: ok, content: { application/json: { schema: { $ref: '#/components/schemas/Order' } } } }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409': { $ref: '#/components/responses/Conflict' }
+
+components:
+  securitySchemes:
+    bearerAuth: { type: http, scheme: bearer, bearerFormat: JWT }
+
+  parameters:
+    Id:
+      in: path
+      name: id
+      required: true
+      schema: { $ref: '#/components/schemas/Id' }
+
+  responses:
+    BadRequest:   { description: invalid_input,  content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } } }
+    Unauthorized: { description: unauthorized / refresh_replayed, content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } } }
+    Forbidden:    { description: forbidden,      content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } } }
+    NotFound:     { description: not_found,      content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } } }
+    Conflict:     { description: 規則擋下(見 error 代碼), content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } } }
+
+  schemas:
+    Id: { type: string, minLength: 1 }
+    EpochMs: { type: integer, format: int64, minimum: 0, description: epoch 毫秒 }
+    EpochMsNullable:
+      type: [integer, 'null']
+      format: int64
+    Cents: { type: integer, minimum: 0, description: 整數分;顯示轉換由前端 money 模組負責 }
+    Pct: { type: integer, minimum: 0, maximum: 100, default: 0 }
+    SeatNo: { type: string, pattern: '^[A-J](10|[1-9])$', description: 10×10,列 A–J、欄 1–10 }
+    EventStatus: { type: string, enum: [draft, on_sale, closed, finished] }
+    OrderStatus: { type: string, enum: [confirmed, checked_in, cancelled] }
+    HoldStatus: { type: string, enum: [holding, confirmed, expired, cancelled] }
+    Role: { type: string, enum: [member, staff] }
+
+    Error:
+      type: object
+      required: [error]
+      properties:
+        error:
+          type: string
+          enum: [invalid_input, unauthorized, refresh_replayed, forbidden, not_found, not_implemented, internal,
+                 email_taken, not_on_sale, seat_taken, hold_exists, sold_out, hold_expired, terminal_state,
+                 capacity_below_sold, capacity_exceeded, promo_rejected]
+        server_now: { $ref: '#/components/schemas/EpochMs' }
+
+    Member:
+      type: object
+      required: [id, email, nickname, role]
+      properties:
+        id: { $ref: '#/components/schemas/Id' }
+        email: { type: string }
+        nickname: { type: string }
+        role: { $ref: '#/components/schemas/Role' }
+
+    TokenPair:
+      type: object
+      required: [access_token, refresh_token, expires_at, member]
+      properties:
+        access_token: { type: string }
+        refresh_token: { type: string }
+        expires_at: { $ref: '#/components/schemas/EpochMs', description: access 到期 }
+        member: { $ref: '#/components/schemas/Member' }
+
+    EventSummary:
+      type: object
+      required: [id, name, status, opens_at, deadline_at, remaining_seats]
+      properties:
+        id: { $ref: '#/components/schemas/Id' }
+        name: { type: string }
+        status: { $ref: '#/components/schemas/EventStatus' }
+        opens_at: { $ref: '#/components/schemas/EpochMs' }
+        deadline_at: { $ref: '#/components/schemas/EpochMs' }
+        remaining_seats: { type: integer, minimum: 0, maximum: 100 }
+
+    Event:
+      allOf:
+        - $ref: '#/components/schemas/EventSummary'
+        - type: object
+          required: [owner_id, group_min_qty, group_pct, hold_ttl_minutes]
+          properties:
+            owner_id: { $ref: '#/components/schemas/Id' }
+            group_min_qty: { type: integer }
+            group_pct: { $ref: '#/components/schemas/Pct' }
+            hold_ttl_minutes: { type: integer }
+
+    TicketType:
+      type: object
+      required: [id, event_id, name, price_cents, capacity, remaining, early_bird_until, early_bird_pct]
+      properties:
+        id: { $ref: '#/components/schemas/Id' }
+        event_id: { $ref: '#/components/schemas/Id' }
+        name: { type: string }
+        price_cents: { $ref: '#/components/schemas/Cents' }
+        capacity: { type: integer }
+        remaining: { type: integer, minimum: 0 }
+        early_bird_until: { $ref: '#/components/schemas/EpochMsNullable' }
+        early_bird_pct: { $ref: '#/components/schemas/Pct' }
+
+    Seat:
+      type: object
+      required: [seat_no, state]
+      properties:
+        seat_no: { $ref: '#/components/schemas/SeatNo' }
+        state: { type: string, enum: [free, held, sold, mine] }
+        ticket_type_id: { type: [string, 'null'] }
+
+    EventDetail:
+      allOf:
+        - $ref: '#/components/schemas/Event'
+        - type: object
+          required: [ticket_types, seats, my_hold, server_now]
+          properties:
+            ticket_types: { type: array, items: { $ref: '#/components/schemas/TicketType' } }
+            seats: { type: array, minItems: 100, maxItems: 100, items: { $ref: '#/components/schemas/Seat' } }
+            my_hold:
+              oneOf:
+                - $ref: '#/components/schemas/Hold'
+                - type: 'null'
+            server_now: { $ref: '#/components/schemas/EpochMs' }
+
+    Hold:
+      type: object
+      required: [id, event_id, ticket_type_id, seat_nos, status, expires_at, server_now]
+      properties:
+        id: { $ref: '#/components/schemas/Id' }
+        event_id: { $ref: '#/components/schemas/Id' }
+        ticket_type_id: { $ref: '#/components/schemas/Id' }
+        seat_nos: { type: array, items: { $ref: '#/components/schemas/SeatNo' } }
+        status: { $ref: '#/components/schemas/HoldStatus' }
+        expires_at: { $ref: '#/components/schemas/EpochMs' }
+        server_now: { $ref: '#/components/schemas/EpochMs', description: 倒數以此為準,不用客戶端時鐘 }
+
+    OrderItem:
+      type: object
+      required: [seat_no, ticket_type_id, ticket_type_name, unit_price_cents]
+      properties:
+        seat_no: { $ref: '#/components/schemas/SeatNo' }
+        ticket_type_id: { $ref: '#/components/schemas/Id' }
+        ticket_type_name: { type: string }
+        unit_price_cents: { $ref: '#/components/schemas/Cents', description: 確認當下的快照 }
+
+    Order:
+      type: object
+      required: [id, event_id, event_name, member_id, status, items,
+                 subtotal_cents, early_bird_pct, group_pct, promo_code, promo_cents, total_cents,
+                 confirmed_at, qr_payload]
+      properties:
+        id: { $ref: '#/components/schemas/Id' }
+        event_id: { $ref: '#/components/schemas/Id' }
+        event_name: { type: string }
+        member_id: { $ref: '#/components/schemas/Id' }
+        status: { $ref: '#/components/schemas/OrderStatus' }
+        items: { type: array, minItems: 1, items: { $ref: '#/components/schemas/OrderItem' } }
+        subtotal_cents: { $ref: '#/components/schemas/Cents' }
+        early_bird_pct: { $ref: '#/components/schemas/Pct' }
+        group_pct: { $ref: '#/components/schemas/Pct' }
+        promo_code: { type: [string, 'null'] }
+        promo_cents: { $ref: '#/components/schemas/Cents' }
+        total_cents: { $ref: '#/components/schemas/Cents' }
+        confirmed_at: { $ref: '#/components/schemas/EpochMs' }
+        qr_payload: { type: string, description: '<order_id>.<hmac 前 22 字元>;不含個資' }
