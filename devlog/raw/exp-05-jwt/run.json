@@ -1,0 +1,95 @@
+{
+ "duration_api_ms": 65357,
+ "stop_reason": "end_turn",
+ "total_cost_usd": 0.34017860000000005,
+ "usage": {
+  "input_tokens": 10,
+  "cache_creation_input_tokens": 21262,
+  "cache_read_input_tokens": 120613,
+  "output_tokens": 7296,
+  "output_tokens_details": {
+   "thinking_tokens": 1684
+  },
+  "server_tool_use": {
+   "web_search_requests": 0,
+   "web_fetch_requests": 0
+  },
+  "service_tier": "standard",
+  "cache_creation": {
+   "ephemeral_1h_input_tokens": 21262,
+   "ephemeral_5m_input_tokens": 0
+  },
+  "inference_geo": "not_available",
+  "iterations": [
+   {
+    "input_tokens": 2,
+    "output_tokens": 1007,
+    "cache_read_input_tokens": 30930,
+    "cache_creation_input_tokens": 450,
+    "cache_creation": {
+     "ephemeral_5m_input_tokens": 0,
+     "ephemeral_1h_input_tokens": 450
+    },
+    "type": "message"
+   }
+  ],
+  "speed": "standard"
+ },
+ "modelUsage": {
+  "claude-opus-5-5": {
+   "inputTokens": 10,
+   "outputTokens": 7296,
+   "cacheReadInputTokens": 120613,
+   "cacheCreationInputTokens": 21262,
+   "webSearchRequests": 0,
+   "costUSD": 0.34017860000000005,
+   "contextWindow": 1000000,
+   "maxOutputTokens": 128000,
+   "thinkingTokens": 1684,
+   "canonicalModel": "claude-opus-5-5",
+   "provider": "firstParty",
+   "costBasis": "list"
+  }
+ },
+ "permission_denials": [],
+ "terminal_reason": "completed",
+ "fast_mode_state": "off",
+ "fast_mode_disabled_reason": "sdk_opt_in_required",
+ "subagent_stats": {
+  "spawned": 0,
+  "requested": {
+   "background": 0,
+   "foreground": 0,
+   "unset": 0
+  },
+  "started_in_background": 0,
+  "max_depth": 0,
+  "spawned_by_subagents": 0,
+  "completed": 0,
+  "failed": 0,
+  "killed": {
+   "parent": 0,
+   "user": 0,
+   "system": 0
+  },
+  "refused": {
+   "depth_limit": 0,
+   "concurrency_limit": 0,
+   "budget": 0
+  },
+  "by_type": {}
+ },
+ "is_error": false,
+ "num_turns": 5,
+ "subtype": "success",
+ "api_error_status": null,
+ "result": "我寫好了 `src/auth.js`,只有這一個檔,沒有寫測試。語法檢查(`node --check`)有過,但還沒實際跑過:這個 repo 沒有 `package.json`,也沒裝 `hono`,所以沒有對真的 D1 打過任何一支 API。\n\n**接進既有 app 的方式**\n```js\nimport { auth, requireMember } from './auth.js'\napp.route('/auth', auth)\napp.use('/api/*', requireMember)   // 之後用 c.get('member') 取 { id, role }\n```\n\n**幾個要先知道的設計決定**\n- **時間單位是 Unix 秒**:`expires_at`(回應和資料表)、`created_at` 都用秒,和 JWT 的 `exp` 一致。\n- **有效期限**:access token 是 HS256 JWT,15 分鐘;refresh token 30 天。\n- **refresh token 是隨機亂數**,資料庫只存它的 SHA-256。就算資料表外洩,裡面的值也不能直接拿來用。\n- **每次 refresh 都換新 token**,舊的用一條條件式 `UPDATE … RETURNING` 作廢。同一個 token 被同時送來兩次,只有一個請求會成功。\n- **舊 token 被重用時全部撤銷**:已作廢的 refresh token 如果又被拿來用,會當作被偷,撤銷該會員所有 refresh token。副作用是前端同時發兩個 refresh,會被強制登出,前端要確保同一時間只發一個。\n- **密碼**:用 PBKDF2-SHA256 跑 100,000 次(Workers 的上限)。帳號不存在時也會算一次,避免從回應時間猜出 email 有沒有註冊。\n- **`requireMember` 不查資料庫**,直接信任 JWT 裡的 `role`。所以改權限或停權,最多要 15 分鐘才生效(等 access token 過期);refresh 時會重新讀會員資料。\n- **註冊規則**:`role` 一律由伺服器設為 `member`,body 傳什麼都不理;email 會先去頭尾空白、轉小寫。\n- **輸入限制**:密碼 8–256 字、nickname 1–50 字;email 重複回 409,body 格式錯回 400。\n- **logout 一律回 204**:不管 token 存不存在,都不透露 token 的狀態。\n\n**你那邊要做的**\n- 裝 `hono`(`hono/jwt` 的 `verify` 會用到明確指定演算法的參數,建議用新版)。\n- 用 `wrangler secret put JWT_SECRET` 設一組夠長的隨機字串。\n- 過期的 `refresh_tokens` 不會自動清掉,之後可以加個 Cron 定期刪除。",
+ "ttft_ms": 1516,
+ "type": "result",
+ "duration_ms": 66058,
+ "ttft_stream_ms": 935,
+ "time_to_request_ms": 76,
+ "first_content_frame_ms": 935,
+ "queued_turn_count": 0,
+ "result_index": 0
+}
