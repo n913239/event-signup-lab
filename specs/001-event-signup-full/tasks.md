@@ -69,7 +69,7 @@ repo 根:`src/`(API)、`tests/`、`scripts/`、`web/`(Pages)、`ios/EventSignup/
 
 ### 金額引擎(實驗二)
 
-- [ ] T018 📅9/24 🖐 [US1] **作者手寫 `src/domain/money.js`,AI 不得先出版本**。介面照 `research.md` R4:`applyPct(cents, pct)` = `Math.floor((cents * (100 - pct) + 50) / 100)`;`quote({ unit_price_cents, qty, early_bird_pct, group_min_qty, group_pct, promo_cents })` → `{ subtotal_cents, after_early_bird_cents, after_group_cents, promo_cents, total_cents }`,先乘後減、整筆小計不逐座、`total_cents` 下限 0。**先寫紅的 `tests/domain/money.test.js`**:向量 100000/10/10/10000 → 71000;反向探針 72900、70000 不得出現;33333×3 早鳥 10 → 89999;5000 − 6000 → 0;`qty < group_min_qty` 不套團體。`npm run check:money` 綠。commit「AI 尚未介入」
+- [x] T018 📅9/24 🖐 [US1] **作者手寫 `src/domain/money.js`,AI 不得先出版本**。介面照 `research.md` R4:`applyPct(cents, pct)` = `Math.floor((cents * (100 - pct) + 50) / 100)`;`quote({ unit_price_cents, qty, early_bird_pct, group_min_qty, group_pct, promo_cents })` → `{ subtotal_cents, after_early_bird_cents, after_group_cents, promo_cents, total_cents }`,先乘後減、整筆小計不逐座、`total_cents` 下限 0。**先寫紅的 `tests/domain/money.test.js`**:向量 100000/10/10/10000 → 71000;反向探針 72900、70000 不得出現;33333×3 早鳥 10 → 89999;5000 − 6000 → 0;`qty < group_min_qty` 不套團體。`npm run check:money` 綠。commit「AI 尚未介入」
 - [ ] T019 📅9/25 🖐 [US1] 乾淨 session 出 AI 版金額引擎(prompt 只給折扣三層與順序,不給硬規則)→ `devlog/raw/exp-02-money/` → 用同一份 `tests/domain/money.test.js` 與 `check-money.sh` 量 → 差異寫 devlog,另外 commit
 
 ### 時間判定(實驗三)
@@ -172,7 +172,7 @@ repo 根:`src/`(API)、`tests/`、`scripts/`、`web/`(Pages)、`ios/EventSignup/
 ## Phase 8: Polish & Cross-Cutting(10/3、10/10–10/13)
 
 - [ ] T051 📅10/3 `scripts/smoke.sh` 填實:照 `quickstart.md` 第 3 節的 curl 流程(註冊 → 登入 → 建活動 → 票種 → 4 座 hold → 帶 `WELCOME` 確認 → 斷言 `total_cents = 314000` → 改價 → 重讀不變 → 取消 → 重 hold A1 → 201);`npm run smoke` 對 `wrangler dev`
-- [ ] T052 📅10/3 部署:`wrangler d1 create signup` 換掉 `wrangler.toml` 的 placeholder id、`wrangler secret put JWT_SECRET / QR_SECRET`、`wrangler d1 execute signup --remote --file=schema.sql`、`wrangler deploy`;`BASE_URL=<worker> npm run smoke`
+- [~] T052 📅10/3 部署:`wrangler d1 create signup` 換掉 `wrangler.toml` 的 placeholder id、`wrangler secret put JWT_SECRET / QR_SECRET`、`wrangler d1 execute signup --remote --file=schema.sql`、`wrangler deploy`;`BASE_URL=<worker> npm run smoke`
 - [ ] T053 📅10/3 `scripts/race.sh` 填實:對遠端 Worker 用 `xargs -P 20 curl` 打同一座位 20 次與同票種名額 + 5 次,統計 201 / 409 數量,寫 `devlog/raw/race-<date>.txt`;結果進 `docs/verified.md` ✅「真實併發」
 - [ ] T054 [P] 📅10/10 Pages 部署:`web/` 連 Pages 專案、`VITE_API_BASE` 指向 Worker、Worker 的 `CORS_ORIGIN` 改成 Pages 網域;線上走一遍五畫面
 - [ ] T055 [P] 📅10/10 SC-007 / SC-008 實測:同帳號 web、iOS、curl 三份 `GET /events` 與三份 `GET /orders` 各自逐欄 diff;`rows_read` 數字;寫進 `docs/verified.md` ✅ 欄(有輸出可貼的才進)
