@@ -1,0 +1,13 @@
+{
+ "orders": 6,
+ "seats": 14,
+ "join": {
+  "queries": 1,
+  "rows_returned": 14,
+  "rows_read": 60
+ },
+ "n_plus_1": {
+  "queries": 27,
+  "rows_read": 52
+ }
+}
