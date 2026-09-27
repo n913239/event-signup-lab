@@ -12,4 +12,4 @@ database_id = "be735007-781b-488a-93c3-6e0288b745a8"   # 2026-09-27 wrangler d1 
 crons = ["*/5 * * * *"]
 
 [vars]
-CORS_ORIGIN = "http://localhost:5173"
+CORS_ORIGIN = "https://event-signup-web.pages.dev"   # 本機開發由 .dev.vars 覆寫成 http://localhost:5173
