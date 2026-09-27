@@ -1,0 +1,24 @@
+diff --git a/specs/001-event-signup-full/tasks.md b/specs/001-event-signup-full/tasks.md
+index cfc8428..47e490e 100644
+--- a/specs/001-event-signup-full/tasks.md
++++ b/specs/001-event-signup-full/tasks.md
+@@ -263,3 +263,19 @@ US2 只是讓主辦不用下 SQL;US3 的 refresh 是安全性;US4 / US5 是兩
+ 
+ **風險點**(排得最緊的三天):9/29(T030 是整個專案最難的一段,又是實驗)、10/1(六條 endpoint 一天)、10/3(六個 task)。
+ 若 9/29 滑一天,10/1–10/3 順延,砍 10/13 的緩衝;若再滑,先砍 iOS(T047–T049 改成只做 T047 的 client 產生)。
++
++---
++
++## Phase 9: Convergence
++
++- [ ] T061 把 `docs/spec.md`「折扣怎麼算」2026-09-27 改定(不疊加、擇優,平手 優惠碼 → 早鳥 → 團體)同步進 `specs/001-event-signup-full/spec.md` 的 FR-051–053、SC-003、US1/AC5–6,以及 `plan.md`、`quickstart.md` 的 71000 / 314000 範例;程式(`src/domain/money.js`)已照作者新規則,不改 per FR-052 (contradicts)
++- [ ] T062 把 C8 改定(無效優惠碼:本來會被選中或沒有別的折扣 → 409 `promo_rejected`;否則忽略碼照樣成立)同步進 `spec.md` 的 FR-056、US1/AC7、SC-011 與 Edge Cases per FR-056 (contradicts)
++- [ ] T063 把 M1(早鳥看建立保留的時間)同步進 `spec.md` FR-022 / FR-055 的敘述,與 `tests/routes/holds.test.js` 的 M1 測試對齊 per FR-022 (contradicts)
++- [ ] T064 `POST /auth/logout` 不帶 body(或沒有 `refresh_token`)改回 400 `invalid_input`,目前 `src/routes/auth.js` 一律 204;先在 T035 的 auth 路由測試寫紅 per T035 (contradicts)
++- [ ] T065 第 18 條 endpoint `POST /holds/:id/quote`(作者 2026-09-27 加)寫進 `spec.md`(FR 與 US1)、`plan.md`(Summary / Scale / Gate「沒有新 endpoint」列)、`specs/001-event-signup-full/contracts/openapi.yaml` 與 `quickstart.md` 的端點數 per plan: 17 endpoint (unrequested)
++- [ ] T066 登入失敗鎖定 L1(`tests/routes/login-lockout.test.js`)寫進 `spec.md` FR-081 與 US3、`plan.md` Constraints 的「無 rate limit」改為「只有登入鎖定」,對齊 `docs/non-goals.md` per FR-081 (unrequested)
++- [ ] T067 把 `docs/spec.md`「保留與確認的商業規則」的 H1(一次最多 10 席)、H4(放棄 / 過期 / 取消都還名額)、H7(重複確認回同一張訂單 200)、M2(取消後碼可再用)、M4 寫進 `spec.md` 的 FR-030 / FR-037 / FR-042 / FR-056 與 Edge Cases per FR-030 (unrequested)
++- [ ] T068 web 錯誤代碼翻成友善中文(`web/src/pages/ui.js`)與 FR-081 / `docs/non-goals.md`「錯誤訊息不友善」及 T043「顯示原始 error 字串」衝突:先問作者,保留就回寫 `docs/non-goals.md` 與 `spec.md` FR-081,不保留就改回原始代碼 per FR-081 (contradicts)
++- [ ] T069 T051 的 smoke 期望值依擇優規則重算(`quickstart.md` 第 3 節 314000 是疊加算法),先改 quickstart 再填實 `scripts/smoke.sh` per T051 (partial)
++- [ ] T070 補 `tests/worker.test.js`:`clock` 推過期後呼叫 `worker.scheduled()`,斷言過期 hold 變 `expired` 且回傳筆數,釘住 Cron → `sweepExpired` 的接線 per plan: T034 (partial)
++- [ ] T071 iOS 離線快取目前只涵蓋 `GET /orders`(`Cache/OrdersCache.swift`),活動列表離線無資料:問作者是補 `GET /events` 快取,還是把 US4/AC4 收窄為「只有票券」並回寫 `spec.md` per US4/AC4 (partial)

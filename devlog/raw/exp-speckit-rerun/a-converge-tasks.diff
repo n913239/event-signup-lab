@@ -1,0 +1,16 @@
+diff --git a/specs/001-event-signup-full/tasks.md b/specs/001-event-signup-full/tasks.md
+index 9f2969f..466f395 100644
+--- a/specs/001-event-signup-full/tasks.md
++++ b/specs/001-event-signup-full/tasks.md
+@@ -271,3 +271,11 @@ US2 只是讓主辦不用下 SQL;US3 的 refresh 是安全性;US4 / US5 是兩
+ - [x] T074 [US1] `POST /holds/:id/quote` 試算(第 18 條)+ web 保留頁「套用」按鈕;`tests/routes/quote.test.js`
+ - [x] T075 [US3] 登入失敗鎖定 L1:members 加 `failed_logins` / `locked_until`;`tests/routes/login-lockout.test.js` 7 個
+ - [x] T076 [US3] logout 不帶 refresh_token → 400;`tests/routes/auth.test.js`(T035)
++
++## Phase 9: Convergence
++
++- [ ] T077 [US1] `tests/concurrency.test.js` 的 SC-004 補斷言:每一輪都要驗「原持有人的 confirm → 409 `hold_expired`,A1 不屬於原持有人」;現在只驗「5 次結果一樣」,沒有釘住作者定的「到期那一刻原持有人的確認一律輸」 per SC-004 (partial)
++- [ ] T078 [US1] 新增 `tests/worker.test.js`(T034 寫了要做,但檔案不存在):用 `clock` 把時間推過到期後單獨呼叫 `sweepExpired` → 斷言 `changes`、hold 翻成 `expired`、列還在(沒刪)、票種 `remaining` 還回去(H4 的 sweep 路徑目前沒有測試);再用假的 `ctx.waitUntil` 呼叫一次 `worker.scheduled()` per FR-034 / US1-AC11 / FR-035 (partial)
++- [ ] T079 `scripts/smoke.sh` 填實時,確認金額斷言用 `total_cents = 360000`(早鳥擇優、WELCOME 沒被選中也沒用掉),不要用 T051 寫的 314000 —— 那是 C9 改定前的疊加算法 per SC-003 (contradicts)
++- [ ] T080 [US1] H7 併發版:同一個 hold 兩個 confirm 同時到(用 `gate.js`)時,輸的那一方現在回 409 `hold_expired`;改成 `insertConfirmed` 回 false 時重讀 hold,若已是 `confirmed` 就回 200 + 同一張訂單;先寫會紅的閘門測試 per FR-043 (partial)
++- [ ] T081 [US2] `PATCH /events/:id` 做到全有全無:現在先 `events.update` 再逐一 `updateCapacity`,第 N 個票種失敗回 409 時,活動欄位與前面的票種已經寫進去;先寫會紅的測試(兩個票種,第二個名額低於已售 → 409,且活動時間與第一個票種都沒變)再改 per FR-013 (partial)
