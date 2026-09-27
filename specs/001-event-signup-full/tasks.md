@@ -171,9 +171,9 @@ repo 根:`src/`(API)、`tests/`、`scripts/`、`web/`(Pages)、`ios/EventSignup/
 
 ## Phase 8: Polish & Cross-Cutting(10/3、10/10–10/13)
 
-- [ ] T051 📅10/3 `scripts/smoke.sh` 填實:照 `quickstart.md` 第 3 節的 curl 流程(註冊 → 登入 → 建活動 → 票種 → 4 座 hold → 帶 `WELCOME` 確認 → 斷言 `total_cents = 360000` 且 `promo_code = null`(擇優選早鳥,WELCOME 沒被用掉;2026-09-27 更正,原本寫 314000) → 改價 → 重讀不變 → 取消 → 重 hold A1 → 201);`npm run smoke` 對 `wrangler dev`
+- [x] T051 📅10/3 `scripts/smoke.sh` 填實:照 `quickstart.md` 第 3 節的 curl 流程(註冊 → 登入 → 建活動 → 票種 → 4 座 hold → 帶 `WELCOME` 確認 → 斷言 `total_cents = 360000` 且 `promo_code = null`(擇優選早鳥,WELCOME 沒被用掉;2026-09-27 更正,原本寫 314000) → 改價 → 重讀不變 → 取消 → 重 hold A1 → 201);`npm run smoke` 對 `wrangler dev` **〔完成:本機 11/11,`c25a7d9`〕**
 - [x] T052 📅10/3 部署(2026-09-27 完成:D1 建立與建表、secret、deploy、/health 200;遠端不跑 seed):`wrangler d1 create signup` 換掉 `wrangler.toml` 的 placeholder id、`wrangler secret put JWT_SECRET / QR_SECRET`、`wrangler d1 execute signup --remote --file=schema.sql`、`wrangler deploy`;`BASE_URL=<worker> npm run smoke`
-- [ ] T053 📅10/3 `scripts/race.sh` 填實:對遠端 Worker 用 `xargs -P 20 curl` 打同一座位 20 次與同票種名額 + 5 次,統計 201 / 409 數量,寫 `devlog/raw/race-<date>.txt`;結果進 `docs/verified.md` ✅「真實併發」
+- [x] T053 📅10/3 `scripts/race.sh` 填實:對遠端 Worker 用 `xargs -P 20 curl` 打同一座位 20 次與同票種名額 + 5 次,統計 201 / 409 數量,寫 `devlog/raw/race-<date>.txt`;結果進 `docs/verified.md` ✅「真實併發」 **〔完成:遠端 5 輪 × 20 連線全一致,`devlog/raw/race-2026-09-27.txt`〕**
 - [x] T054 [P] 📅10/10 Pages 部署:`web/` 連 Pages 專案、`VITE_API_BASE` 指向 Worker、Worker 的 `CORS_ORIGIN` 改成 Pages 網域;線上走一遍五畫面
 - [ ] T055 [P] 📅10/10 SC-007 / SC-008 實測:同帳號 web、iOS、curl 三份 `GET /events` 與三份 `GET /orders` 各自逐欄 diff;`rows_read` 數字;寫進 `docs/verified.md` ✅ 欄(有輸出可貼的才進)
 - [ ] T056 📅10/11 `docs/verified.md` 全面對帳:❌ 欄逐項移到 ✅ 或留著(JWT 由 repo 內六個測試 + `check-jwt-timing.sh` 裁定,2026-09-27 改定;外部清單不再是驗收);「已知的坑」補這 30 天踩到的

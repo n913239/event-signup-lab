@@ -1,0 +1,7 @@
+# race.sh 2026-09-27 17:17:55 +0800 against https://event-signup.n913239.workers.dev,5 輪,每輪 20 條連線同時起跑
+✅ 第 1 輪 | A 同座位: 1 201; 19 409 seat_taken; | B 名額 5: 5 201; 15 409 sold_out; remaining=0 佔位座位=5
+✅ 第 2 輪 | A 同座位: 1 201; 19 409 seat_taken; | B 名額 5: 5 201; 15 409 sold_out; remaining=0 佔位座位=5
+✅ 第 3 輪 | A 同座位: 1 201; 19 409 seat_taken; | B 名額 5: 5 201; 15 409 sold_out; remaining=0 佔位座位=5
+✅ 第 4 輪 | A 同座位: 1 201; 19 409 seat_taken; | B 名額 5: 5 201; 15 409 sold_out; remaining=0 佔位座位=5
+✅ 第 5 輪 | A 同座位: 1 201; 19 409 seat_taken; | B 名額 5: 5 201; 15 409 sold_out; remaining=0 佔位座位=5
+✅ 5 輪全部一致:同座位恰 1 人、名額 5 恰 5 人,remaining 不為負
