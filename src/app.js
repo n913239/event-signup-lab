@@ -1,4 +1,5 @@
 import { Hono } from 'hono'
+import { cors } from 'hono/cors'
 import { auth } from './routes/auth.js'
 import { events } from './routes/events.js'
 import { ticketTypes } from './routes/ticket-types.js'
@@ -21,6 +22,14 @@ export function createApp({ now = Date.now } = {}) {
       c.res.headers.set('x-server-now', String(c.get('now')))
     }
   })
+
+  // web(Pages)跨網域呼叫;x-server-now 要 expose,前端倒數才讀得到。
+  app.use('*', (c, next) => cors({
+    origin: c.env?.CORS_ORIGIN ?? 'http://localhost:5173',
+    allowHeaders: ['authorization', 'content-type'],
+    allowMethods: ['GET', 'POST', 'PATCH', 'DELETE', 'OPTIONS'],
+    exposeHeaders: ['x-server-now'],
+  })(c, next))
 
   app.get('/health', (c) =>
     c.json({ ok: true, server_now: c.get('now') }))
