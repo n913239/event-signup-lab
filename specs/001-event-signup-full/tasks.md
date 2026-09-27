@@ -75,7 +75,7 @@ repo 根:`src/`(API)、`tests/`、`scripts/`、`web/`(Pages)、`ios/EventSignup/
 ### 時間判定(實驗三)
 
 - [x] T020 📅9/26 ~~🖐~~ [US1] **(2026-09-27 改:寫作 session 寫、作者審)** **作者手寫 `src/domain/time-rules.js`,AI 不得先出版本**。介面照 R5:`canHold(event, now)` → `{ ok, reason }`,`status !== 'on_sale'` 回 `not_on_sale`、`now < opens_at` 回 `not_open_yet`、`now >= deadline_at` 回 `deadline_passed`(**兩個真相來源分開回**);`isEarlyBird(ticketType, now)`(`early_bird_until` 為 null → false);`isHoldExpired(hold, now)`(`expires_at <= now`);`holdExpiresAt(now, ttlMinutes)`。**先寫紅的 `tests/domain/time-rules.test.js`**:每個邊界一條,含「剛好等於 `opens_at`」「剛好等於 `deadline_at`」「剛好等於 `expires_at`」。`npm run check:time` 綠。commit「AI 尚未介入」
-- [ ] T021 📅9/27 🖐 [US1] 乾淨 session 出 AI 版時間判定 → `devlog/raw/exp-03-time/` → 同一份測試量(預期它會自己 `Date.now()`,那正是 A3 實驗要抓的)→ devlog,另外 commit
+- [x] T021 📅9/27 🖐 [US1] 乾淨 session 出 AI 版時間判定 → `devlog/raw/exp-03-time/` → 同一份測試量(預期它會自己 `Date.now()`,那正是 A3 實驗要抓的)→ devlog,另外 commit
 
 ### 併發(實驗四)—— 測試先於機制
 
