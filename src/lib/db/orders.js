@@ -44,9 +44,9 @@ export async function insertConfirmed(db, { orderId, hold, memberId, unitPriceCe
     db.prepare(`INSERT INTO orders (id, member_id, event_id, hold_id, status, subtotal_cents, early_bird_pct, group_pct,
           promo_code, promo_cents, total_cents, confirmed_at)
         SELECT ?, ?, ?, ?, 'confirmed', ?, ?, ?, ?, ?, ?, ?
-        WHERE (SELECT COUNT(*) FROM seat_holds WHERE hold_id = ? AND status = 'confirmed') = ?`)
+        WHERE changes() = ?`)   // 只有「這一個 batch 的 UPDATE」真的翻成功才插;別的 confirm 先翻掉的不算(H7 併發)
       .bind(orderId, memberId, hold.event_id, hold.id, quote.subtotal_cents, quote.early_bird_pct, quote.group_pct,
-        promoCode, quote.promo_cents, quote.total_cents, now, hold.id, n),
+        promoCode, quote.promo_cents, quote.total_cents, now, n),
     db.prepare(`INSERT INTO order_items (order_id, seat_no, ticket_type_id, unit_price_cents)
         SELECT ?, seat_no, ticket_type_id, ? FROM seat_holds
         WHERE hold_id = ? AND status = 'confirmed' AND EXISTS (SELECT 1 FROM orders WHERE id = ?)`)

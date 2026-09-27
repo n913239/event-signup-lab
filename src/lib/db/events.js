@@ -36,6 +36,25 @@ export async function update(db, id, ownerId, v) {
   return r.meta.changes
 }
 
+// 改活動欄位 + 各票種名額,同一個 batch(全有全無,T081)。
+// 名額的合法性(不小於已售、總和 ≤ 100)由呼叫端先驗;這裡的第二道是 CHECK (remaining >= 0) 與 opens_at < deadline_at —
+// 同時有人搶到座位讓「已售」變多時,remaining 扣到負數會拋錯,整批回滾。
+export async function updateWithCapacities(db, id, ownerId, v, capacities) {
+  const keys = PATCHABLE.filter((k) => v[k] !== undefined)
+  const stmts = []
+  if (keys.length) {
+    stmts.push(db.prepare(`UPDATE events SET ${keys.map((k) => `${k} = ?`).join(', ')} WHERE id = ? AND owner_id = ?`)
+      .bind(...keys.map((k) => v[k]), id, ownerId))
+  }
+  for (const { id: ttId, capacity } of capacities) {
+    stmts.push(db.prepare('UPDATE ticket_types SET remaining = remaining + (? - capacity), capacity = ? WHERE id = ? AND event_id = ?')
+      .bind(capacity, capacity, ttId, id))
+  }
+  if (stmts.length === 0) return true
+  const results = await db.batch(stmts)
+  return results.every((r) => r.meta.changes === 1)
+}
+
 export async function close(db, id, ownerId) {
   const r = await db.prepare("UPDATE events SET status = 'closed' WHERE id = ? AND owner_id = ? AND status = 'on_sale'")
     .bind(id, ownerId).run()

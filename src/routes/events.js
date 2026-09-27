@@ -46,17 +46,24 @@ events_.patch('/:id', requireOwner, async (c) => {  // 僅主辦:改時間 / 參
   const v = validate.eventPatch(await body(c))
   if (!v.ok) return err(c, 400, v.error)
   const e = c.get('event')
-  try {
-    await events.update(c.env.DB, e.id, e.owner_id, v.value)
-  } catch (x) {
-    if (/CHECK/.test(x.message)) return err(c, 400, 'invalid_input')   // opens_at >= deadline_at
-    throw x
+  // 先驗名額:每個票種都屬於這個活動、不小於已售、改完總和 ≤ 100;不合法就一筆都不寫(T081 全有全無)
+  const caps = v.value.ticket_types ?? []
+  if (caps.length) {
+    const current = new Map((await ticketTypes.listByEvent(c.env.DB, e.id)).map((x) => [x.id, x]))
+    let total = [...current.values()].reduce((s, x) => s + x.capacity, 0)
+    for (const { id, capacity } of caps) {
+      const row = current.get(id)
+      if (!row) return err(c, 404, 'not_found')
+      if (capacity < row.capacity - row.remaining) return err(c, 409, 'capacity_below_sold')
+      total += capacity - row.capacity
+    }
+    if (total > 100) return err(c, 409, 'capacity_exceeded')
   }
-  for (const t of v.value.ticket_types ?? []) {
-    if (await ticketTypes.updateCapacity(c.env.DB, t.id, e.id, t.capacity) === 1) continue
-    const row = await ticketTypes.findById(c.env.DB, t.id)
-    if (!row || row.event_id !== e.id) return err(c, 404, 'not_found')
-    return err(c, 409, t.capacity < row.capacity - row.remaining ? 'capacity_below_sold' : 'capacity_exceeded')
+  try {
+    if (!(await events.updateWithCapacities(c.env.DB, e.id, e.owner_id, v.value, caps))) return err(c, 409, 'capacity_below_sold')
+  } catch (x) {
+    if (/CHECK/.test(x.message)) return err(c, /remaining/.test(x.message) ? 409 : 400, /remaining/.test(x.message) ? 'capacity_below_sold' : 'invalid_input')
+    throw x
   }
   return c.json(present.event(await events.findById(c.env.DB, e.id, c.get('now'))))
 })

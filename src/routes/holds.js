@@ -52,7 +52,13 @@ holds.post('/:id/confirm', async (c) => {
       orderId, hold: h, memberId: me, unitPriceCents: tt.price_cents, quote: q,
       promoCode: q.applied === 'promo' ? promo.code : null,                  // 沒被選中的碼不記、不算用掉
     }, now)
-    if (!ok) return err(c, 409, 'hold_expired')                            // 跟 sweep / 搶位同時到,輸了
+    if (!ok) {
+      // 輸了:可能是別的 confirm 先成立(H7 → 回同一張訂單),或跟 sweep / 搶位同時到期
+      const again = await holdsDb.findHold(c.env.DB, h.id, me)
+      const existing = again?.status === 'confirmed' ? await orders.findByHold(c.env.DB, h.id) : null
+      if (existing) return c.json(await present.order(existing, c.env.QR_SECRET), 200)
+      return err(c, 409, 'hold_expired')
+    }
   } catch (e) {
     if (/UNIQUE.*orders\.member_id/.test(e.message)) return err(c, 409, 'promo_rejected')
     throw e
