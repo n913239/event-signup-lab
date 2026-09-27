@@ -6,4 +6,4 @@ CREATE TABLE seat_holds (id INTEGER PRIMARY KEY, event_id INTEGER NOT NULL, seat
 CREATE UNIQUE INDEX ux_seat_active ON seat_holds(event_id, seat_no) WHERE status IN ('holding','confirmed');
 CREATE TABLE orders (id INTEGER PRIMARY KEY, member_id INTEGER NOT NULL, event_id INTEGER NOT NULL, status TEXT NOT NULL CHECK (status IN ('confirmed','checked_in','cancelled')), total_cents INTEGER NOT NULL, created_at INTEGER NOT NULL) STRICT;
 CREATE TABLE order_items (id INTEGER PRIMARY KEY, order_id INTEGER NOT NULL, ticket_type_id INTEGER NOT NULL, seat_no TEXT NOT NULL, unit_price_cents INTEGER NOT NULL) STRICT;
-CREATE TABLE promo_codes (id INTEGER PRIMARY KEY, code TEXT NOT NULL UNIQUE, pct INTEGER NOT NULL, valid_until INTEGER NOT NULL) STRICT;
+CREATE TABLE promo_codes (id INTEGER PRIMARY KEY, code TEXT NOT NULL UNIQUE, pct INTEGER NOT NULL, valid_until INTEGER NOT NULL, active INTEGER NOT NULL DEFAULT 1 CHECK (active IN (0, 1))) STRICT;

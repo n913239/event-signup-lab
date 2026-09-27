@@ -7,7 +7,7 @@
 
 | 檔案 | 壞在哪 | 應該紅在 |
 |---|---|---|
-| `good.sql` | — | 全綠(11 passed) |
+| `good.sql` | —(`promo_codes.active IN (0, 1)` 是**不誤報探針**:布林旗標不算狀態,2026-09-27 加) | 全綠(11 passed) |
 | `bad-index.sql` | 部分索引述詞只寫 `'holding'`,漏了 `confirmed` | ④ |
 | `bad-float.sql` | 金額欄用 `REAL` 而且名字沒帶單位 | ① ×2 |
 | `bad-strict.sql` | 沒有 `STRICT` | ⑧ |

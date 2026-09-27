@@ -115,8 +115,11 @@ d('③ status 有 CHECK,而且列舉值不多不少', () => {
     const ddl = (await db.prepare(
       "SELECT sql FROM sqlite_master WHERE type='table' AND sql IS NOT NULL").all())
       .results.map((r) => r.sql).join('\n')
+    // 只收字串值:`is_seated IN (0, 1)` 這種布林旗標不是狀態(2026-09-27 量 AI 版 schema 時,
+    // 0 / 1 被算成「狀態機以外的值」—— 裁判抓太寬,見 devlog/LEDGER)
     const found = [...ddl.matchAll(/CHECK\s*\([^)]*?\bIN\s*\(([^)]*)\)/gi)]
-      .flatMap((m) => m[1].split(',').map((x) => x.trim().replace(/^'|'$/g, '')))
+      .flatMap((m) => m[1].split(',').map((x) => x.trim()))
+      .filter((x) => /^'.*'$/.test(x)).map((x) => x.slice(1, -1))
     expect(found.length, '找不到任何 CHECK … IN (…) 列舉').toBeGreaterThan(0)
     const extra = [...new Set(found)].filter((v) => !KNOWN.has(v))
     expect(extra, '多一個列舉值 = 有一個狀態沒人處理').toEqual([])
