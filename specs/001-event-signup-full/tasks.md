@@ -148,7 +148,7 @@ repo 根:`src/`(API)、`tests/`、`scripts/`、`web/`(Pages)、`ios/EventSignup/
 
 ### iOS 骨架
 
-- [ ] T047 📅10/7 [US4] 建 `ios/EventSignup/`(SwiftPM,iOS 17,SwiftUI);`Package.swift` 加 `swift-openapi-generator`(plugin)、`swift-openapi-runtime`、`swift-openapi-urlsession`;`Sources/EventSignup/openapi.yaml` 由 repo 根複製(加 `scripts/sync-openapi.sh` 一行 `cp`);`openapi-generator-config.yaml`(`generate: [types, client]`);build 通過、`Client` 型別出現
+- [x] T047 📅10/7 [US4] 建 `ios/EventSignup/`(SwiftPM,iOS 17,SwiftUI);`Package.swift` 加 `swift-openapi-generator`(plugin)、`swift-openapi-runtime`、`swift-openapi-urlsession`;`Sources/EventSignup/openapi.yaml` 由 repo 根複製(加 `scripts/sync-openapi.sh` 一行 `cp`);`openapi-generator-config.yaml`(`generate: [types, client]`);build 通過、`Client` 型別出現
 - [ ] T048 📅10/8 [US4] `ios/EventSignup/Sources/EventSignup/Auth/LoginView.swift` + `Auth/TokenStore.swift`(Keychain)+ `Auth/BearerMiddleware.swift`(`ClientMiddleware`,401 → refresh 一次重試)
 - [ ] T049a 📅10/9 [US4] `ios/EventSignup/Sources/EventSignup/Events/EventListView.swift`(`GET /events?status=on_sale`,daisyUI card 的對應:名稱、開賣 / 截止、票種與剩餘)+ `Events/EventDetailView.swift`(`GET /events/:id`,畫 100 席 `free/held/sold/mine` 四色,**唯讀不可點**;FR-071 不做選位);不做離線快取
 - [ ] T049b 📅10/9 [US4] `ios/EventSignup/Sources/EventSignup/Tickets/TicketListView.swift`、`Tickets/TicketDetailView.swift`(CoreImage `CIFilter.qrCodeGenerator()` 畫 `qr_payload`;金額顯示集中 `Tickets/Money.swift`)、`Cache/OrdersCache.swift`(最後一次 `GET /orders` 原始 JSON 存 Application Support;離線時讀並顯示「離線資料」;登出離線時提示需連線)
