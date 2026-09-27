@@ -23,6 +23,7 @@ tags:
 paths:
   /health:
     get:
+      operationId: health
       security: []
       summary: 健康檢查與伺服器時間
       responses:
@@ -40,6 +41,7 @@ paths:
   # ── 認證(4)─────────────────────────────────────────────
   /auth/register:
     post:
+      operationId: register
       tags: [auth]
       security: []
       summary: 建立成員(單一組織,角色 member)
@@ -61,6 +63,7 @@ paths:
 
   /auth/login:
     post:
+      operationId: login
       tags: [auth]
       security: []
       summary: 登入,回 access(15 分鐘)+ refresh(30 天)
@@ -81,6 +84,7 @@ paths:
 
   /auth/refresh:
     post:
+      operationId: refresh
       tags: [auth]
       security: []
       summary: 輪替 refresh;舊的立刻失效;重放 → 撤銷該成員全部 refresh
@@ -99,6 +103,7 @@ paths:
 
   /auth/logout:
     post:
+      operationId: logout
       tags: [auth]
       summary: 撤銷當前 refresh
       requestBody:
@@ -117,6 +122,7 @@ paths:
   # ── 活動(5)─────────────────────────────────────────────
   /events:
     post:
+      operationId: createEvent
       tags: [events]
       summary: 建活動(staff);直接 on_sale;建立者為主辦;座位固定 10×10
       requestBody:
@@ -139,6 +145,7 @@ paths:
         '401': { $ref: '#/components/responses/Unauthorized' }
         '403': { $ref: '#/components/responses/Forbidden' }
     get:
+      operationId: listEvents
       tags: [events]
       summary: 活動列表;預設不含 draft;主辦看得到自己的 draft
       parameters:
@@ -161,6 +168,7 @@ paths:
   /events/{id}:
     parameters: [{ $ref: '#/components/parameters/Id' }]
     get:
+      operationId: getEvent
       tags: [events]
       summary: 活動詳情:票種、剩餘名額、100 席座位狀態
       responses:
@@ -168,6 +176,7 @@ paths:
         '401': { $ref: '#/components/responses/Unauthorized' }
         '404': { $ref: '#/components/responses/NotFound' }
     patch:
+      operationId: updateEvent
       tags: [events]
       summary: 僅主辦:改時間 / 改名額(票種名額改到 < 已售 → 409)
       requestBody:
@@ -204,6 +213,7 @@ paths:
   /events/{id}/close:
     parameters: [{ $ref: '#/components/parameters/Id' }]
     post:
+      operationId: closeEvent
       tags: [events]
       summary: 僅主辦:手動提前截止(只擋新 hold;既有 hold 仍可確認)
       responses:
@@ -217,6 +227,7 @@ paths:
   /events/{id}/ticket-types:
     parameters: [{ $ref: '#/components/parameters/Id' }]
     post:
+      operationId: createTicketType
       tags: [ticket-types]
       summary: 僅主辦:新增票種(同活動名額總和 ≤ 100)
       requestBody:
@@ -243,6 +254,7 @@ paths:
   /ticket-types/{id}:
     parameters: [{ $ref: '#/components/parameters/Id' }]
     patch:
+      operationId: updateTicketType
       tags: [ticket-types]
       summary: 僅主辦:改價格(既有訂單不受影響;未確認 hold 以新價計)
       requestBody:
@@ -265,6 +277,7 @@ paths:
   /events/{id}/holds:
     parameters: [{ $ref: '#/components/parameters/Id' }]
     post:
+      operationId: createHold
       tags: [holds]
       summary: 選位 + 保留(一個票種、N 個座位,全有全無;一人一活動一個有效 hold)
       requestBody:
@@ -294,6 +307,7 @@ paths:
   /holds/{id}:
     parameters: [{ $ref: '#/components/parameters/Id' }]
     delete:
+      operationId: deleteHold
       tags: [holds]
       summary: 僅本人:主動放棄(座位釋放)
       responses:
@@ -305,6 +319,7 @@ paths:
   /holds/{id}/confirm:
     parameters: [{ $ref: '#/components/parameters/Id' }]
     post:
+      operationId: confirmHold
       tags: [holds]
       summary: 僅本人:確認 → 建訂單(以確認當下票價與折扣計;可帶優惠碼)
       requestBody:
@@ -327,6 +342,7 @@ paths:
   # ── 訂單(3)─────────────────────────────────────────────
   /orders:
     get:
+      operationId: listOrders
       tags: [orders]
       summary: 我的票券(web 與 iOS 對同一份資料)
       responses:
@@ -345,6 +361,7 @@ paths:
   /orders/{id}:
     parameters: [{ $ref: '#/components/parameters/Id' }]
     get:
+      operationId: getOrder
       tags: [orders]
       summary: 本人或主辦:明細,含金額快照與 qr_payload
       responses:
@@ -355,6 +372,7 @@ paths:
   /orders/{id}/cancel:
     parameters: [{ $ref: '#/components/parameters/Id' }]
     post:
+      operationId: cancelOrder
       tags: [orders]
       summary: 僅本人:取消 confirmed 訂單(座位釋放;checked_in / cancelled → 409)
       responses:
