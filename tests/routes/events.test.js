@@ -89,6 +89,17 @@ describe.skipIf(!existsSync('schema.sql'))('活動', () => {
     expect(row).toEqual({ capacity: 5, remaining: 2 })
   })
 
+  it('改名額全有全無:第二個票種低於已售 → 409,活動欄位與第一個票種都沒變(T081)', async () => {
+    const ev = await (await create(staff.access)).json()
+    const t1 = await (await w.call(`/events/${ev.id}/ticket-types`, jsonReq('POST', { name: 'A', price_cents: 1, capacity: 10 }, staff.access))).json()
+    const t2 = await (await w.call(`/events/${ev.id}/ticket-types`, jsonReq('POST', { name: 'B', price_cents: 1, capacity: 10 }, staff.access))).json()
+    await w.db.prepare('UPDATE ticket_types SET remaining = 5 WHERE id = ?').bind(t2.id).run()   // B 已售 5
+    const res = await w.call(`/events/${ev.id}`, jsonReq('PATCH', { name: '改過', ticket_types: [{ id: t1.id, capacity: 20 }, { id: t2.id, capacity: 3 }] }, staff.access))
+    expect(res.status).toBe(409)
+    expect((await w.db.prepare('SELECT name FROM events WHERE id = ?').bind(ev.id).first()).name).toBe('演唱會')
+    expect((await w.db.prepare('SELECT capacity FROM ticket_types WHERE id = ?').bind(t1.id).first()).capacity).toBe(10)
+  })
+
   it('截止 → closed;再截止一次 → 409', async () => {
     const ev = await (await create(staff.access)).json()
     const res = await w.call(`/events/${ev.id}/close`, bearer(staff.access, { method: 'POST' }))

@@ -73,6 +73,19 @@ describe.skipIf(!has)('併發', () => {
     expect((await r.json()).error).toBe('seat_taken')
   })
 
+  it('H7 併發:同一個 hold 兩個 confirm 同時到 → 同一張訂單(一個 201、一個 200),不會 409 或 500(T080)', async () => {
+    s = await setup({ members: 1 })
+    const [u] = s.users
+    const h = await (await s.hold(u, ['A1'])).json()
+    const { ok } = await runConcurrently(2, async () => {
+      const r = await s.w.call(`/holds/${h.id}/confirm`, jsonReq('POST', {}, u.access))
+      return [r.status, (await r.json()).id]
+    })
+    expect(ok.map(([st]) => st).sort()).toEqual([200, 201])
+    expect(ok[0][1]).toBe(ok[1][1])
+    expect((await s.w.db.prepare('SELECT COUNT(*) AS n FROM orders').first()).n).toBe(1)
+  })
+
   it('SC-004 三方競態(到期那一刻:原持有人確認 / 別人搶同座 / sweep),重跑 5 次結果一樣,座位不會同時屬於兩個人', async () => {
     const { sweepExpired } = await import('../src/lib/db/holds.js')
     const outcomes = []
@@ -88,6 +101,8 @@ describe.skipIf(!has)('併發', () => {
       })
       const taken = await seatsTaken(s.w, s.ev.id)
       expect(taken.length).toBeLessThanOrEqual(1)
+      expect(ok[0]).toBe(409)                                   // 作者定:到期那一刻原持有人的確認一律輸(T077)
+      expect(taken[0]?.member_id).not.toBe(owner.member.id)
       outcomes.push(JSON.stringify({ ok, owner: taken[0]?.member_id === owner.member.id }))
       await s.w.dispose(); s = null
     }
