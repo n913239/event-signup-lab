@@ -28,15 +28,20 @@ Cloudflare Workers + Hono + D1 · Pages(web)· SwiftUI(iOS)· 自製 JWT · Open
 
 ## 現在的狀態
 
-尺造好了,被量的東西還沒有。
+尺與被量的東西都有了:18 條 endpoint、web、iOS 骨架,部署在 Cloudflare(Workers + D1 + Pages)。
 
 ```bash
-sh scripts/self-test.sh   # 40 筆探針:五支靜態檢查抓得到、而且不誤報
-npm test                  # 閘門 helper
-npm run check:all         # 五支靜態檢查
+sh scripts/self-test.sh        # 41 筆探針:五支靜態檢查抓得到、而且不誤報
+npm test                       # 245 個測試(含 fuzz 20,000 組、契約測試)
+npm run check:all              # 五支靜態檢查(含 web/src、ios/)
+npm run test:race              # 單一 process 閘門併發,每條重跑 5 次
+npm run dev && npm run smoke   # 本機端到端(只打本機,用 seed 帳密)
+BASE_URL=… STAFF_TOKEN=… sh scripts/race.sh 5          # 真的多連線打遠端 Worker
+BASE_URL=… ACCESS_TOKEN=… bash scripts/compare-clients.sh  # curl vs iOS 逐欄比
+cd web && npm run dev          # web(Vite,/api 代理到 8788)
+cd ios/App && xcodegen         # iOS app 殼;畫面與 client 在 ios/EventSignup(swift test)
 ```
 
-尚未實作:schema、所有 endpoint、金額引擎、JWT、前端。
 逐項狀態見 `docs/verified.md`。
 
 ## 紀律
