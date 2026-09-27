@@ -21,9 +21,16 @@ iOS 的 `Tickets/Money.swift`(2026-09-27;三處都在 `check-money.sh` 的範圍
 ### II. 時間是參數,不是副作用
 
 `src/domain/` 不准出現 `Date.now()` / `new Date()`;`now` 從外面傳進來。
-取現在時間是 `routes` / `worker` 的責任。
+讀時鐘只准在兩個入口:`src/app.js`(注入 `now`,routes 一律用 `c.get('now')`)
+與 `src/worker.js`(Cron)。SQL 不自己取時間(`unixepoch()` 等),時間用 `?` 綁進去;
+不用 `hono/jwt`(它的 verify 內部自己讀時鐘)。
 
 裁判:`scripts/check-time-injection.sh`
+
+> 2026-09-27 收緊(照抄 `CLAUDE.md`):原文舊版是「取現在時間是 `routes` / `worker` 的責任」,
+> 裁判只掃 `src/domain/`。現在裁判掃整個 `src/`(放過 `src/app.js`、`src/worker.js`),
+> 並擋 SQL 的 `unixepoch()` / `datetime('now')` / `CURRENT_TIMESTAMP` 與 `hono/jwt`;
+> `scripts/self-test.sh` 補了對應的紅燈探針與不誤報探針。
 
 ### III. 併發判斷必須在 SQL 的 `WHERE` 裡
 
@@ -125,7 +132,7 @@ iOS 的 `Tickets/Money.swift`(2026-09-27;三處都在 `check-money.sh` 的範圍
 **版本規則(Spec Kit 模板要求,原文沒有)。** 依 semver:
 MAJOR = 移除或改寫既有原則 / 非目標 / 做完定義;MINOR = 新增一條;PATCH = 措辭與錯字。
 
-**Version**: 2.0.0 | **Ratified**: 2026-09-14 | **Last Amended**: 2026-09-27
+**Version**: 3.0.0 | **Ratified**: 2026-09-14 | **Last Amended**: 2026-09-27
 
 ---
 
