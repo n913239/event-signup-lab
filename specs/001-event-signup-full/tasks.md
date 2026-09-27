@@ -177,7 +177,7 @@ repo 根:`src/`(API)、`tests/`、`scripts/`、`web/`(Pages)、`ios/EventSignup/
 - [x] T054 [P] 📅10/10 Pages 部署:`web/` 連 Pages 專案、`VITE_API_BASE` 指向 Worker、Worker 的 `CORS_ORIGIN` 改成 Pages 網域;線上走一遍五畫面
 - [ ] T055 [P] 📅10/10 SC-007 / SC-008 實測:同帳號 web、iOS、curl 三份 `GET /events` 與三份 `GET /orders` 各自逐欄 diff;`rows_read` 數字;寫進 `docs/verified.md` ✅ 欄(有輸出可貼的才進)
 - [ ] T056 📅10/11 `docs/verified.md` 全面對帳:❌ 欄逐項移到 ✅ 或留著(JWT 由 repo 內六個測試 + `check-jwt-timing.sh` 裁定,2026-09-27 改定;外部清單不再是驗收);「已知的坑」補這 30 天踩到的
-- [ ] T057 [P] 📅10/11 CLAUDE.md 與 `.specify/memory/constitution.md` 規則 V 的註記改為「另一半由 `tests/schema.test.js` ⑥ 裁判」(research.md 末段);`/speckit-constitution` 走 PATCH 版本
+- [x] T057 [P] 📅10/11 CLAUDE.md 與 `.specify/memory/constitution.md` 規則 V 的註記改為「另一半由 `tests/schema.test.js` ⑥ 裁判」(research.md 末段);`/speckit-constitution` 走 PATCH 版本 **〔2026-09-27 完成:CLAUDE.md `7d4963e`、constitution 2.0.0 `c945592`〕**
 - [ ] T058 [P] 📅10/12 `README.md`「現在的狀態」改寫:尺與被量的東西都有了;指令表補 `web`、`ios`、`race`
 - [ ] T059 📅10/12 CI 帳本:從 `.github/workflows/ci.yml` 的 job summary 數「量了幾次、擋下幾次」,寫 `devlog/LEDGER`(Day 30 素材)
 - [ ] T060 📅10/13 收尾緩衝:`sh scripts/self-test.sh && npm run check:all && npm test && for i in 1 2 3 4 5; do npm run test:race || exit 1; done` 全綠;沒綠的項目**不補綠**,寫進 `docs/verified.md` ❌ 欄
