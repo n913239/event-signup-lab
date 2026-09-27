@@ -133,7 +133,7 @@ repo 根:`src/`(API)、`tests/`、`scripts/`、`web/`(Pages)、`ios/EventSignup/
 
 ### API 側
 
-- [ ] T038 [P] 📅10/3 [US4] 先寫 `tests/lib/hmac.test.js` → 實作 `src/lib/hmac.js`:`qrPayload(orderId, key)` = `"<orderId>.<base64url(HMAC-SHA256(orderId))[0:22]>"`,用 `crypto.subtle.sign`;不含任何個資
+- [x] T038 [P] 📅10/3 [US4] 先寫 `tests/lib/hmac.test.js` → 實作 `src/lib/hmac.js`:`qrPayload(orderId, key)` = `"<orderId>.<base64url(HMAC-SHA256(orderId))[0:22]>"`,用 `crypto.subtle.sign`;不含任何個資
 - [ ] T039 [P] 📅10/3 [US4] `src/presentation/money.js`(`centsToDisplay(cents)` → `"1,000"` 元字串,**唯一可以 `/ 100` 的地方**)與 `src/presentation/orders.js`(組 `Order` schema:`items[]` 帶 `ticket_type_name`、`event_name`、`qr_payload`)
 - [ ] T040 📅10/3 [US4] 先寫 `tests/routes/orders.test.js`(紅):`GET /orders` 只回本人;`GET /orders/:id` 本人 200、主辦 200、其他成員 404;`qr_payload` 格式與可用同 key 重算驗證;改票價後重讀 `total_cents`、`items[].unit_price_cents` 不變 → 實作 `src/lib/db/orders.js` 的 `listByMember`(**一次 JOIN 查詢**,`meta.rows_read` 記下來)、`findById`;`GET /orders`、`GET /orders/:id` 於 `src/routes/orders.js`;501 清單移除兩條;T033 的 `qr_payload` 空字串換成真的
 
