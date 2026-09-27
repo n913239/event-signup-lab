@@ -7,9 +7,8 @@
 #
 # ⚠️ 這支**只管得到「不可變」那一半**。
 #   規則 5 的另一半是「明細要存快照,不是靠 ticket_type_id JOIN 即時算」——
-#   那要知道票種表與價格欄叫什麼,而 docs/spec.md 目前只定義 17 條 endpoint,
-#   沒定義 schema。schema.sql 落地之後補,在那之前那一半只有 /check-schema 第 6 條
-#   在人工把關(見 docs/verified.md)。
+#   由 tests/schema.test.js ⑥(明細表有自己的單價欄)與 tests/routes/holds.test.js
+#   「改價後已確認的訂單不變」裁判(2026-09-27 更新;原本寫「只有 /check-schema 人工把關」已過時)。
 set -e
 . "$(dirname "$0")/_lib.sh"
 cd "$(dirname "$0")/.."

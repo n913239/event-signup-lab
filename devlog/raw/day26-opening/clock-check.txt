@@ -1,0 +1,6 @@
+# 2026-09-27 18:42 +0800,BASE_URL=線上 Worker
+$ BASE_URL=https://event-signup.<子網域>.workers.dev sh scripts/clock-check.sh
+本機:      2026-09-27T10:42:43Z
+伺服器:    Sun, 27 Sep 2026 10:42:43 GMT
+第三方:    "dateTime":"2026-09-27T10:42:43.80024"
+HTTP Date: Sun, 27 Sep 2026 10:42:44 GMT
