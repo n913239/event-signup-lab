@@ -48,6 +48,12 @@ fire() {  # $1 event $2 ticket type $3 座位產生方式(same | distinct)
     "$BASE" "$1" "$2" < "$TMP/jobs" | sort | uniq -c | tr -s ' ' | tr '\n' ';'
 }
 
+# 截止一定要 -X POST:j() 沒帶 body 時不加 -d,curl 會送 GET(2026-09-27 第一次實跑 10 個活動因此沒截止,留在開賣列表)
+closeEvent() {
+  code=$(curl -s -o /dev/null -w '%{http_code}' -X POST "$BASE/events/$1/close" -H "authorization: Bearer $STAFF")
+  [ "$code" = 200 ] || echo "🔴 截止 $1 失敗:HTTP $code" >&2
+}
+
 newEvent() {  # $1 name $2 capacity → 印「event_id ticket_type_id」
   ev=$(j /events "$STAFF" "$(printf '{"name":"%s","opens_at":0,"deadline_at":4102444800000}' "$1")" | jq -r .id)
   tt=$(j "/events/$ev/ticket-types" "$STAFF" "$(printf '{"name":"race","price_cents":100,"capacity":%s}' "$2")" | jq -r .id)
@@ -64,12 +70,12 @@ LOG="$TMP/log"
   while [ "$r" -le "$ROUNDS" ]; do
     set -- $(newEvent "race-$RUN-r$r-seat" 20)
     A=$(fire "$1" "$2" same)
-    j "/events/$1/close" "$STAFF" > /dev/null
+    closeEvent "$1"
     set -- $(newEvent "race-$RUN-r$r-quota" 5)
     B=$(fire "$1" "$2" distinct)
     rem=$(j "/events/$1" "$STAFF" | jq -r '.ticket_types[0].remaining')
     sold=$(j "/events/$1" "$STAFF" | jq '[.seats[] | select(.state != "free")] | length')
-    j "/events/$1/close" "$STAFF" > /dev/null
+    closeEvent "$1"
     # 比完整的一段「 1 201;」,前面的空白不能省:只比 '1 201;' 的話「11 201;」也會中
     okA=$(echo "$A" | grep -oE '(^| )1 201;' | head -1); okB=$(echo "$B" | grep -oE '(^| )5 201;' | head -1)
     [ -n "$okA" ] && [ -n "$okB" ] && [ "$rem" = 0 ] && [ "$sold" = 5 ] && v=✅ || { v=🔴; FAIL=1; }

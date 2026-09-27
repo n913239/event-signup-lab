@@ -21,10 +21,31 @@ targets:
         INFOPLIST_KEY_UILaunchScreen_Generation: YES
         INFOPLIST_KEY_NSAppTransportSecurity: ""
         MARKETING_VERSION: "0.1.0"
+        # App 連哪個 API:預設線上 Worker;本機開發用 xcodebuild API_BASE_URL=http://127.0.0.1:8788 覆寫
+        API_BASE_URL: "https://event-signup.n913239.workers.dev"
         CURRENT_PROJECT_VERSION: "1"
     info:
       path: EventSignupApp/Info.plist
       properties:
         UILaunchScreen: {}
+        API_BASE_URL: $(API_BASE_URL)
         NSAppTransportSecurity:
           NSAllowsLocalNetworking: true
+  # 模擬器接線上走一遍三畫面並截圖(T055)。帳密只從環境變數給:
+  #   TEST_RUNNER_DEMO_EMAIL / TEST_RUNNER_DEMO_PASSWORD(xcodebuild 會去掉 TEST_RUNNER_ 前綴傳進測試)
+  EventSignupAppUITests:
+    type: bundle.ui-testing
+    platform: iOS
+    sources: [EventSignupAppUITests]
+    dependencies:
+      - target: EventSignupApp
+    settings:
+      base:
+        GENERATE_INFOPLIST_FILE: YES
+schemes:
+  EventSignupApp:
+    build:
+      targets:
+        EventSignupApp: all
+    test:
+      targets: [EventSignupAppUITests]

@@ -7,15 +7,28 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		2D7F15811522997E239B4F04 /* LiveWalkthroughTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2956D3098B54CB7B9781E6A /* LiveWalkthroughTests.swift */; };
 		930A4EDD8619DD0A4BFA9B0F /* EventSignup in Frameworks */ = {isa = PBXBuildFile; productRef = D7C8B6035D21F2F4CD58D342 /* EventSignup */; };
 		BA3CCEB76CED8DC9B13BA293 /* EventSignupApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4EA2CDD68E2C19EED2F350E4 /* EventSignupApp.swift */; };
 /* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		55430727A4BE2B4497B7D0D6 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = EC6FDC62689CD3001C13ED72 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = BECA591FE6B09011F25B3C84;
+			remoteInfo = EventSignupApp;
+		};
+/* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
 		03B6867830E04F8197D5CA1B /* EventSignup */ = {isa = PBXFileReference; lastKnownFileType = folder; name = EventSignup; path = ../EventSignup; sourceTree = SOURCE_ROOT; };
 		4EA2CDD68E2C19EED2F350E4 /* EventSignupApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventSignupApp.swift; sourceTree = "<group>"; };
 		5B077C30E0D16EA84ACE9D1F /* EventSignupApp.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = EventSignupApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		8B134EE8135E761E7CE7F939 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		A2956D3098B54CB7B9781E6A /* LiveWalkthroughTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiveWalkthroughTests.swift; sourceTree = "<group>"; };
+		A74C3747DDC9376592705B78 /* EventSignupAppUITests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = EventSignupAppUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -42,6 +55,7 @@
 			isa = PBXGroup;
 			children = (
 				30A6C6CFA130A780576A6DBF /* EventSignupApp */,
+				F5776DC4EE9F1E87D368CD5B /* EventSignupAppUITests */,
 				0EE396AC901D462895226D04 /* Packages */,
 				CB1D1EBD4C00B418DC31144D /* Products */,
 			);
@@ -60,13 +74,40 @@
 			isa = PBXGroup;
 			children = (
 				5B077C30E0D16EA84ACE9D1F /* EventSignupApp.app */,
+				A74C3747DDC9376592705B78 /* EventSignupAppUITests.xctest */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		F5776DC4EE9F1E87D368CD5B /* EventSignupAppUITests */ = {
+			isa = PBXGroup;
+			children = (
+				A2956D3098B54CB7B9781E6A /* LiveWalkthroughTests.swift */,
+			);
+			path = EventSignupAppUITests;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		60D83D85A7A993594CFD2BAD /* EventSignupAppUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 18EA6253D982D491D6FC9582 /* Build configuration list for PBXNativeTarget "EventSignupAppUITests" */;
+			buildPhases = (
+				5946B7FBE432C4ABEC3D3F2F /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				72F60FAE09A27349D0383E61 /* PBXTargetDependency */,
+			);
+			name = EventSignupAppUITests;
+			packageProductDependencies = (
+			);
+			productName = EventSignupAppUITests;
+			productReference = A74C3747DDC9376592705B78 /* EventSignupAppUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
 		BECA591FE6B09011F25B3C84 /* EventSignupApp */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = C26E09504E0BD919CEF6519A /* Build configuration list for PBXNativeTarget "EventSignupApp" */;
@@ -95,6 +136,9 @@
 				BuildIndependentTargetsInParallel = YES;
 				LastUpgradeCheck = 1430;
 				TargetAttributes = {
+					60D83D85A7A993594CFD2BAD = {
+						TestTargetID = BECA591FE6B09011F25B3C84;
+					};
 				};
 			};
 			buildConfigurationList = 1DE83B3360CD8E36E5F7B78F /* Build configuration list for PBXProject "EventSignupApp" */;
@@ -115,6 +159,7 @@
 			projectRoot = "";
 			targets = (
 				BECA591FE6B09011F25B3C84 /* EventSignupApp */,
+				60D83D85A7A993594CFD2BAD /* EventSignupAppUITests */,
 			);
 		};
 /* End PBXProject section */
@@ -128,12 +173,29 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		5946B7FBE432C4ABEC3D3F2F /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				2D7F15811522997E239B4F04 /* LiveWalkthroughTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		72F60FAE09A27349D0383E61 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = BECA591FE6B09011F25B3C84 /* EventSignupApp */;
+			targetProxy = 55430727A4BE2B4497B7D0D6 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		0F2CA08712014283077818FD /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				API_BASE_URL = "https://event-signup.n913239.workers.dev";
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CURRENT_PROJECT_VERSION = 1;
@@ -152,9 +214,27 @@
 			};
 			name = Release;
 		};
+		3349449D0A7E9617F1F17AEB /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = dev.eventsignup.EventSignupAppUITests;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = EventSignupApp;
+			};
+			name = Release;
+		};
 		55E0DEF081197DE8FB6670DF /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				API_BASE_URL = "https://event-signup.n913239.workers.dev";
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CURRENT_PROJECT_VERSION = 1;
@@ -170,6 +250,23 @@
 				PRODUCT_BUNDLE_IDENTIFIER = dev.eventsignup.EventSignupApp;
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		9F925EB5332FFC5E0723E249 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = dev.eventsignup.EventSignupAppUITests;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = EventSignupApp;
 			};
 			name = Debug;
 		};
@@ -295,6 +392,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		18EA6253D982D491D6FC9582 /* Build configuration list for PBXNativeTarget "EventSignupAppUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				9F925EB5332FFC5E0723E249 /* Debug */,
+				3349449D0A7E9617F1F17AEB /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
 		1DE83B3360CD8E36E5F7B78F /* Build configuration list for PBXProject "EventSignupApp" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (

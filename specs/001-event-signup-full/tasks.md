@@ -175,7 +175,7 @@ repo 根:`src/`(API)、`tests/`、`scripts/`、`web/`(Pages)、`ios/EventSignup/
 - [x] T052 📅10/3 部署(2026-09-27 完成:D1 建立與建表、secret、deploy、/health 200;遠端不跑 seed):`wrangler d1 create signup` 換掉 `wrangler.toml` 的 placeholder id、`wrangler secret put JWT_SECRET / QR_SECRET`、`wrangler d1 execute signup --remote --file=schema.sql`、`wrangler deploy`;`BASE_URL=<worker> npm run smoke`
 - [x] T053 📅10/3 `scripts/race.sh` 填實:對遠端 Worker 用 `xargs -P 20 curl` 打同一座位 20 次與同票種名額 + 5 次,統計 201 / 409 數量,寫 `devlog/raw/race-<date>.txt`;結果進 `docs/verified.md` ✅「真實併發」 **〔完成:遠端 5 輪 × 20 連線全一致,`devlog/raw/race-2026-09-27.txt`〕**
 - [x] T054 [P] 📅10/10 Pages 部署:`web/` 連 Pages 專案、`VITE_API_BASE` 指向 Worker、Worker 的 `CORS_ORIGIN` 改成 Pages 網域;線上走一遍五畫面
-- [ ] T055 [P] 📅10/10 SC-007 / SC-008 實測:同帳號 web、iOS、curl 三份 `GET /events` 與三份 `GET /orders` 各自逐欄 diff;`rows_read` 數字;寫進 `docs/verified.md` ✅ 欄(有輸出可貼的才進)
+- [x] T055 [P] 📅10/10 SC-007 / SC-008 實測:同帳號 web、iOS、curl 三份 `GET /events` 與三份 `GET /orders` 各自逐欄 diff;`rows_read` 數字;寫進 `docs/verified.md` ✅ 欄(有輸出可貼的才進) **〔完成:`devlog/raw/t055-2026-09-27/`〕**
 - [ ] T056 📅10/11 `docs/verified.md` 全面對帳:❌ 欄逐項移到 ✅ 或留著(JWT 由 repo 內六個測試 + `check-jwt-timing.sh` 裁定,2026-09-27 改定;外部清單不再是驗收);「已知的坑」補這 30 天踩到的
 - [x] T057 [P] 📅10/11 CLAUDE.md 與 `.specify/memory/constitution.md` 規則 V 的註記改為「另一半由 `tests/schema.test.js` ⑥ 裁判」(research.md 末段);`/speckit-constitution` 走 PATCH 版本 **〔2026-09-27 完成:CLAUDE.md `7d4963e`、constitution 2.0.0 `c945592`〕**
 - [ ] T058 [P] 📅10/12 `README.md`「現在的狀態」改寫:尺與被量的東西都有了;指令表補 `web`、`ios`、`race`
