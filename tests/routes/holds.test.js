@@ -180,6 +180,22 @@ describe.skipIf(!existsSync('schema.sql') || !existsSync('src/lib/db/holds.js'))
     expect((await confirm(h2, alice, { promo_code: 'WELCOME' })).status).toBe(201)
   })
 
+  it('C8 改定:碼已用過,但團體折扣本來就比較好 → 忽略碼、照樣成立', async () => {
+    const h1 = await (await hold(alice, ['A1'])).json()
+    await confirm(h1, alice, { promo_code: 'WELCOME' })                       // 用掉 WELCOME
+    const h2 = await (await hold(alice, ['B1', 'B2', 'B3', 'B4'])).json()     // 團體 30% > 100 元
+    const res = await confirm(h2, alice, { promo_code: 'WELCOME' })
+    expect(res.status).toBe(201)
+    expect(await res.json()).toMatchObject({ promo_code: null, group_pct: 30 })
+  })
+
+  it('C8 改定:碼不存在,但有別的折扣 → 忽略碼;沒有別的折扣 → 409', async () => {
+    const h = await (await hold(alice, ['A1', 'A2', 'A3', 'A4'])).json()
+    expect((await confirm(h, alice, { promo_code: 'TYPO' })).status).toBe(201)
+    const h2 = await (await hold(alice, ['C1'])).json()
+    expect((await confirm(h2, alice, { promo_code: 'TYPO' })).status).toBe(409)
+  })
+
   it('碼沒被選中(團體 30% 更優惠)→ 訂單不記碼,碼沒有用掉', async () => {
     const h = await (await hold(alice, ['A1', 'A2', 'A3', 'A4'])).json()
     const o = await (await confirm(h, alice, { promo_code: 'WELCOME' })).json()
