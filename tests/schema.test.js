@@ -12,6 +12,7 @@
 import { describe, it, expect, beforeAll, afterAll } from 'vitest'
 import { getPlatformProxy } from 'wrangler'
 import { readFileSync, existsSync } from 'node:fs'
+import { splitSql } from './helpers/sql.js'
 
 const SCHEMA = process.env.SCHEMA ?? 'schema.sql'
 const HAS_SCHEMA = existsSync(SCHEMA)
@@ -24,8 +25,7 @@ beforeAll(async () => {
   proxy = await getPlatformProxy({ persist: false })
   db = proxy.env.DB
   // D1 的 exec() 不吃多行語句,自己切開再 batch
-  const stmts = sql.replace(/^\s*--.*$/gm, '').split(/;\s*$/m).map((s) => s.trim())
-    .filter(Boolean)
+  const stmts = splitSql(sql)
   await db.batch(stmts.map((s) => db.prepare(s)))
 })
 

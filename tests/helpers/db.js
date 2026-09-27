@@ -8,6 +8,7 @@
  */
 import { getPlatformProxy } from 'wrangler'
 import { readFileSync, existsSync } from 'node:fs'
+import { splitSql } from './sql.js'
 
 export async function withDb() {
   const proxy = await getPlatformProxy({ persist: false })
@@ -15,11 +16,7 @@ export async function withDb() {
 
   if (existsSync('schema.sql')) {
     // ⚠️ D1 的 exec() 不吃多行語句,要自己切開再 batch。
-    const stmts = readFileSync('schema.sql', 'utf8')
-      .replace(/^\s*--.*$/gm, '')   // 先剝整行註解:檔頭註解接在第一句前面時,整句會被當註解丟掉(2026-09-27 踩到)
-      .split(/;\s*$/m)
-      .map((x) => x.trim())
-      .filter(Boolean)
+    const stmts = splitSql(readFileSync('schema.sql', 'utf8'))
     await db.batch(stmts.map((sql) => db.prepare(sql)))
   }
 
