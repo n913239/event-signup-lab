@@ -10,5 +10,7 @@
 | (a) 回寫 | 寫作 session 把改定寫進 spec / plan / quickstart / data-model / tasks(`c6581f6`) | — | — |
 | (a) analyze | 回寫後再跑 | $0.774 / 9 | **回寫不完整**:US1 驗收情境、Edge Case 還是疊加;**FR-038 編號重複**(回寫造成);tasks 舊描述過時;constitution 規則 I 說分 → 元只准在 presentation,但 web 與 iOS 也在做,**Swift 那支沒有裁判** |
 | (a) converge | 回寫後再跑(worktree) | $1.208 / 18 | 追加 T077–T081:SC-004 沒斷言「原持有人輸」、**sweep 與 Cron 沒有測試**、**同一 hold 兩個 confirm 同時到時輸的一方回 409(H7 要回同一張)**、**PATCH /events 不是全有全無**、race.sh payload 跟契約不符 |
+| (a) 補漏洞 | 寫作 session 照 analyze 的 D1–I14、C1、C2、A1、E1 改(`7d4963e`);Money.swift 補裁判(`0492e65`);T080/T081 修好(`06f8fd2`) | — | — |
+| (a) constitution | `/speckit-constitution` 同步原文 | $0.508 / 13 | 1.0.0 → **2.0.0**(它照本文件的規則判 MAJOR:規則 I 允許位置一處改三處算改寫);刪掉已解決的「規則 V 另一半應有到期條件」 |
 
 原始輸出:`b-*.md` / `a-*.md`(報告)、`*.json`(cost 與 usage,session id 已遮)、`*-converge-tasks.diff`(converge 追加的 task,沒進主線)。

@@ -13,7 +13,8 @@
 ### I. 金額一律用整數最小單位
 
 金額路徑出現浮點 = CI 紅燈。
-顯示轉換(分 → 元)只能在 `src/presentation/`。
+顯示轉換(分 → 元)只准在三個地方:API 的 `src/presentation/`、web 的 `web/src/lib/money.js`、
+iOS 的 `Tickets/Money.swift`(2026-09-27;三處都在 `check-money.sh` 的範圍內)。
 
 裁判:`scripts/check-money.sh`
 
@@ -36,18 +37,19 @@
 
 裁判:`scripts/check-jwt-timing.sh`
 
+> JWT 邊界(照抄 `docs/spec.md`):由 repo 內 `tests/jwt.test.js` 六個測試 +
+> `scripts/check-jwt-timing.sh` 裁定(2026-09-27 作者改定;原本的「七項清單放 repo 外」
+> 不再作為驗收)。
+
 ### V. 確認後的訂單金額不可變
 
 明細要存價格快照,不是 JOIN 即時算。
 
-裁判:`scripts/check-price-snapshot.sh` —— **只管到一半**,見下。
+裁判:`scripts/check-price-snapshot.sh` + `tests/schema.test.js` ⑥,見下。
 
-> ⚠️ **規則 V 只有一半有裁判。** `check-price-snapshot.sh` 管的是
-> 「**沒有任何 `UPDATE` 可以寫入金額欄**」—— 金額只在建單那次 `INSERT` 寫進去。
-> 另一半「明細要存快照,不是靠 `ticket_type_id` JOIN 即時算」**還沒有自動檢查**:
-> 那要知道票種表與價格欄叫什麼,而 `docs/spec.md` 目前只定義 17 條 endpoint,
-> 沒定義 schema。`schema.sql` 落地之後補;在那之前那一半由 `/check-schema` 第 6 條
-> 人工把關,狀態記在 `docs/verified.md`。
+> 規則 V 由兩支裁判分工:`check-price-snapshot.sh` 管「**沒有任何 `UPDATE` 可以寫入金額欄**」
+> —— 金額只在建單那次 `INSERT` 寫進去;另一半「明細要存快照,不是靠 `ticket_type_id` JOIN 即時算」
+> 由 `tests/schema.test.js` ⑥ 裁判(要求 `order_items` 有自己的 `_cents` 欄)。
 
 ### 裁判總表
 
@@ -59,7 +61,7 @@
 | II 時間當參數 | `scripts/check-time-injection.sh` |
 | III 併發寫進 `WHERE` | `scripts/check-concurrency.sh` |
 | IV 常數時間比對 | `scripts/check-jwt-timing.sh` |
-| V 價格快照 | `scripts/check-price-snapshot.sh` —— **只管到一半** |
+| V 價格快照 | `scripts/check-price-snapshot.sh` + `tests/schema.test.js` ⑥ |
 
 `scripts/self-test.sh` 負責證明上面每一支都真的抓得到 ——
 一支從不亮紅燈的檢查,跟沒有檢查是同一件事。
@@ -123,7 +125,7 @@
 **版本規則(Spec Kit 模板要求,原文沒有)。** 依 semver:
 MAJOR = 移除或改寫既有原則 / 非目標 / 做完定義;MINOR = 新增一條;PATCH = 措辭與錯字。
 
-**Version**: 1.0.0 | **Ratified**: 2026-09-14 | **Last Amended**: 2026-09-14
+**Version**: 2.0.0 | **Ratified**: 2026-09-14 | **Last Amended**: 2026-09-27
 
 ---
 
@@ -145,9 +147,6 @@ MAJOR = 移除或改寫既有原則 / 非目標 / 做完定義;MINOR = 新增一
 - **硬規則 IV 的兩種說法不一致。** `CLAUDE.md` 寫「常數時間比對」,`docs/spec.md`
   硬性約束第 4 條寫「用 `crypto.subtle.verify`」。前者是要求,後者是實作;建議原文擇一,
   或明寫「後者是前者的唯一允許實作」。
-- **規則 V 的另一半應有到期條件。** 目前寫「`schema.sql` 落地之後補」,但沒說誰在
-  `schema.sql` 進 repo 的那個 commit 負責補裁判。建議明寫:落地 `schema.sql` 的 commit
-  MUST 同時補齊 `check-price-snapshot.sh` 的另一半,否則 CI 紅燈。
 - **非目標的例外程序。** 15 條寫了「為什麼」,但沒寫要怎麼推翻其中一條(第 14 條自帶
   例外條件,其餘沒有)。建議加一句:推翻任一非目標 MUST 改 `docs/non-goals.md` 並在
   commit message 寫明理由,不能在功能 commit 裡順手做。
