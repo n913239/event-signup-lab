@@ -8,10 +8,11 @@ cd "$(dirname "$0")/.."
 
 PROBE=src/domain/__self_test_probe.js
 PROBE_LIB=src/lib/__self_test_probe.js
+PROBE_ROUTES=src/routes/__self_test_probe.js
 PROBE_WEB=web/src/__self_test_probe.js
 PROBE_IOS=ios/EventSignup/Sources/EventSignup/__SelfTestProbe.swift
 FAIL=0
-cleanup() { rm -f "$PROBE" "$PROBE_LIB" "$PROBE_WEB" "$PROBE_IOS"; rmdir src/lib 2>/dev/null || true; }
+cleanup() { rm -f "$PROBE" "$PROBE_LIB" "$PROBE_ROUTES" "$PROBE_WEB" "$PROBE_IOS"; rmdir src/lib 2>/dev/null || true; }
 trap cleanup EXIT
 
 # check <名稱> <腳本> <程式碼> [探針路徑]
@@ -90,6 +91,12 @@ export const v = (k,s,d) => crypto.subtle.verify('HMAC', k, s, d)"
 allow "註解提到 Date.now"   check-time-injection.sh "// don't call Date.now() here — now comes in as a parameter
 export const ok = (e, now) => now < e.deadline_at"
 allow "new Date(now) 帶參數" check-time-injection.sh "export const at = (now) => new Date(now).toISOString()"
+check "盲區:Date.now 在 routes(Day 24)"  check-time-injection.sh "const now = () => Math.floor(Date.now() / 1000)" "$PROBE_ROUTES"
+check "SQL 自己取時間 unixepoch()"        check-time-injection.sh "export const q = 'SELECT * FROM holds WHERE expires_at <= unixepoch()'" "$PROBE_LIB"
+check "SQL datetime('now')"              check-time-injection.sh "export const q = \"UPDATE t SET at = datetime('now') WHERE id = ?\"" "$PROBE_LIB"
+check "hono/jwt 內部讀時鐘"               check-time-injection.sh "import { verify } from 'hono/jwt'" "$PROBE_ROUTES"
+allow "routes 用 c.get('now') 不誤報"     check-time-injection.sh "export const h = (c) => c.json({ server_now: c.get('now') })" "$PROBE_ROUTES"
+allow "SQL 綁定時間參數不誤報"             check-time-injection.sh "export const q = 'SELECT * FROM holds WHERE expires_at <= ?'" "$PROBE_LIB"
 allow "行尾的 return r.meta.changes(2026-09-27)" check-concurrency.sh "export const f = async (db) => {
   const r = await db.prepare('UPDATE t SET x = 1 WHERE id = 1').run()
   return r.meta.changes

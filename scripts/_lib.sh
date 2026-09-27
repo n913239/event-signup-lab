@@ -45,9 +45,14 @@ scan() {
     if [ -n "${SCAN_EXCLUDE:-}" ]; then
       case "$_f" in */"$SCAN_EXCLUDE"/*) continue ;; esac
     fi
-    # SCAN_EXCLUDE_FILE:要跳過的單一檔案(路徑結尾比對)。2026-09-27 為了 web/src/lib/money.js 加的。
+    # SCAN_EXCLUDE_FILE:要跳過的檔案(路徑結尾比對,空白分隔可列多個)。2026-09-27 為了 web/src/lib/money.js 加的;
+    # 同日改成可列多個 —— 時鐘檢查要放過 src/app.js 與 src/worker.js 兩個入口。
     if [ -n "${SCAN_EXCLUDE_FILE:-}" ]; then
-      case "$_f" in *"$SCAN_EXCLUDE_FILE") continue ;; esac
+      _skip=0
+      for _x in $SCAN_EXCLUDE_FILE; do
+        case "$_f" in *"$_x") _skip=1 ;; esac
+      done
+      [ "$_skip" = 1 ] && continue
     fi
     if [ "${SCAN_ICASE:-}" = "1" ]; then
       _hit=$(strip_comments "$_f" | grep -inE "$_pattern" 2>&1)

@@ -11,7 +11,9 @@
    顯示轉換(分 → 元)只准在三個地方:API 的 `src/presentation/`、web 的 `web/src/lib/money.js`、
    iOS 的 `Tickets/Money.swift`(2026-09-27;三處都在 `check-money.sh` 的範圍內)。
 2. **時間是參數,不是副作用。** `src/domain/` 不准出現 `Date.now()` / `new Date()`;
-   `now` 從外面傳進來。取現在時間是 `routes` / `worker` 的責任。
+   `now` 從外面傳進來。讀時鐘只准在兩個入口:`src/app.js`(注入 `now`,routes 一律用 `c.get('now')`)
+   與 `src/worker.js`(Cron)。SQL 不自己取時間(`unixepoch()` 等),時間用 `?` 綁進去;
+   不用 `hono/jwt`(它的 verify 內部自己讀時鐘)。
 3. **併發判斷必須在 SQL 的 `WHERE` 裡**,不能在應用層先查再寫。
    條件式寫入 + 檢查 `changes`,並用 `CHECK` 當第二道防線。
 4. **簽章比對必須是常數時間。** 不得自己重算 HMAC 再 `===`。
@@ -39,7 +41,7 @@
 
 ```
 src/domain/        純邏輯,無 I/O,時間與亂數都從參數進來
-src/routes/        Hono handler,負責取現在時間、驗身分
+src/routes/        Hono handler,驗身分;現在時間用 c.get('now')(app.js 注入)
 src/lib/           有 I/O 的共用模組:JWT、HMAC、密碼雜湊、db/(SQL 存取)—— 不進 domain
 src/presentation/  顯示轉換(API 側唯一可以做金額除法的地方;web / iOS 各有一個檔,見硬規則 1)
 tests/helpers/     閘門等測試基礎設施
