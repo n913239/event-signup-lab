@@ -128,6 +128,15 @@ describe.skipIf(!existsSync('schema.sql'))('名額總和的第二道(T082)', () 
     expect((await w.db.prepare('SELECT SUM(capacity) AS n FROM ticket_types WHERE event_id = ?').bind(ev.id).first()).n).toBe(100)
   })
 
+  it('同一個 PATCH 一加一減、總和不變(A 60→80、B 40→20)→ 200(trigger 逐句檢查,不能被中途總和 120 誤擋)', async () => {
+    const ev = await (await create(staff.access)).json()
+    const a = await (await w.call(`/events/${ev.id}/ticket-types`, jsonReq('POST', { name: 'A', price_cents: 1, capacity: 60 }, staff.access))).json()
+    const b = await (await w.call(`/events/${ev.id}/ticket-types`, jsonReq('POST', { name: 'B', price_cents: 1, capacity: 40 }, staff.access))).json()
+    const res = await w.call(`/events/${ev.id}`, jsonReq('PATCH', { ticket_types: [{ id: a.id, capacity: 80 }, { id: b.id, capacity: 20 }] }, staff.access))
+    expect(res.status).toBe(200)
+    expect((await w.db.prepare('SELECT SUM(capacity) AS n FROM ticket_types WHERE event_id = ?').bind(ev.id).first()).n).toBe(100)
+  })
+
   it('PATCH 調高名額與 POST 新票種同時到 → 總和永遠 ≤ 100(重跑 5 次)', async () => {
     const { runConcurrently } = await import('../helpers/gate.js')
     for (let round = 0; round < 5; round++) {

@@ -58,6 +58,8 @@ events_.patch('/:id', requireOwner, async (c) => {  // 僅主辦:改時間 / 參
       total += capacity - row.capacity
     }
     if (total > 100) return err(c, 409, 'capacity_exceeded')
+    // 先減後加:schema 的 trigger 逐句檢查總和,A 60→80、B 40→20 若先加,中途總和 120 會被誤擋(Fable 複查抓到)
+    caps.sort((x, y) => (x.capacity - current.get(x.id).capacity) - (y.capacity - current.get(y.id).capacity))
   }
   try {
     if (!(await events.updateWithCapacities(c.env.DB, e.id, e.owner_id, v.value, caps))) return err(c, 409, 'capacity_below_sold')
