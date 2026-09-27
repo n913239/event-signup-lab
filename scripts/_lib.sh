@@ -36,7 +36,7 @@ scan() {
   _out=""
   _rc=1
   _files=$(find $_dirs -type f \( -name '*.js' -o -name '*.mjs' -o -name '*.cjs' \
-             -o -name '*.ts' -o -name '*.mts' -o -name '*.tsx' -o -name '*.sql' \) \
+             -o -name '*.ts' -o -name '*.mts' -o -name '*.tsx' -o -name '*.sql' -o -name '*.swift' \) \
            ! -name '*.test.*' ! -name '*.spec.*' 2>/dev/null)
   for _f in $_files; do
     case "$_f" in

@@ -9,8 +9,9 @@ cd "$(dirname "$0")/.."
 PROBE=src/domain/__self_test_probe.js
 PROBE_LIB=src/lib/__self_test_probe.js
 PROBE_WEB=web/src/__self_test_probe.js
+PROBE_IOS=ios/EventSignup/Sources/EventSignup/__SelfTestProbe.swift
 FAIL=0
-cleanup() { rm -f "$PROBE" "$PROBE_LIB" "$PROBE_WEB"; rmdir src/lib 2>/dev/null || true; }
+cleanup() { rm -f "$PROBE" "$PROBE_LIB" "$PROBE_WEB" "$PROBE_IOS"; rmdir src/lib 2>/dev/null || true; }
 trap cleanup EXIT
 
 # check <名稱> <腳本> <程式碼> [探針路徑]
@@ -98,10 +99,13 @@ check "浮點乘法 c * 0.9"    check-money.sh "export const p = (c) => Math.rou
 check "schema NUMERIC 型別" check-money.sh "total_cents NUMERIC" "src/domain/__probe.sql"
 check "web 裸 /100(T046)"      check-money.sh "export const yuan = (c) => c / 100" "$PROBE_WEB"
 check "web toFixed(T046)"       check-money.sh "export const y = (c) => (c / 100).toFixed(2)" "$PROBE_WEB"
+check "iOS Double(D1)"          check-money.sh "let y = Double(cents) / 100" "$PROBE_IOS"
+check "iOS 裸 /100(D1)"         check-money.sh "let y = cents / 100" "$PROBE_IOS"
+allow "iOS 時間 /1000 不誤報"   check-money.sh "let d = TimeInterval(ms) / 1000" "$PROBE_IOS"
 
 echo ""
 echo "=== 乾淨狀態應全過 ==="
-sh scripts/check-money.sh          >/dev/null && echo "✅ 金額(含 web/src/lib/money.js 不誤報)"
+sh scripts/check-money.sh          >/dev/null && echo "✅ 金額(含 web/src/lib/money.js、Tickets/Money.swift 不誤報)"
 sh scripts/check-time-injection.sh >/dev/null && echo "✅ 時間"
 sh scripts/check-jwt-timing.sh     >/dev/null && echo "✅ 簽章"
 sh scripts/check-concurrency.sh    >/dev/null && echo "✅ 併發"

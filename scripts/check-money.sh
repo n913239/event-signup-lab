@@ -34,4 +34,16 @@ fi
 if ! scan "web 金額除法" "$DIV" web/src; then
   echo ""; echo "❌ web 出現裸的 /100 —— 分 → 元只准在 web/src/lib/money.js"; exit 1
 fi
-echo "✅ 金額路徑零浮點(src + web/src)"
+
+# 2026-09-27(spec-kit analyze D1):iOS 也要管。Swift 的分 → 元只准在 Tickets/Money.swift,
+# 其他 Swift 檔出現 Double / Float / Decimal 或裸的 /100 一律紅燈。
+# 時間的 TimeInterval(ms) / 1000 不會中:它不是 /100,也沒有這三個型別字。
+SWIFT_FLOAT='\b(Double|Float|CGFloat|Decimal)\b'
+export SCAN_EXCLUDE_FILE=Tickets/Money.swift
+if ! scan "iOS 金額浮點" "$SWIFT_FLOAT" ios/EventSignup/Sources ios/App; then
+  echo ""; echo "❌ iOS 出現浮點型別 —— 金額顯示一律經 Tickets/Money.swift"; exit 1
+fi
+if ! scan "iOS 金額除法" "$DIV" ios/EventSignup/Sources ios/App; then
+  echo ""; echo "❌ iOS 出現裸的 /100 —— 分 → 元只准在 Tickets/Money.swift"; exit 1
+fi
+echo "✅ 金額路徑零浮點(src + web/src + iOS)"
