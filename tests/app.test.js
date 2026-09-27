@@ -35,10 +35,10 @@ const PROTECTED = [
   ['PATCH', '/events/1'], ['POST', '/events/1/close'],
   ['POST', '/events/1/ticket-types'], ['PATCH', '/ticket-types/1'],
   ['POST', '/events/1/holds'], ['DELETE', '/holds/1'],
-  ['POST', '/holds/1/confirm'],
+  ['POST', '/holds/1/confirm'], ['POST', '/holds/1/quote'],
   ['GET', '/orders'], ['GET', '/orders/1'], ['POST', '/orders/1/cancel'],
 ]
-// 2026-09-27:17 條全部實作完成,501 骨架清單退場;每條的行為測試在 tests/routes/、tests/jwt.test.js、tests/concurrency.test.js。
+// 2026-09-27:17 條全部實作完成(同日加試算,共 18 條),501 骨架清單退場;每條的行為測試在 tests/routes/、tests/jwt.test.js、tests/concurrency.test.js。
 
 describe('沒登入', () => {
   it.each(PROTECTED)('%s %s → 401', async (method, path) => {

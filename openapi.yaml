@@ -3,7 +3,7 @@ info:
   title: 活動報名系統 API
   version: 0.1.0
   description: |
-    17 條 endpoint + /health。一份契約餵 web(Pages)與 iOS(swift-openapi-generator)。
+    18 條 endpoint + /health。一份契約餵 web(Pages)與 iOS(swift-openapi-generator)。
     慣例:金額一律整數「分」(*_cents);時間一律 epoch 毫秒整數;每個 JSON 回應帶 x-server-now header;
     錯誤一律 { error, server_now }。狀態碼:400 輸入、401 身分、403 權限、404 不存在或不屬於你、409 規則擋下。
 servers:
@@ -341,6 +341,27 @@ paths:
           content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } }
 
   # ── 訂單(3)─────────────────────────────────────────────
+  /holds/{id}/quote:
+    parameters: [{ $ref: '#/components/parameters/Id' }]
+    post:
+      operationId: quoteHold
+      tags: [holds]
+      summary: 試算(不建訂單、不用掉碼);跟確認共用同一套算法
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                promo_code: { type: string, maxLength: 32 }
+      responses:
+        '200': { description: 試算結果, content: { application/json: { schema: { $ref: '#/components/schemas/Quote' } } } }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409': { $ref: '#/components/responses/Conflict' }
+
   /orders:
     get:
       operationId: listOrders
@@ -521,6 +542,18 @@ components:
         ticket_type_name: { type: string }
         unit_price_cents: { $ref: '#/components/schemas/Cents', description: 確認當下的快照 }
 
+    Quote:
+      type: object
+      required: [subtotal_cents, applied, early_bird_pct, group_pct, promo_cents, total_cents, promo_status, server_now]
+      properties:
+        subtotal_cents: { $ref: '#/components/schemas/Cents' }
+        applied: { type: [string, 'null'], enum: [promo, early_bird, group, null], description: 套用的折扣;折扣不疊加、擇優 }
+        early_bird_pct: { $ref: '#/components/schemas/Pct' }
+        group_pct: { $ref: '#/components/schemas/Pct' }
+        promo_cents: { $ref: '#/components/schemas/Cents' }
+        total_cents: { $ref: '#/components/schemas/Cents' }
+        promo_status: { type: string, enum: [none, applied, not_better, invalid] }
+        server_now: { $ref: '#/components/schemas/EpochMs' }
     Order:
       type: object
       required: [id, event_id, event_name, member_id, status, items,

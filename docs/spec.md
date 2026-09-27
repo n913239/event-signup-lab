@@ -52,6 +52,7 @@
 | `POST` | `/events/:id/holds` | 成員 | 票種 + `seat_nos` + 保留(活動設定的時長) |
 | `DELETE` | `/holds/:id` | 僅本人 | 主動放棄 |
 | `POST` | `/holds/:id/confirm` | 僅本人 | 確認 → 建訂單;body 可帶優惠碼;以確認當下票價計 |
+| `POST` | `/holds/:id/quote` | 僅本人 | 試算:原價、套用哪種折扣、應付、優惠碼狀態;不建訂單、不用掉碼(2026-09-27 加,給「套用」按鈕) |
 
 ### 訂單
 | Method | Path | 授權 | 說明 |
@@ -60,7 +61,7 @@
 | `GET` | `/orders/:id` | 本人或主辦 | 明細,含金額快照與票券 QR(訂單 id + HMAC,不含個資) |
 | `POST` | `/orders/:id/cancel` | 僅本人 | 取消 `confirmed`,座位釋放;`checked_in` 不可 |
 
-合計 17 條。
+合計 18 條(2026-09-27 加試算;原規劃 17 條)。
 
 ## 前端
 

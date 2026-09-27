@@ -36,8 +36,8 @@ const operations = Object.entries(doc.paths).flatMap(([path, item]) =>
 const app = createApp()
 
 describe('契約', () => {
-  it('18 條 operation(17 條 endpoint + /health)', () => {
-    expect(operations).toHaveLength(18)
+  it('19 條 operation(18 條 endpoint + /health)', () => {
+    expect(operations).toHaveLength(19)
   })
 
   it.each(operations)('%s %s 符合契約', async (method, path, op) => {
