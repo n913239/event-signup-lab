@@ -1,0 +1,95 @@
+{
+ "duration_api_ms": 117051,
+ "stop_reason": "end_turn",
+ "total_cost_usd": 0.5049087999999999,
+ "usage": {
+  "input_tokens": 10,
+  "cache_creation_input_tokens": 26856,
+  "cache_read_input_tokens": 128504,
+  "output_tokens": 13216,
+  "output_tokens_details": {
+   "thinking_tokens": 3490
+  },
+  "server_tool_use": {
+   "web_search_requests": 0,
+   "web_fetch_requests": 0
+  },
+  "service_tier": "standard",
+  "cache_creation": {
+   "ephemeral_1h_input_tokens": 26856,
+   "ephemeral_5m_input_tokens": 0
+  },
+  "inference_geo": "not_available",
+  "iterations": [
+   {
+    "input_tokens": 2,
+    "output_tokens": 1428,
+    "cache_read_input_tokens": 35865,
+    "cache_creation_input_tokens": 1109,
+    "cache_creation": {
+     "ephemeral_5m_input_tokens": 0,
+     "ephemeral_1h_input_tokens": 1109
+    },
+    "type": "message"
+   }
+  ],
+  "speed": "standard"
+ },
+ "modelUsage": {
+  "claude-opus-5-5": {
+   "inputTokens": 10,
+   "outputTokens": 13216,
+   "cacheReadInputTokens": 128504,
+   "cacheCreationInputTokens": 26856,
+   "webSearchRequests": 0,
+   "costUSD": 0.5049087999999999,
+   "contextWindow": 1000000,
+   "maxOutputTokens": 128000,
+   "thinkingTokens": 3490,
+   "canonicalModel": "claude-opus-5-5",
+   "provider": "firstParty",
+   "costBasis": "list"
+  }
+ },
+ "permission_denials": [],
+ "terminal_reason": "completed",
+ "fast_mode_state": "off",
+ "fast_mode_disabled_reason": "sdk_opt_in_required",
+ "subagent_stats": {
+  "spawned": 0,
+  "requested": {
+   "background": 0,
+   "foreground": 0,
+   "unset": 0
+  },
+  "started_in_background": 0,
+  "max_depth": 0,
+  "spawned_by_subagents": 0,
+  "completed": 0,
+  "failed": 0,
+  "killed": {
+   "parent": 0,
+   "user": 0,
+   "system": 0
+  },
+  "refused": {
+   "depth_limit": 0,
+   "concurrency_limit": 0,
+   "budget": 0
+  },
+  "by_type": {}
+ },
+ "is_error": false,
+ "num_turns": 7,
+ "subtype": "success",
+ "api_error_status": null,
+ "result": "Schema 已經設計好並跑過測試，全部寫在本地檔案：\n\n- `schema.sql`：資料表、trigger 和 view\n- `flows.sql`：保留、確認出票、取消、清理過期、驗票這幾個流程的 SQL 範本\n- `test.sh`：用暫存 DB 跑主要情境\n\n## 資料表\n\n| 表 | 用途 |\n|---|---|\n| `events` | 活動資料、開賣時間、`hold_seconds`（保留幾秒，預設 600） |\n| `ticket_types` | 票種、價格。`is_seated=1` 是劃位票，名額等於綁在這個票種的座位數；`is_seated=0` 是自由入座或站票，名額看 `quota` |\n| `seats` | 每場活動各有一份座位，**鎖定狀態直接記在座位上**（`reservation_id`、`lock_expires_at`） |\n| `reservations` | 保留單（也就是訂單）：`held` 之後會變成 `confirmed`、`expired` 或 `cancelled` |\n| `reservation_items` | 一列是一張票，記下單當下的價格 |\n| `tickets` | 確認後才產生，`reservation_item_id UNIQUE` 擋掉重複出票 |\n\n## 主要設計決定\n\n1. **過期是查詢時才判斷，不靠排程。** 保留有沒有過期，都是拿 `expires_at` 跟 `unixepoch()` 比。所以清理的排程（flows.sql 的 D 段）沒跑也不會算錯，它只是把過期單的狀態整理乾淨。\n2. **搶位用一條條件式 UPDATE：**\n   ```sql\n   UPDATE seats SET reservation_id=:rid, lock_expires_at=:exp\n    WHERE id=:seat_id AND (reservation_id IS NULL OR lock_expires_at <= unixepoch());\n   ```\n   `changes()=0` 代表位子被別人拿走了。座位的狀態只看兩個欄位：\n   - 沒有 `reservation_id`：空位\n   - `lock_expires_at` 還沒到：保留中\n   - `lock_expires_at` 已經過了：當作空位\n   - `lock_expires_at` 是 NULL：已售出\n3. **非劃位票的名額由 trigger 擋。** 算佔用數時，已確認的加上還沒過期的保留都算，額滿就 `RAISE 'sold out'`。\n4. **寫入一律用 `BEGIN IMMEDIATE`。** SQLite 同時只允許一個寫入者，交易一開始就拿寫鎖，兩個請求就不會同時讀到「還有位子」。\n5. **確認出票**是一個交易，三步：\n   - 先確認這張單還是 `held` 而且沒過期\n   - 把座位鎖改成永久（`lock_expires_at=NULL`）\n   - 產生 tickets\n6. 其他 trigger 會擋這幾種情況：\n   - 劃位票沒帶座位，或站票帶了座位\n   - 座位不屬於這個票種\n   - 座位沒被這張單鎖住\n   - 超過每單上限\n   - 票種屬於別場活動\n\n## 測試結果（`bash test.sh`）\n\n以下情境都符合預期：\n- 同一個座位被第二個人搶，失敗\n- 沒拿到鎖就直接插入明細，被 trigger 擋下\n- 站票名額 2，買第 3 張時出現 sold out\n- 過期的保留會被別人接手\n- 重複出票被 UNIQUE 擋下\n- 過期的單無法確認\n\n## 目前沒做的部分\n\n- 付款成功的通知如果在保留過期後才到，確認會失敗（`changes()=0`），這時要由應用程式走退款流程。\n- 沒有會員表，只記聯絡人姓名和 email。要接會員系統的話，在 `reservations` 加 `user_id` 就可以。\n- 場館座位範本（多場活動共用同一份座位圖）沒有拆出來。目前每場活動各存一份座位，建活動時從範本複製過去即可。",
+ "ttft_ms": 34490,
+ "type": "result",
+ "duration_ms": 118214,
+ "ttft_stream_ms": 960,
+ "time_to_request_ms": 70,
+ "first_content_frame_ms": 960,
+ "queued_turn_count": 0,
+ "result_index": 0
+}
