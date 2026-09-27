@@ -24,8 +24,8 @@ beforeAll(async () => {
   proxy = await getPlatformProxy({ persist: false })
   db = proxy.env.DB
   // D1 的 exec() 不吃多行語句,自己切開再 batch
-  const stmts = sql.split(/;\s*$/m).map((s) => s.trim())
-    .filter((s) => s && !s.startsWith('--'))
+  const stmts = sql.replace(/^\s*--.*$/gm, '').split(/;\s*$/m).map((s) => s.trim())
+    .filter(Boolean)
   await db.batch(stmts.map((s) => db.prepare(s)))
 })
 
