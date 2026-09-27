@@ -139,12 +139,12 @@ repo 根:`src/`(API)、`tests/`、`scripts/`、`web/`(Pages)、`ios/EventSignup/
 
 ### web(Cloudflare Pages)
 
-- [ ] T041 📅10/4 [US4] 建 `web/`:`npm create vite@latest web -- --template vanilla`、Tailwind v4 + daisyUI v5(`@import "tailwindcss"; @plugin "daisyui";`)、`vite.config.js` 的 `server.proxy['/api'] → http://127.0.0.1:8788`(rewrite 去掉 `/api`);`web/src/api.js`(bearer、401 自動 refresh 一次、讀 `x-server-now` 更新 `serverNow`);`web/src/lib/money.js`(**web 唯一分 → 元**);`web/src/lib/countdown.js`(以 `server_now` 校正的倒數)
-- [ ] T042 📅10/4 [US4] `web/src/pages/login.js`(登入 / 註冊表單,token 存 memory + `localStorage.refresh`)與 `web/src/pages/events.js`(列表,`?status=on_sale` 切換,daisyUI card)
-- [ ] T043 📅10/5 [US4] `web/src/pages/event.js`:10×10 座位格(`seats[]` 的 `free/held/sold/mine` 四色,daisyUI btn)、票種選單、多選 → `POST /events/:id/holds`;409 各代碼顯示原始 `error` 字串(錯誤訊息不友善是刻意的)
-- [ ] T044 📅10/5 [US4] `web/src/pages/hold.js`:倒數(`countdown.js`)、優惠碼輸入、確認 → `POST /holds/:id/confirm`、放棄 → `DELETE`;倒數歸零改顯示已過期並回活動頁
-- [ ] T045 📅10/6 [US4] `web/src/pages/tickets.js`:`GET /orders` 列表 + 明細,`qrcode` npm 套件畫 `qr_payload`,金額經 `lib/money.js`;取消按鈕(US5 的 T050 之後接上)
-- [ ] T046 📅10/6 [US4] `scripts/check-money.sh` 掃描範圍加 `web/src`、排除 `web/src/lib/money.js`;`scripts/self-test.sh` 加兩筆探針(web 裡裸 `/100` 要紅、`lib/money.js` 裡不誤報);`sh scripts/self-test.sh` 全綠
+- [x] T041 📅10/4 [US4] 建 `web/`:`npm create vite@latest web -- --template vanilla`、Tailwind v4 + daisyUI v5(`@import "tailwindcss"; @plugin "daisyui";`)、`vite.config.js` 的 `server.proxy['/api'] → http://127.0.0.1:8788`(rewrite 去掉 `/api`);`web/src/api.js`(bearer、401 自動 refresh 一次、讀 `x-server-now` 更新 `serverNow`);`web/src/lib/money.js`(**web 唯一分 → 元**);`web/src/lib/countdown.js`(以 `server_now` 校正的倒數)
+- [x] T042 📅10/4 [US4] `web/src/pages/login.js`(登入 / 註冊表單,token 存 memory + `localStorage.refresh`)與 `web/src/pages/events.js`(列表,`?status=on_sale` 切換,daisyUI card)
+- [x] T043 📅10/5 [US4] `web/src/pages/event.js`:10×10 座位格(`seats[]` 的 `free/held/sold/mine` 四色,daisyUI btn)、票種選單、多選 → `POST /events/:id/holds`;409 各代碼顯示原始 `error` 字串(錯誤訊息不友善是刻意的)
+- [x] T044 📅10/5 [US4] `web/src/pages/hold.js`:倒數(`countdown.js`)、優惠碼輸入、確認 → `POST /holds/:id/confirm`、放棄 → `DELETE`;倒數歸零改顯示已過期並回活動頁
+- [x] T045 📅10/6 [US4] `web/src/pages/tickets.js`:`GET /orders` 列表 + 明細,`qrcode` npm 套件畫 `qr_payload`,金額經 `lib/money.js`;取消按鈕(US5 的 T050 之後接上)
+- [x] T046 📅10/6 [US4] `scripts/check-money.sh` 掃描範圍加 `web/src`、排除 `web/src/lib/money.js`;`scripts/self-test.sh` 加兩筆探針(web 裡裸 `/100` 要紅、`lib/money.js` 裡不誤報);`sh scripts/self-test.sh` 全綠
 
 ### iOS 骨架
 
