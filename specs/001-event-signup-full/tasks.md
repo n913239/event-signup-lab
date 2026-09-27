@@ -28,11 +28,11 @@ repo 根:`src/`(API)、`tests/`、`scripts/`、`web/`(Pages)、`ios/EventSignup/
 **Purpose**: 回寫規格、契約先行、測試基礎設施補齊。全部是本 session 可做的(除了 T001 是作者)。
 
 - [ ] T001 📅9/14 🖐 作者回寫 `docs/spec.md`:依 `specs/001-event-signup-full/spec-writeback.md` 十一節逐條回寫(規格層決定表 7 → 14 列、活動狀態機拿掉 `cancelled`、折扣節補 C6–C10、前端新節);commit message 寫明「作者決定」
-- [ ] T002 📅9/15 把 `specs/001-event-signup-full/contracts/openapi.yaml` 複製到 repo 根 `openapi.yaml`,單獨一個 commit(契約先行的證據,要早於任何回 200 的 handler)
-- [ ] T003 [P] 📅9/15 新增 `.dev.vars.example`(`JWT_SECRET=`、`QR_SECRET=`、`CORS_ORIGIN=http://localhost:5173`),`.gitignore` 已排除 `.dev.vars`;`wrangler.toml` 補 `[triggers] crons = ["*/5 * * * *"]` 與 `[vars] CORS_ORIGIN`
-- [ ] T004 [P] 📅9/15 `package.json` devDependencies 加 `yaml`、`ajv`、`ajv-formats`;寫 `tests/contract.test.js`:讀 `openapi.yaml`,對 18 條 operation 各打一次 `app.request()`,驗回應 status 在契約列出的 codes 內、body 符合對應 schema —— **501 階段也要綠**(`not_implemented` 在 `Error.error` enum 裡)
-- [ ] T005 [P] 📅9/15 `src/app.js` 改成 `createApp({ now = Date.now } = {})`,middleware 用 `c.set('now', now())`;新增 `tests/helpers/clock.js`(`fakeClock(t0)` 提供 `now`、`advance(ms)`、`set(t)`);`tests/app.test.js` 改用 `createApp()` 預設值,確認 `npm run check:time` 仍綠(`Date.now` 只在 `app.js`、`worker.js`)
-- [ ] T006 [P] 📅9/15 `CLAUDE.md` 目錄表補 `src/lib/`(JWT、HMAC、密碼、`db/` SQL 存取;有 I/O 所以不進 domain)—— 不補等於偷加目錄
+- [x] T002 📅9/15 把 `specs/001-event-signup-full/contracts/openapi.yaml` 複製到 repo 根 `openapi.yaml`,單獨一個 commit(契約先行的證據,要早於任何回 200 的 handler)
+- [x] T003 [P] 📅9/15 新增 `.dev.vars.example`(`JWT_SECRET=`、`QR_SECRET=`、`CORS_ORIGIN=http://localhost:5173`),`.gitignore` 已排除 `.dev.vars`;`wrangler.toml` 補 `[triggers] crons = ["*/5 * * * *"]` 與 `[vars] CORS_ORIGIN`
+- [x] T004 [P] 📅9/15 `package.json` devDependencies 加 `yaml`、`ajv`、`ajv-formats`;寫 `tests/contract.test.js`:讀 `openapi.yaml`,對 18 條 operation 各打一次 `app.request()`,驗回應 status 在契約列出的 codes 內、body 符合對應 schema —— **501 階段也要綠**(`not_implemented` 在 `Error.error` enum 裡)
+- [x] T005 [P] 📅9/15 `src/app.js` 改成 `createApp({ now = Date.now } = {})`,middleware 用 `c.set('now', now())`;新增 `tests/helpers/clock.js`(`fakeClock(t0)` 提供 `now`、`advance(ms)`、`set(t)`);`tests/app.test.js` 改用 `createApp()` 預設值,確認 `npm run check:time` 仍綠(`Date.now` 只在 `app.js`、`worker.js`)
+- [x] T006 [P] 📅9/15 `CLAUDE.md` 目錄表補 `src/lib/`(JWT、HMAC、密碼、`db/` SQL 存取;有 I/O 所以不進 domain)—— 不補等於偷加目錄
 
 ---
 
