@@ -49,6 +49,8 @@ Token 存放:access 放記憶體,refresh 放 `localStorage`;`api.js` 在 401 時
 
 ## R4. 金額引擎介面 **[作者手寫區,Day 25]**
 
+> **2026-09-27 作者改定:折扣不疊加、擇優**(`docs/spec.md`「折扣怎麼算」)。下面的疊加向量(71000 等)是 9/14 的規劃,已被取代;`quote()` 回傳改為 `{ subtotal_cents, applied, early_bird_pct, group_pct, promo_cents, total_cents }`。
+
 **決定(只定介面與測試向量)**:`src/domain/money.js` 匯出
 
 ```

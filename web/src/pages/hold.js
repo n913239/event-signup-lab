@@ -26,7 +26,9 @@ export async function holdPage(el, id) {
   el.querySelector('#ok').addEventListener('click', async () => {
     const promo = el.querySelector('#promo').value.trim()
     try {
-      await api('POST', `/holds/${encodeURIComponent(hold.id)}/confirm`, promo ? { promo_code: promo } : {})
+      const order = await api('POST', `/holds/${encodeURIComponent(hold.id)}/confirm`, promo ? { promo_code: promo } : {})
+      // 折扣不疊加、擇優:輸入了碼卻沒被選中時告訴使用者,碼沒有用掉
+      if (promo && !order.promo_code) sessionStorage.setItem('flash', '優惠碼未套用:已有更優惠的折扣,這個碼沒有用掉')
       location.hash = '#/tickets'
     } catch (e) { el.querySelector('#err').innerHTML = errorBox(e) }
   })

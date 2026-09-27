@@ -7,7 +7,8 @@ import { esc, errorBox, fmtTime } from './ui.js'
 export async function ticketsPage(el) {
   let orders
   try { ({ orders } = await api('GET', '/orders')) } catch (e) { el.innerHTML = errorBox(e); return }
-  el.innerHTML = `<h2 class="text-xl font-bold mb-4">我的票券</h2>` + (orders.length ? orders.map((o) => `
+  const flash = sessionStorage.getItem('flash'); sessionStorage.removeItem('flash')
+  el.innerHTML = `<h2 class="text-xl font-bold mb-4">我的票券</h2>` + (flash ? `<div role="alert" class="alert alert-info mb-3">${esc(flash)}</div>` : '') + (orders.length ? orders.map((o) => `
     <div class="card bg-base-100 shadow mb-3"><div class="card-body">
       <h3 class="card-title">${esc(o.event_name)} <span class="badge">${esc(o.status)}</span></h3>
       <p class="text-sm">${o.items.map((i) => `${esc(i.seat_no)} ${esc(i.ticket_type_name)} ${formatCents(i.unit_price_cents)}`).join('、')}</p>
