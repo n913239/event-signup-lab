@@ -41,6 +41,7 @@
 ```
 src/domain/        純邏輯,無 I/O,時間與亂數都從參數進來
 src/routes/        Hono handler,負責取現在時間、驗身分
+src/lib/           有 I/O 的共用模組:JWT、HMAC、密碼雜湊、db/(SQL 存取)—— 不進 domain
 src/presentation/  顯示轉換(唯一可以做金額除法的地方)
 tests/helpers/     閘門等測試基礎設施
 scripts/           靜態檢查與壓測
