@@ -133,9 +133,11 @@ describe.skipIf(!existsSync('schema.sql'))('名額總和的第二道(T082)', () 
     for (let round = 0; round < 5; round++) {
       const ev = await (await create(staff.access)).json()
       const a = await (await w.call(`/events/${ev.id}/ticket-types`, jsonReq('POST', { name: 'A', price_cents: 1, capacity: 50 }, staff.access))).json()
-      await runConcurrently(2, (i) => i === 0
+      const { ok } = await runConcurrently(2, (i) => i === 0
         ? w.call(`/events/${ev.id}`, jsonReq('PATCH', { ticket_types: [{ id: a.id, capacity: 60 }] }, staff.access))
         : w.call(`/events/${ev.id}/ticket-types`, jsonReq('POST', { name: 'B', price_cents: 1, capacity: 50 }, staff.access)))
+      expect(ok.map((r) => r.status)).not.toContain(500)
+      expect(ok.filter((r) => r.status === 409)).toHaveLength(1)   // 兩個都成功就超過 100 了,一定有一個輸
       expect((await w.db.prepare('SELECT SUM(capacity) AS n FROM ticket_types WHERE event_id = ?').bind(ev.id).first()).n).toBeLessThanOrEqual(100)
     }
   })

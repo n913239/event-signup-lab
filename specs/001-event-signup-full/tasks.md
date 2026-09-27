@@ -286,7 +286,7 @@ US2 只是讓主辦不用下 SQL;US3 的 refresh 是安全性;US4 / US5 是兩�
 
 原文見 `devlog/raw/exp-speckit-rerun/a2-converge-tasks.diff`。
 
-- [ ] T082 [US2] `PATCH /events/:id` 的「名額總和 ≤ 100」只在應用層先查再寫 —— **T081 的修法把原本 `updateCapacity` 裡的 SQL 守衛拿掉了**,與 `POST /events/:id/ticket-types` 同時到時總和可超過 100。先寫紅測試(資料層直接越過第一道 + 閘門併發),再讓資料庫在總和 > 100 時**拋錯**(整批回滾)
-- [ ] T083 [US4] 移除 `src/lib/hmac.js` 的 `verifyQrPayload`(自己重算 HMAC 再逐位元比對;C21:本專案只簽不驗);測試改成斷言 `qr_payload` = `qrPayload(order.id, key)` 重產的值、不含個資
-- [ ] T084 [US4] iOS 離線登出:`AppModel.logout()` 現在 `try?` 吞掉失敗照樣清 token 與 `OrdersCache`,伺服器端 refresh 沒撤銷;改成連不上時保留登入狀態並提示「登出需要連線」(T049b 原定)
-- [ ] T085 [US2] 刪掉 T081 之後沒人呼叫的 `events.update`、`ticketTypes.updateCapacity`
+- [x] T082 [US2] `PATCH /events/:id` 的「名額總和 ≤ 100」只在應用層先查再寫 —— **T081 的修法把原本 `updateCapacity` 裡的 SQL 守衛拿掉了**,與 `POST /events/:id/ticket-types` 同時到時總和可超過 100。先寫紅測試(資料層直接越過第一道 + 閘門併發),再讓資料庫在總和 > 100 時**拋錯**(整批回滾) **〔完成:schema 加兩個 trigger(INSERT / UPDATE OF capacity 後總和 > 100 → RAISE ABORT),PATCH 撞到回 409 `capacity_exceeded`;閘門測試輸的一方 409、重跑 5 次總和都 ≤ 100〕**
+- [x] T083 [US4] 移除 `src/lib/hmac.js` 的 `verifyQrPayload`(自己重算 HMAC 再逐位元比對;C21:本專案只簽不驗);測試改成斷言 `qr_payload` = `qrPayload(order.id, key)` 重產的值、不含個資 **〔完成:`verifyQrPayload` 已刪,測試改重產比對〕**
+- [x] T084 [US4] iOS 離線登出:`AppModel.logout()` 現在 `try?` 吞掉失敗照樣清 token 與 `OrdersCache`,伺服器端 refresh 沒撤銷;改成連不上時保留登入狀態並提示「登出需要連線」(T049b 原定) **〔完成:連不上回 false、保留登入並跳「登出需要連線」;伺服器有回應(含 401)才清本機;`swift build` 過〕**
+- [x] T085 [US2] 刪掉 T081 之後沒人呼叫的 `events.update`、`ticketTypes.updateCapacity` **〔完成:兩個函式已刪〕**

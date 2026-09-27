@@ -62,6 +62,7 @@ events_.patch('/:id', requireOwner, async (c) => {  // 僅主辦:改時間 / 參
   try {
     if (!(await events.updateWithCapacities(c.env.DB, e.id, e.owner_id, v.value, caps))) return err(c, 409, 'capacity_below_sold')
   } catch (x) {
+    if (/capacity_exceeded/.test(x.message)) return err(c, 409, 'capacity_exceeded')   // schema 的 trigger(T082)
     if (/CHECK/.test(x.message)) return err(c, /remaining/.test(x.message) ? 409 : 400, /remaining/.test(x.message) ? 'capacity_below_sold' : 'invalid_input')
     throw x
   }

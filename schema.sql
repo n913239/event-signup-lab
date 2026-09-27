@@ -79,6 +79,23 @@ CREATE TABLE ticket_types (
 CREATE INDEX idx_ticket_types_event_id
   ON ticket_types(event_id);
 
+-- 一個活動的票種名額總和 ≤ 100(座位 10×10)。跨列的條件 CHECK 寫不出來,用 trigger 拋錯當第二道:
+-- 路由先驗是第一道,但先查再寫擋不住「改名額」與「加票種」同時到(T082,2026-09-27 寫作 session 補)。
+-- 拋錯而不是 changes = 0 —— db.batch() 只在拋錯時整批回滾。
+CREATE TRIGGER trg_ticket_types_sum_insert
+  AFTER INSERT ON ticket_types
+  WHEN (SELECT SUM(capacity) FROM ticket_types WHERE event_id = NEW.event_id) > 100
+BEGIN
+  SELECT RAISE(ABORT, 'capacity_exceeded');
+END;
+
+CREATE TRIGGER trg_ticket_types_sum_update
+  AFTER UPDATE OF capacity ON ticket_types
+  WHEN (SELECT SUM(capacity) FROM ticket_types WHERE event_id = NEW.event_id) > 100
+BEGIN
+  SELECT RAISE(ABORT, 'capacity_exceeded');
+END;
+
 CREATE TABLE seat_holds (
   id TEXT PRIMARY KEY NOT NULL,
   hold_id TEXT NOT NULL,

@@ -27,15 +27,6 @@ export async function list(db, { status, viewerId }, now) {
 
 const PATCHABLE = ['name', 'opens_at', 'deadline_at', 'hold_ttl_minutes', 'group_min_qty', 'group_pct']
 
-// 只有主辦改得到:WHERE 帶 owner_id,看 changes。opens_at < deadline_at 由表上的 CHECK 兜底(違反會拋錯)。
-export async function update(db, id, ownerId, v) {
-  const keys = PATCHABLE.filter((k) => v[k] !== undefined)
-  if (keys.length === 0) return 1
-  const r = await db.prepare(`UPDATE events SET ${keys.map((k) => `${k} = ?`).join(', ')} WHERE id = ? AND owner_id = ?`)
-    .bind(...keys.map((k) => v[k]), id, ownerId).run()
-  return r.meta.changes
-}
-
 // 改活動欄位 + 各票種名額,同一個 batch(全有全無,T081)。
 // 名額的合法性(不小於已售、總和 ≤ 100)由呼叫端先驗;這裡的第二道是 CHECK (remaining >= 0) 與 opens_at < deadline_at —
 // 同時有人搶到座位讓「已售」變多時,remaining 扣到負數會拋錯,整批回滾。

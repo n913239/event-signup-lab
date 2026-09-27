@@ -21,11 +21,3 @@ export async function updatePrice(db, id, priceCents) {
   return r.meta.changes
 }
 
-// 改名額:remaining 跟著平移;新名額 < 已售(capacity − remaining)或總和超過 100 → changes = 0。
-export async function updateCapacity(db, id, eventId, capacity) {
-  const r = await db.prepare(`UPDATE ticket_types SET remaining = remaining + (? - capacity), capacity = ?
-    WHERE id = ? AND event_id = ? AND ? >= capacity - remaining
-      AND (SELECT COALESCE(SUM(capacity), 0) FROM ticket_types WHERE event_id = ? AND id != ?) + ? <= 100`)
-    .bind(capacity, capacity, id, eventId, capacity, eventId, id, capacity).run()
-  return r.meta.changes
-}

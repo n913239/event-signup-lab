@@ -18,9 +18,15 @@ public final class AppModel: ObservableObject {
         loggedIn = true
     }
 
-    public func logout() async {
-        if let r = store.refresh { _ = try? await client.logout(body: .json(.init(refresh_token: r))) }
+    /// 登出要先讓伺服器撤銷 refresh。連不上就保留登入狀態並回 false(T084):
+    /// 只清本機的話,伺服器那顆 refresh 30 天內還能用。伺服器有回應(含 401 已失效)才清本機。
+    @discardableResult
+    public func logout() async -> Bool {
+        if let r = store.refresh {
+            do { _ = try await client.logout(body: .json(.init(refresh_token: r))) } catch { return false }
+        }
         store.clear(); OrdersCache.clear(); loggedIn = false
+        return true
     }
 }
 

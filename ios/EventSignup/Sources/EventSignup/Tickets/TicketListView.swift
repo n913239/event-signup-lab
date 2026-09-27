@@ -5,6 +5,7 @@ public struct TicketListView: View {
     @EnvironmentObject var app: AppModel
     @State private var orders: [Components.Schemas.Order] = []
     @State private var offline = false
+    @State private var logoutFailed = false
     public init() {}
 
     public var body: some View {
@@ -21,7 +22,8 @@ public struct TicketListView: View {
             }
         }
         .navigationTitle("我的票券")
-        .toolbar { Button("登出") { Task { await app.logout() } } }
+        .toolbar { Button("登出") { Task { logoutFailed = !(await app.logout()) } } }
+        .alert("登出需要連線", isPresented: $logoutFailed) { Button("好") {} } message: { Text("連上網路後再登出一次,伺服器才會撤銷這台裝置的登入。") }
         .task { await load() }
         .refreshable { await load() }
     }
