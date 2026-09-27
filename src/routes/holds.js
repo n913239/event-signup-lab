@@ -43,23 +43,31 @@ holds.post('/:id/confirm', async (c) => {
 
   const [tt, ev] = await Promise.all([ticketTypes.findById(c.env.DB, h.ticket_type_id), events.findById(c.env.DB, h.event_id, now)])
 
+  const base = {
+    unit_price_cents: tt.price_cents,                                    // C10:確認當下的票價
+    qty: h.seat_nos.length,
+    early_bird_pct: isEarlyBird(tt, h.created_at) ? tt.early_bird_pct : 0,   // M1:早鳥看建立保留的時間
+    group_min_qty: ev.group_min_qty, group_pct: ev.group_pct,
+    promo_cents: 0,
+  }
+  let q = quote(base)
   let promo = null
   if (b.promo_code !== undefined) {
     const v = validate.promoCode(b.promo_code)
     if (!v.ok) return err(c, 400, v.error)
     promo = await promos.findByCode(c.env.DB, v.value)
-    const ok = promo && now < promo.valid_until && (promo.event_id == null || promo.event_id === h.event_id)   // M4:看確認時間
+    const valid = promo && now < promo.valid_until && (promo.event_id == null || promo.event_id === h.event_id)   // M4:看確認時間
       && !(await promos.usedBy(c.env.DB, { memberId: me, eventId: h.event_id, code: promo.code }))
-    if (!ok) return err(c, 409, 'promo_rejected')
+    if (valid) {
+      q = quote({ ...base, promo_cents: promo.discount_cents })
+    } else {
+      // C8(2026-09-27 改定):無效的碼只在「它本來會被選中」或「沒有別的折扣」時才擋;別的折扣本來就比較好 → 忽略碼
+      const wouldWin = promo ? quote({ ...base, promo_cents: promo.discount_cents }).total_cents < q.total_cents : q.applied === null   // 平手 = 別的折扣一樣好 → 忽略
+      if (wouldWin) return err(c, 409, 'promo_rejected')
+      promo = null
+    }
   }
 
-  const q = quote({
-    unit_price_cents: tt.price_cents,                                    // C10:確認當下的票價
-    qty: h.seat_nos.length,
-    early_bird_pct: isEarlyBird(tt, h.created_at) ? tt.early_bird_pct : 0,   // M1:早鳥看建立保留的時間
-    group_min_qty: ev.group_min_qty, group_pct: ev.group_pct,
-    promo_cents: promo?.discount_cents ?? 0,
-  })
   const orderId = crypto.randomUUID()
   try {
     const ok = await orders.insertConfirmed(c.env.DB, {

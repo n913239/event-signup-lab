@@ -189,6 +189,17 @@ describe.skipIf(!existsSync('schema.sql') || !existsSync('src/lib/db/holds.js'))
     expect(await res.json()).toMatchObject({ promo_code: null, group_pct: 30 })
   })
 
+  it('C8 改定:碼已用過,早鳥跟碼一樣好(都折 100 元)→ 忽略碼,套早鳥', async () => {
+    const eb = await (await w.call(`/events/${ev.id}/ticket-types`, jsonReq('POST',
+      { name: '早鳥票', price_cents: 100000, capacity: 5, early_bird_until: T0 + DAY, early_bird_pct: 10 }, staff.access))).json()
+    const h1 = await (await hold(alice, ['A1'])).json()
+    await confirm(h1, alice, { promo_code: 'WELCOME' })
+    const h2 = await (await w.call(`/events/${ev.id}/holds`, jsonReq('POST', { ticket_type_id: eb.id, seat_nos: ['D1'] }, alice.access))).json()
+    const res = await confirm(h2, alice, { promo_code: 'WELCOME' })
+    expect(res.status).toBe(201)
+    expect(await res.json()).toMatchObject({ promo_code: null, early_bird_pct: 10, total_cents: 90000 })
+  })
+
   it('C8 改定:碼不存在,但有別的折扣 → 忽略碼;沒有別的折扣 → 409', async () => {
     const h = await (await hold(alice, ['A1', 'A2', 'A3', 'A4'])).json()
     expect((await confirm(h, alice, { promo_code: 'TYPO' })).status).toBe(201)
