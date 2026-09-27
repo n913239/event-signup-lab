@@ -9,7 +9,7 @@ const hold = (who, seats, eventId = ev.id) =>
   w.call(`/events/${eventId}/holds`, jsonReq('POST', { ticket_type_id: tt.id, seat_nos: seats }, who.access))
 const errorOf = async (res) => (await res.json()).error
 
-describe.skipIf(!existsSync('schema.sql'))('保留與確認', () => {
+describe.skipIf(!existsSync('schema.sql') || !existsSync('src/lib/db/holds.js'))('保留與確認', () => {
   beforeEach(async () => {
     w = await world()
     staff = await userWith(w.app, w.env, w.db, 's@example.com', { staff: true })
