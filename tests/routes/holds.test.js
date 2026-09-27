@@ -2,7 +2,7 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest'
 import { existsSync } from 'node:fs'
 import { world, T0, MIN, DAY } from '../helpers/world.js'
-import { userWith, bearer, jsonReq } from '../helpers/auth.js'
+import { userWith, login, bearer, jsonReq } from '../helpers/auth.js'
 
 let w, staff, alice, bob, ev, tt
 const hold = (who, seats, eventId = ev.id) =>
@@ -35,6 +35,7 @@ describe.skipIf(!existsSync('schema.sql') || !existsSync('src/lib/db/holds.js'))
 
   it('status 仍是 on_sale,但時間過了 deadline_at → 409', async () => {
     w.clock.set(T0 + DAY)
+    alice = await login(w.app, w.env, { email: 'a@example.com' })   // 推了一天,token 早過期,重新登入
     expect((await hold(alice, ['A1'])).status).toBe(409)
   })
 

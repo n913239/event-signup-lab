@@ -1,7 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import { createApp } from '../src/app.js'
 
-import { sign } from '../src/lib/jwt.js'
 
 const app = createApp()
 const ENV = { JWT_SECRET: 'app-test-secret' }
@@ -39,34 +38,7 @@ const PROTECTED = [
   ['POST', '/holds/1/confirm'],
   ['GET', '/orders'], ['GET', '/orders/1'], ['POST', '/orders/1/cancel'],
 ]
-// 2026-09-27:活動 5 條、票種 2 條已實作(tests/routes/),移出 501 清單。
-const ENDPOINTS = PROTECTED.filter(([m, p]) => !/^\/(events|ticket-types)(\/1)?(\/close|\/ticket-types)?$/.test(p))
-
-describe('尚未實作的 6 條:登入後回 501', () => {
-  it('剛好 6 條(17 − auth 4 − 活動 5 − 票種 2)', () => {
-    expect(ENDPOINTS).toHaveLength(6)
-  })
-
-  it.each(ENDPOINTS)('%s %s → 501', async (method, path) => {
-    const token = await sign({ sub: 'm1', role: 'member' }, ENV.JWT_SECRET, Date.now())
-    const res = await call(path, { method, headers: { authorization: `Bearer ${token}` } })
-    expect(res.status).toBe(501)
-    expect((await res.json()).error).toBe('not_implemented')
-  })
-})
-
-describe('時鐘注入', () => {
-  it('createApp({ now }) 用注入的時鐘,不讀系統時間', async () => {
-    const { fakeClock } = await import('./helpers/clock.js')
-    const clock = fakeClock(1_790_000_000_000)
-    const fixed = createApp({ now: clock.now })
-    let body = await (await fixed.request('/health', {}, {})).json()
-    expect(body.server_now).toBe(1_790_000_000_000)
-    clock.advance(600_000)
-    body = await (await fixed.request('/health', {}, {})).json()
-    expect(body.server_now).toBe(1_790_000_600_000)
-  })
-})
+// 2026-09-27:17 條全部實作完成,501 骨架清單退場;每條的行為測試在 tests/routes/、tests/jwt.test.js、tests/concurrency.test.js。
 
 describe('沒登入', () => {
   it.each(PROTECTED)('%s %s → 401', async (method, path) => {
