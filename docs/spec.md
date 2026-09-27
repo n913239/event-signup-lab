@@ -80,7 +80,7 @@
           └─ cancelled
 ```
 
-`draft` 只由 SQL 進出;`finished` 由排程或 SQL;不做活動 `cancelled`。
+`draft` 只由 SQL 進出;`finished` 由排程或 SQL —— 排程在 `deadline_at + hold_ttl_minutes` 之後把 `on_sale` / `closed` 轉 `finished`(`on_sale` 先 close 再 finish;2026-09-27 作者定);不做活動 `cancelled`。
 
 ## 必須被測試證明的規則
 
