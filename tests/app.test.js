@@ -49,3 +49,16 @@ describe('17 條 endpoint 都接上了', () => {
     expect((await res.json()).error).toBe('not_implemented')
   })
 })
+
+describe('時鐘注入', () => {
+  it('createApp({ now }) 用注入的時鐘,不讀系統時間', async () => {
+    const { fakeClock } = await import('./helpers/clock.js')
+    const clock = fakeClock(1_790_000_000_000)
+    const fixed = createApp({ now: clock.now })
+    let body = await (await fixed.request('/health', {}, {})).json()
+    expect(body.server_now).toBe(1_790_000_000_000)
+    clock.advance(600_000)
+    body = await (await fixed.request('/health', {}, {})).json()
+    expect(body.server_now).toBe(1_790_000_600_000)
+  })
+})

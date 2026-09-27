@@ -5,7 +5,9 @@ import { ticketTypes } from './routes/ticket-types.js'
 import { holds } from './routes/holds.js'
 import { orders } from './routes/orders.js'
 
-export function createApp() {
+// now 從外面注入:正式環境用 Date.now,測試傳假時鐘(tests/helpers/clock.js)。
+// 「剛好等於開賣」「剛好逾時」這種邊界,只有時鐘可控才測得到。
+export function createApp({ now = Date.now } = {}) {
   const app = new Hono()
 
   // 每個回應都帶伺服器的現在時間。
@@ -13,7 +15,7 @@ export function createApp() {
   // 可能慢五分鐘,而「保留還剩幾秒」是伺服器說了算。
   // 這裡是整個系統唯一取現在時間的地方之一(另一處是 scheduled)。
   app.use('*', async (c, next) => {
-    c.set('now', Date.now())
+    c.set('now', now())
     await next()
     if (c.res.headers.get('content-type')?.includes('application/json')) {
       c.res.headers.set('x-server-now', String(c.get('now')))
