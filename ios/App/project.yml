@@ -1,0 +1,30 @@
+# iOS app 殼:只負責啟動 RootView,所有畫面與 client 都在 ../EventSignup 這個 Swift package。
+# 產生 Xcode 專案:cd ios/App && xcodegen
+name: EventSignupApp
+options:
+  bundleIdPrefix: dev.eventsignup
+  deploymentTarget:
+    iOS: "17.0"
+packages:
+  EventSignup:
+    path: ../EventSignup
+targets:
+  EventSignupApp:
+    type: application
+    platform: iOS
+    sources: [EventSignupApp]
+    dependencies:
+      - package: EventSignup
+    settings:
+      base:
+        GENERATE_INFOPLIST_FILE: YES
+        INFOPLIST_KEY_UILaunchScreen_Generation: YES
+        INFOPLIST_KEY_NSAppTransportSecurity: ""
+        MARKETING_VERSION: "0.1.0"
+        CURRENT_PROJECT_VERSION: "1"
+    info:
+      path: EventSignupApp/Info.plist
+      properties:
+        UILaunchScreen: {}
+        NSAppTransportSecurity:
+          NSAllowsLocalNetworking: true
