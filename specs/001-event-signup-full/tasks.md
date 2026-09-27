@@ -281,3 +281,12 @@ US2 只是讓主辦不用下 SQL;US3 的 refresh 是安全性;US4 / US5 是兩�
 - [x] T079 smoke 的金額斷言改 360000 + `promo_code = null` —— 已併進 T051 的描述
 - [x] T080 [US1] H7 併發版:同一 hold 兩個 confirm 同時到 → `[200, 201]` 同一張訂單。實測修之前輸的一方是 **500**(撞 `orders.hold_id` 唯一索引),不是 converge 說的 409;修法是訂單 INSERT 條件改 `WHERE changes() = 座位數`,輸的一方重讀 hold
 - [x] T081 [US2] `PATCH /events/:id` 全有全無:先驗全部票種名額,再把活動欄位與名額放進同一個 `db.batch`(`tests/routes/events.test.js`)
+
+## 追加:/speckit-converge 第二輪(補完漏洞之後),2026-09-27
+
+原文見 `devlog/raw/exp-speckit-rerun/a2-converge-tasks.diff`。
+
+- [ ] T082 [US2] `PATCH /events/:id` 的「名額總和 ≤ 100」只在應用層先查再寫 —— **T081 的修法把原本 `updateCapacity` 裡的 SQL 守衛拿掉了**,與 `POST /events/:id/ticket-types` 同時到時總和可超過 100。先寫紅測試(資料層直接越過第一道 + 閘門併發),再讓資料庫在總和 > 100 時**拋錯**(整批回滾)
+- [ ] T083 [US4] 移除 `src/lib/hmac.js` 的 `verifyQrPayload`(自己重算 HMAC 再逐位元比對;C21:本專案只簽不驗);測試改成斷言 `qr_payload` = `qrPayload(order.id, key)` 重產的值、不含個資
+- [ ] T084 [US4] iOS 離線登出:`AppModel.logout()` 現在 `try?` 吞掉失敗照樣清 token 與 `OrdersCache`,伺服器端 refresh 沒撤銷;改成連不上時保留登入狀態並提示「登出需要連線」(T049b 原定)
+- [ ] T085 [US2] 刪掉 T081 之後沒人呼叫的 `events.update`、`ticketTypes.updateCapacity`

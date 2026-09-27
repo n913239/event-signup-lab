@@ -3,7 +3,7 @@ import { describe, it, expect, beforeEach, afterEach } from 'vitest'
 import { existsSync } from 'node:fs'
 import { world, T0, DAY } from '../helpers/world.js'
 import { userWith, bearer, jsonReq } from '../helpers/auth.js'
-import { verifyQrPayload } from '../../src/lib/hmac.js'
+import { qrPayload } from '../../src/lib/hmac.js'
 
 let w, staff, alice, bob, ev, tt
 const buy = async (who, seats) => {
@@ -37,9 +37,9 @@ describe.skipIf(!existsSync('schema.sql') || !existsSync('src/lib/db/holds.js'))
     expect((await w.call(`/orders/${o.id}`, bearer(bob.access))).status).toBe(404)
   })
 
-  it('qr_payload 用同一把 key 驗得過,而且不含個資', async () => {
+  it('qr_payload = 同一把 key 對訂單 id 簽出來的值,而且不含個資', async () => {
     const o = await buy(alice, ['A1'])
-    expect(await verifyQrPayload(o.qr_payload, w.env.QR_SECRET)).toBe(true)
+    expect(o.qr_payload).toBe(await qrPayload(o.id, w.env.QR_SECRET))
     expect(o.qr_payload).not.toContain('a@example.com')
   })
 

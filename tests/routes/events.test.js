@@ -108,3 +108,35 @@ describe.skipIf(!existsSync('schema.sql'))('活動', () => {
     expect((await w.call(`/events/${ev.id}/close`, bearer(staff.access, { method: 'POST' }))).status).toBe(409)
   })
 })
+
+// T082:名額總和 ≤ 100 不能只靠路由先查。資料層必須自己擋,而且要「拋錯」—— changes = 0 不會讓 batch 回滾。
+describe.skipIf(!existsSync('schema.sql'))('名額總和的第二道(T082)', () => {
+  // w / staff 沿用檔頭的變數:create() 讀的是那個 w
+  beforeEach(async () => {
+    w = await world()
+    staff = await userWith(w.app, w.env, w.db, 's@example.com', { staff: true })
+  })
+  afterEach(() => w.dispose())
+
+  it('資料層直接改到總和 101 → 拋錯,活動名稱與名額都沒變', async () => {
+    const { updateWithCapacities } = await import('../../src/lib/db/events.js')
+    const ev = await (await create(staff.access)).json()
+    const a = await (await w.call(`/events/${ev.id}/ticket-types`, jsonReq('POST', { name: 'A', price_cents: 1, capacity: 50 }, staff.access))).json()
+    await w.call(`/events/${ev.id}/ticket-types`, jsonReq('POST', { name: 'B', price_cents: 1, capacity: 50 }, staff.access))
+    await expect(updateWithCapacities(w.db, ev.id, staff.member.id, { name: '改過' }, [{ id: a.id, capacity: 51 }])).rejects.toThrow()
+    expect((await w.db.prepare('SELECT name FROM events WHERE id = ?').bind(ev.id).first()).name).toBe('演唱會')
+    expect((await w.db.prepare('SELECT SUM(capacity) AS n FROM ticket_types WHERE event_id = ?').bind(ev.id).first()).n).toBe(100)
+  })
+
+  it('PATCH 調高名額與 POST 新票種同時到 → 總和永遠 ≤ 100(重跑 5 次)', async () => {
+    const { runConcurrently } = await import('../helpers/gate.js')
+    for (let round = 0; round < 5; round++) {
+      const ev = await (await create(staff.access)).json()
+      const a = await (await w.call(`/events/${ev.id}/ticket-types`, jsonReq('POST', { name: 'A', price_cents: 1, capacity: 50 }, staff.access))).json()
+      await runConcurrently(2, (i) => i === 0
+        ? w.call(`/events/${ev.id}`, jsonReq('PATCH', { ticket_types: [{ id: a.id, capacity: 60 }] }, staff.access))
+        : w.call(`/events/${ev.id}/ticket-types`, jsonReq('POST', { name: 'B', price_cents: 1, capacity: 50 }, staff.access)))
+      expect((await w.db.prepare('SELECT SUM(capacity) AS n FROM ticket_types WHERE event_id = ?').bind(ev.id).first()).n).toBeLessThanOrEqual(100)
+    }
+  })
+})

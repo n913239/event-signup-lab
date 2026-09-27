@@ -1,0 +1,15 @@
+diff --git a/specs/001-event-signup-full/tasks.md b/specs/001-event-signup-full/tasks.md
+index a99ec90..8aacdf5 100644
+--- a/specs/001-event-signup-full/tasks.md
++++ b/specs/001-event-signup-full/tasks.md
+@@ -281,3 +281,10 @@ US2 只是讓主辦不用下 SQL;US3 的 refresh 是安全性;US4 / US5 是兩
+ - [x] T079 smoke 的金額斷言改 360000 + `promo_code = null` —— 已併進 T051 的描述
+ - [x] T080 [US1] H7 併發版:同一 hold 兩個 confirm 同時到 → `[200, 201]` 同一張訂單。實測修之前輸的一方是 **500**(撞 `orders.hold_id` 唯一索引),不是 converge 說的 409;修法是訂單 INSERT 條件改 `WHERE changes() = 座位數`,輸的一方重讀 hold
+ - [x] T081 [US2] `PATCH /events/:id` 全有全無:先驗全部票種名額,再把活動欄位與名額放進同一個 `db.batch`(`tests/routes/events.test.js`)
++
++## Phase 9: Convergence
++
++- [ ] T082 [US2] CRITICAL:`PATCH /events/:id` 的「名額總和 ≤ 100」現在是應用層先查再寫(`src/routes/events.js` 讀 `listByEvent` 在 JS 裡加總),`updateWithCapacities` 的 `UPDATE ticket_types` 沒有任何 `WHERE` 守衛,跨列總和也沒有 `CHECK` 兜底 —— 與 `POST /events/:id/ticket-types` 同時到時總和可超過 100。先寫會紅的閘門測試(`tests/helpers/gate.js`:同一活動 PATCH 調高名額 + POST 新票種同時放行 → 斷言總和 ≤ 100、重跑 5 次一致),再把總和與「不小於已售」都寫進 batch 的 SQL,且違反時必須**拋錯**讓整批回滾(`changes = 0` 不會回滾,見 plan 規則 III ⚠️) per Constitution III / FR-013 (contradicts)
++- [ ] T083 [US4] 移除 `src/lib/hmac.js` 的 `verifyQrPayload`(自己重算 HMAC 再逐位元比對;C21 寫明本專案只簽不驗,日後的查驗端 MUST 用 `crypto.subtle.verify`);`tests/lib/hmac.test.js` 與 `tests/routes/orders.test.js` 改成斷言 `qr_payload` 等於 `qrPayload(order.id, key)` 重新產生的值、且不含 email / 暱稱 per FR-046 / C21 (contradicts)
++- [ ] T084 [US4] iOS 登出在離線時不可只清本機:`AppModel.logout()` 現在 `try?` 吞掉失敗後照樣清 token 與 `OrdersCache`,伺服器端 refresh 沒撤銷;改成 logout 請求失敗時保留登入狀態並提示「需要連線」(T049b 原定行為) per US4/AC4 / FR-072 (partial)
++- [ ] T085 [US2] 清掉 T081 之後沒人呼叫的 `src/lib/db/events.js` `update` 與 `src/lib/db/ticket-types.js` `updateCapacity`(若 T082 重用 `updateCapacity` 的 SQL 守衛則只刪 `update`) per T081 / Constitution III (unrequested)
