@@ -1,0 +1,45 @@
+/speckit-clarify 42 個標記一次答完,不用逐題問我。答案的依據:(1)作者 2026-09-27 的改定與 repo 現況(已實作、已有測試的行為);(2)原文與現況都沒定的,採市場上最常見的做法,並在 spec 裡標【待作者確認】。沒寫問題內容的三個空標記(Actors 附近兩個、結尾一個),請依上下文與下列答案處理,處理不了就列出來。docs/ 一個字都不准改:原文該回寫的地方另外寫成 specs/<feature>/spec-writeback.md 給作者自己動手。
+
+答案(編號照標記出現順序):
+3. opens_at ≤ now < deadline_at 才能建保留:now == opens_at 可以,now == deadline_at 不行。
+4. 過了 deadline_at 不自動轉 closed;status 與時間是兩個真相來源,各自擋(非 on_sale → 409 not_on_sale;時間不在區間內也回 409 not_on_sale)。
+5. 座位顯示依到期時間判斷:holding 且 expires_at > now 才算保留中;定期清理每 5 分鐘一次(Cron)。
+6. 對非 holding 的保留放棄 → 409 terminal_state;非本人 → 404。
+7. H7:保留已是 confirmed 時,一律回那張訂單 200,不看這次帶的優惠碼、也不看到期時間(已確認就不再有過期問題);訂單已取消(保留變 cancelled)再確認 → 409 terminal_state。
+8. 座位清單為空、超過 10 席、同請求內重複、編號不在 A–J × 1–10 → 400 invalid_input;票種不屬於此活動 → 404 not_found。
+9. 作者 2026-09-27 定:無效碼只有「它會讓應付**嚴格**更低」、或沒有任何別的折扣時才 409;同額 → 忽略碼,訂單照擇優成立。平手順序只用在有效碼之間的選擇。原文這段兩句確實矛盾,寫進 spec-writeback.md。
+10. 不存在的碼:有別的折扣 → 忽略;沒有別的折扣 → 409 promo_rejected。
+11. 0 元票種:有效碼 → 三個候選都是 0,不算「更低」,碼不套用、不記、不算用掉(promo_status = not_better);無效碼 → 沒有別的折扣 → 409(照第 10 條)。
+12. now < valid_until 才有效,相等即失效;碼不分大小寫(一律存大寫、比對前轉大寫)。
+13. 重複截止、對 closed / finished 截止 → 409 terminal_state。
+14. 改時間不影響 status;狀態機沒有 closed → on_sale。
+15. 取消不受活動狀態或時間限制,只看訂單是 confirmed。
+16. 撤銷只作用在續期憑證;存取憑證無狀態,撤銷後仍可用到 15 分鐘到期。
+17. email 一律轉小寫存,唯一不分大小寫;只檢查含 @、長度 3–254。
+18. 暱稱必填 1–50 字,不唯一;密碼 ≥ 8,無上限、無其他規則。
+19. 每次輪替,新續期憑證的 30 天從輪替當下重新起算。
+20. 計數對象是帳號;不存在的 email 不計數,一樣回 401 unauthorized。
+21. 連錯 5 次鎖 5 分鐘;鎖定到期後計數不歸零,再錯 1 次就進下一階(10 → 20 → 40 → 60 分鐘,上限 60);成功登入計數歸零,階梯退回起點。鎖定中的嘗試不驗密碼、不計數。
+22. opens_at 必須 < deadline_at;可以是過去時間;group_min_qty ≥ 2;group_pct 0–100;名稱 1–100 字。
+23. 列 A–J、欄 1–10,編號如 A1、J10。
+24. 目前沒有自動轉 finished 的排程,只能用 SQL;【待作者確認】是否要在 deadline_at 之後由排程轉。
+25. 篩選值 = draft / on_sale / closed / finished,其他值 → 400;?status=on_sale 只看 status 欄,不排除時間已過截止的;預設列表含 closed 與 finished,不含別人的 draft。
+26. 四種:free / held / sold / mine(mine = 自己保留中的)。
+27. 改的是各票種名額,一次可改多個,帶在 PATCH /events/:id 的 ticket_types[].capacity;全有全無:任一項低於已售 → 409 capacity_below_sold、總和 > 100 → 409 capacity_exceeded,整個 PATCH 不寫入(資料庫有 trigger 當第二道)。
+28. 可改:name、opens_at、deadline_at、hold_ttl_minutes、group_min_qty、group_pct,以及票種名額。
+29. early_bird_until 可省略(= 沒有早鳥)、early_bird_pct 預設 0、範圍 0–100;price_cents 整數 ≥ 0;名額 0–100。
+30. 任何狀態都可新增票種,只受總和 ≤ 100 限制。
+31. 放棄與取消後的紀錄一樣留著,只改 status。
+32. 試算:過期 → 409 hold_expired;已放棄或已確認 → 409 terminal_state;非本人 → 404。
+33. promo_status = none / applied / not_better / invalid;試算用試算當下的時間判斷碼的有效期。
+34. 「我的票券」列出本人所有訂單(含 cancelled 與 checked_in),不含保留;依確認時間新到舊。
+35. 已取消訂單的明細仍回 qr_payload;web 只對 confirmed 顯示取消按鈕。
+36. 主辦操作只透過 API(curl);web 五個畫面不放主辦功能(非目標:不做後台)。
+37. 要:保留倒數畫面有「放棄」,我的票券對 confirmed 訂單有「取消訂單」。
+38. 列表只列活動;座位圖在點進活動後的明細畫面。
+39. NT$ 加千分位,整元不顯示小數,有分才顯示兩位(12345 分 → NT$123.45;100000 分 → NT$1,000);web 在 web/src/lib/money.js、iOS 在 Tickets/Money.swift,全程整數。
+40. API 一律 epoch 毫秒;web 用瀏覽器時區、zh-TW 格式顯示。
+41. 完整代碼清單以 openapi.yaml 的 Error.error enum 為準:invalid_input 400、unauthorized 401、forbidden 403、not_found 404、email_taken 409、not_on_sale 409、seat_taken 409、hold_exists 409、sold_out 409、hold_expired 409、terminal_state 409、capacity_below_sold 409、capacity_exceeded 409、promo_rejected 409、refresh_replayed 401。對應:重複 email → email_taken;超過 10 席、保留時長越界 → invalid_input;非 staff 建活動 → forbidden;名額不足 → sold_out;同活動已有保留 → hold_exists;非開賣時段 → not_on_sale;確認過期保留 → hold_expired;取消已報到、已取消再轉 → terminal_state。
+42. 「僅本人」的資源(保留、訂單)對別人一律 404,不透露存在;主辦限定的寫入操作(活動、票種)對非主辦 403;別人的 draft 活動 → 404。
+43. 作者已決定:members 表加 failed_logins、locked_until 兩欄(schema.sql 已落地)。
+44. 量「我的票券」一次載入(GET /orders)的 rows_read,記下數字即可,沒有目標值。

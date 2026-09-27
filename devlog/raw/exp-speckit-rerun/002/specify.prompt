@@ -1,0 +1,1 @@
+/speckit-specify 活動報名系統(完整功能)。以 docs/spec.md 與 docs/non-goals.md 為準,一字不擴張:只把原文已經寫的需求整理成 spec,不新增功能、不替作者做決定。原文沒寫清楚的地方一律標 [NEEDS CLARIFICATION],不准自己決定(數量上限不必管,有幾處就標幾處)。docs/ 底下的檔案一個都不准改。

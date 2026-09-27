@@ -1,0 +1,1 @@
+/speckit-plan 技術棧鎖死,不准換:Cloudflare Workers + Hono + D1(SQLite)做 API,Cloudflare Pages + Vite + Tailwind v4 + daisyUI v5 做 web,SwiftUI + swift-openapi-generator 做 iOS 骨架,三端共用 repo 根目錄的一份 openapi.yaml。constitution 的五條硬規則逐條當 gate 檢查設計,有張力就標 ⚠️ 寫清楚,不要自己改規則。repo 裡已經有實作(src/、tests/、schema.sql、openapi.yaml),plan 要以現況為準描述,不准改任何程式碼與 docs/。
