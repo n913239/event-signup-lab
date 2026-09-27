@@ -20,5 +20,7 @@ let package = Package(
             ],
             plugins: [.plugin(name: "OpenAPIGenerator", package: "swift-openapi-generator")]
         ),
+        // Money.swift 與 web 的顯示向量比對(tests/fixtures/money-format.json)
+        .testTarget(name: "EventSignupTests", dependencies: ["EventSignup"]),
     ]
 )
