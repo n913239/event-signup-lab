@@ -31,7 +31,7 @@ describe('骨架', () => {
 // 規格的 17 條。骨架階段全部回 501 —— 這個測試證明「路由接對了」,
 // 不是證明「功能做好了」。每接好一條,就把它從這裡搬到自己的測試檔。
 // 2026-09-27:auth 四條已實作,移出 501 清單(測試在 tests/jwt.test.js)。其餘要登入,帶一個合法 token 打。
-const ENDPOINTS = [
+const PROTECTED = [
   ['POST', '/events'], ['GET', '/events'], ['GET', '/events/1'],
   ['PATCH', '/events/1'], ['POST', '/events/1/close'],
   ['POST', '/events/1/ticket-types'], ['PATCH', '/ticket-types/1'],
@@ -39,10 +39,12 @@ const ENDPOINTS = [
   ['POST', '/holds/1/confirm'],
   ['GET', '/orders'], ['GET', '/orders/1'], ['POST', '/orders/1/cancel'],
 ]
+// 2026-09-27:活動 5 條、票種 2 條已實作(tests/routes/),移出 501 清單。
+const ENDPOINTS = PROTECTED.filter(([m, p]) => !/^\/(events|ticket-types)(\/1)?(\/close|\/ticket-types)?$/.test(p))
 
-describe('尚未實作的 13 條:登入後回 501', () => {
-  it('剛好 13 條(17 − auth 4)', () => {
-    expect(ENDPOINTS).toHaveLength(13)
+describe('尚未實作的 6 條:登入後回 501', () => {
+  it('剛好 6 條(17 − auth 4 − 活動 5 − 票種 2)', () => {
+    expect(ENDPOINTS).toHaveLength(6)
   })
 
   it.each(ENDPOINTS)('%s %s → 501', async (method, path) => {
@@ -67,7 +69,7 @@ describe('時鐘注入', () => {
 })
 
 describe('沒登入', () => {
-  it.each(ENDPOINTS)('%s %s → 401', async (method, path) => {
+  it.each(PROTECTED)('%s %s → 401', async (method, path) => {
     expect((await call(path, { method })).status).toBe(401)
   })
 })
