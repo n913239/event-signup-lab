@@ -1,0 +1,11 @@
+step 1 action: login as member@example.com -> logout button visible, url=http://localhost:5173/#/events
+step 2 action: open 秋季音樂會 from events list, url=http://localhost:5173/#/events/ev-1
+step 3 action: select ticket type -> 一般・NT$10,000・剩 59
+step 4 action: pick first free seat A2; hold button reads '保留 1 席'
+step 5 action: click hold -> 秋季音樂會:保留 A2; price box: '原價(1 席)\nNT$10,000\n折扣\n—\n應付\nNT$10,000\n折扣不疊加,自動套用最划算的一種'
+step 6 action: confirm order -> redirected to http://localhost:5173/#/tickets
+step 7 action: my tickets card for A2: '秋季音樂會\nconfirmed\n\nA2 一般 NT$10,000\n\n小計 NT$10,000・無折扣\n\n總計 NT$10,000・確認於 2026/9/28 10:34:00\n\n取消訂單'
+FINAL seat=A2
+FINAL ticket_card='秋季音樂會\nconfirmed\n\nA2 一般 NT$10,000\n\n小計 NT$10,000・無折扣\n\n總計 NT$10,000・確認於 2026/9/28 10:34:00\n\n取消訂單'
+step 8 action: DB check (event-db MCP) ticket_types tt-general 一般 price_cents=100000 (=NT$1,000); order 43bad7d9-afcf-4e9f-8202-d868d175dc7b A2 unit_price_cents=100000 total_cents=100000
+FINAL order_amount_displayed=NT$10,000 ; DB=100000 cents = NT$1,000 -> MISMATCH (x10). Cause: web/src/lib/money.js formatCents divides by 10 instead of 100

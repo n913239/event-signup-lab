@@ -1,0 +1,8 @@
+step 1 action: open http://localhost:5173/#/login (login page)
+step 2 action: CP1 login as member@example.com -> http://localhost:5173/#/events, 登出 button visible
+step 3 action: CP2 open event detail: '秋季音樂會 on_sale' at http://localhost:5173/#/events/ev-1
+step 4 action: CP3 select ticket type '一般・NT$10,000・剩 60', pick first free seat A1; button='保留 1 席'
+step 5 action: CP3 hold created: '秋季音樂會:保留 A1'; price box: '原價(1 席)\nNT$10,000\n折扣\n—\n應付\nNT$10,000\n折扣不疊加,自動套用最划算的一種'
+step 6 action: CP4/CP5 confirm order -> http://localhost:5173/#/tickets; ticket card text: '秋季音樂會\nconfirmed\n\nA1 一般 NT$10,000\n\n小計 NT$10,000・無折扣\n\n總計 NT$10,000・確認於 2026/9/28 10:29:41\n\n取消訂單'
+
+FINAL_RESPONSE: seat=A1; hold price box='原價(1 席)\nNT$10,000\n折扣\n—\n應付\nNT$10,000\n折扣不疊加,自動套用最划算的一種'; tickets page card='秋季音樂會\nconfirmed\n\nA1 一般 NT$10,000\n\n小計 NT$10,000・無折扣\n\n總計 NT$10,000・確認於 2026/9/28 10:29:41\n\n取消訂單'

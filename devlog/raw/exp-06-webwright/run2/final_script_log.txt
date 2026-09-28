@@ -1,0 +1,9 @@
+step 1 action: login as member@example.com -> url http://localhost:5173/#/events, logout button visible=True
+step 2 action: open event from list: heading='秋季音樂會 on_sale' url=http://localhost:5173/#/events/ev-1
+step 3 action: select ticket type: '一般・NT$10,000・剩 57'
+step 4 action: select first available seat A4; class now='btn btn-xs btn-outline'
+step 5 action: click 保留 1 席 -> url http://localhost:5173/#/events/ev-1/hold; page: '- main:\n  - heading "秋季音樂會:保留 A4" [level=2]\n  - text: 09:58 原價(1 席) NT$10,000 折扣 — 應付 NT$10,000 折扣不疊加,自動套用最划算的一種\n  - textbox "優惠碼(可不填)"\n  - button "套用"\n  - button "確認"\n  - button "放棄"'
+step 6 action: click confirm -> url http://localhost:5173/#/tickets; page: '- main:\n  - heading "我的票券" [level=2]\n  - heading "秋季音樂會 confirmed" [level=3]\n  - paragraph: A4 一般 NT$10,000\n  - paragraph: 小計 NT$10,000・無折扣\n  - paragraph: 總計 NT$10,000・確認於 2026/9/28 10:14:25\n  - button "取消訂單"\n  - heading "秋季音樂會 confirmed" [level=3]\n  - paragraph: A3 一般 NT$10,000\n  - paragraph: 小計 NT$10,000・無折扣\n  - paragraph: 總計 NT$10,000・確認於 2026/9/28 10:11:53\n  - button "取消訂單"\n  - heading "秋季音樂會 confirmed" [level=3]\n  - paragraph: A2 一般 NT$10,000\n  - paragraph: 小計 NT$10,000・無折扣\n  - paragraph: 總計 NT$10,000・確認於 2026/9/28 10:11:48\n  - button "取消訂單"\n  - heading "秋季音樂會 confirmed" [level=3]\n  - paragraph: A1 一般 NT$10,000\n  - paragraph: 小計 NT$10,000・無折扣\n  - paragraph: 總計 NT$10,000・確認於 2026/9/28 10:10:53\n  - button "取消訂單"'
+step 7 action: my tickets: card for seat A4: '秋季音樂會\nconfirmed\n\nA4 一般 NT$10,000\n\n小計 NT$10,000・無折扣\n\n總計 NT$10,000・確認於 2026/9/28 10:14:25\n\n取消訂單'
+FINAL: seat=A4; ticket card='秋季音樂會\nconfirmed\n\nA4 一般 NT$10,000\n\n小計 NT$10,000・無折扣\n\n總計 NT$10,000・確認於 2026/9/28 10:14:25\n\n取消訂單'
+FINAL DATUM: 座位 A4;訂單金額(應付/總計)NT$10,000;票券頁:秋季音樂會 confirmed / A4 一般 NT$10,000 / 小計 NT$10,000・無折扣 / 總計 NT$10,000・確認於 2026/9/28 10:14:25 / QR code / 取消訂單

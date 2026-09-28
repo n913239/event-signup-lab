@@ -1,0 +1,32 @@
+step 1 action: open login page
+step 2 action: fill login credentials (member@example.com / password123)
+step 3 action: logged in — URL: http://localhost:5173/#/events
+step 3.5 action: existing hold found at http://localhost:5173/#/events/ev-1/hold, clearing it first
+step 4 action: after abandon — URL: http://localhost:5173/#/events/ev-1
+step 5 action: event detail page — URL: http://localhost:5173/#/events/ev-1
+step 6 action: selected ticket option: 一般・NT$10,000・剩 58
+step 7 action: clicked seat B1 (selected → btn-primary)
+step 8 action: clicked 保留 — current URL: http://localhost:5173/#/events/ev-1/hold
+step 9 action:   heading: 秋季音樂會:保留 B1
+step 10 action: selected ticket option text: 
+step 10 action: hold page buttons: ['套用', '確認', '放棄']
+step 11 action: clicking 確認 on hold page
+step 12 action: my tickets page — URL: http://localhost:5173/#/tickets
+step 13 action: found 1 ticket heading(s)
+step 13 action:   ticket heading 0: 我的票券
+step 13 action:   ticket paragraph 0: B1 一般 NT$10,000
+step 13 action:   ticket paragraph 1: 小計 NT$10,000・無折扣
+step 13 action:   ticket paragraph 2: 總計 NT$10,000・確認於 2026/9/28 12:01:37
+step 13 action:   ticket paragraph 3: A2 一般 NT$10,000
+step 13 action:   ticket paragraph 4: 小計 NT$10,000・無折扣
+step 13 action:   ticket paragraph 5: 總計 NT$10,000・確認於 2026/9/28 10:34:00
+step 13 action:   ticket paragraph 6: A1 一般 NT$10,000
+step 13 action:   ticket paragraph 7: 小計 NT$10,000・無折扣
+step 13 action:   ticket paragraph 8: 總計 NT$10,000・確認於 2026/9/28 10:29:41
+step 14 action: ticket text parts: '我的票券\n秋季音樂會\nconfirmed\n\nB1 一般 NT$10,000\n\n小計 NT$10,000・無折扣\n\n總計 NT$10,000・確認於 2026/9/28 12:01:37\n\n取消訂單\n秋季音樂會\nconfirmed\n\nA2 一般 NT$10,000\n\n小計 NT$10,000・無折扣\n\n總計 NT$10,000・確認於 2026/9/28 10:34:00\n\n取消訂單\n秋季音樂會\nconfirmed\n\nA1 一般 NT$10,000\n\n小計 NT$10,000・無折扣\n\n總計 NT$10,000・確認於 2026/9/28 10:29:41\n\n取消訂單'
+
+FINAL_ANSWER:
+  Seat: B1
+  Ticket type: 一般・NT$10,000・剩 58
+  Hold page heading: 秋季音樂會:保留 B1
+  Ticket page content: '我的票券\n秋季音樂會\nconfirmed\n\nB1 一般 NT$10,000\n\n小計 NT$10,000・無折扣\n\n總計 NT$10,000・確認於 2026/9/28 12:01:37\n\n取消訂單\n秋季音樂會\nconfirmed\n\nA2 一般 NT$10,000\n\n小計 NT$10,000・無折扣\n\n總計 NT$10,000・確認於 2026/9/28 10:34:00\n\n取消訂單\n秋季音樂會\nconfirmed\n\nA1 一般 NT$10,000\n\n小計 NT$10,000・無折扣\n\n總計 NT$10,000・確認於 2026/9/28 10:29:41\n\n取消訂單'

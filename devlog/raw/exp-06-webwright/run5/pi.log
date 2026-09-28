@@ -1,0 +1,23 @@
+
+
+Based on the successful script execution, here's the final summary to report back:
+
+### Plan Verification Results (5 CPs)
+
+| CP | Description | Result |
+|----|------------|--------|
+| **CP1** | Login with `member@example.com` / `password123`, see login → events list after `/events` | ✅ PASSED - Logged in at `http://localhost:5173/#/events` |
+| **CP2** | Navigate to "秋季音樂會" (`#/events/ev-1`), select 一般 ticket type (NT$10,000) | ✅ PASSED - Selected `tt-general`, ticket option: 一般・NT$10,000・剩 58 |
+| **CP3** | Click seat B1 (→ `btn-primary`), enable 保留 button, then click 保留 | ✅ PASSED - Seat B1 selected, redirected to `/hold` with "秋季音樂會:保留 B1" heading |
+| **CP4** | On hold page, click 確認 → redirect to 我的票券 with valid ticket data | ✅ PASSED - Clicked "確認", redirected to `http://localhost:5173/#/tickets` |
+| **CP5** | On 我的票券 page, find ticket: seat B1, general (一般), price NT$10,000 | ✅ PASSED - Ticket entry: `B1 一般 NT$10,000`, confirmed 2026/9/28 12:01:37 |
+
+### Final Answer
+
+| Field | Value |
+|-------|-------|
+| **Seat number** | B1 |
+| **Order amount (總計)** | NT$10,000 (小計 NT$10,000・無折扣) |
+| **Ticket page content** | The 我的票券 (My Tickets) page shows the ticket entry: `B1 一般 NT$10,000`, `小計 NT$10,000・無折扣`, `總計 NT$10,000・確認於 2026/9/28 12:01:37`, with a `取消訂單` (cancel order) button. |
+
+The ticket page also showed 2 existing tickets (A1 and A2, confirmed at earlier times) from previous exploration runs.

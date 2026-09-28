@@ -1,0 +1,81 @@
+step 1 action: Navigate to start URL and login with member@example.com / password123
+step 1 action: Logged in successfully. URL: http://localhost:5173/#/events, Title: 活動報名
+step 2 action: Click on 秋季音樂會 event link from events list
+step 2 action: On event page. URL: http://localhost:5173/#/events/ev-1, Title: 活動報名
+step 3 action: Verify '一般' ticket type is selected (NT$10,000)
+step 3 action: Selected ticket type value: tt-general
+step 4 action: Click an unselected seat button (C1) to reserve a seat
+step 4 action: Deselected pre-selected seat A1
+step 4 action: Deselected pre-selected seat A2
+step 4 action: Seat C1 selected. Class: btn btn-xs btn-primary
+step 5 action: Click '保留 1 席' button to reserve the seat
+step 5 action: Reserve button text: 保留 1 席
+step 5 action: Seat reserved. URL: http://localhost:5173/#/events/ev-1/hold
+step 6 action: Confirm order and capture order amount (訂單金額)
+step 6 action: Order confirmation page content: 
+    
+      活動報名
+      
+      我的票券
+      登出
+    
+    
+    
+      秋季音樂會:保留 C1
+      09:56
+      
+      原價(1 席)NT$10,000
+      折扣
+        —
+      應付NT$10,000
+      折扣不疊加,自動套用最划算的一種
+      
+        
+        套用
+      
+      
+      
+        確認
+        放棄
+      
+      
+    
+    
+  
+
+
+step 6 action: Order amount: NT$10,000
+step 7 action: Navigate to '我的票券' (my tickets) page
+step 7 action: On my tickets page. URL: http://localhost:5173/#/tickets, Title: 活動報名
+step 8 action: Verify ticket visible in my tickets, capture seat number and ticket content
+step 8 action: My tickets page content: 
+    
+      活動報名
+      
+      我的票券
+      登出
+    
+    我的票券
+    
+      秋季音樂會 confirmed
+      A2 一般 NT$10,000
+      小計 NT$10,000・無折扣
+      總計 NT$10,000・確認於 2026/9/28 10:34:00
+      
+      取消訂單
+      
+    
+    
+      秋季音樂會 confirmed
+      A1 一般 NT$10,000
+      小計 NT$10,000・無折扣
+      總計 NT$10,000・確認於 2026/9/28 10:29:41
+      
+      取消訂單
+      
+    
+    
+  
+
+
+step 8 action: Seat number: A2

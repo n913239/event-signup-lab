@@ -1,0 +1,21 @@
+step 1 action: login as member@example.com; url=http://localhost:5173/#/events; 登出 button visible
+step 2 action: open event 秋季音樂會 from list; url=http://localhost:5173/#/events/ev-1
+step 3 action: select ticket type 一般 (value=tt-general); selected='一般・NT$1,000・剩 60'
+step 4 action: pick free seat A1; hold button='保留 1 席'
+step 5 action: hold created; title='秋季音樂會:保留 A1'; quote='原價(1 席)\nNT$1,000\n折扣\n—\n應付\nNT$1,000\n折扣不疊加,自動套用最划算的一種'
+step 6 action: confirm order -> redirected to http://localhost:5173/#/tickets
+
+TICKETS_PAGE_TEXT:
+我的票券
+秋季音樂會
+confirmed
+
+A1 一般 NT$1,000
+
+小計 NT$1,000・無折扣
+
+總計 NT$1,000・確認於 2026/9/28 10:10:53
+
+取消訂單
+
+FINAL_RESPONSE: seat=A1; hold_quote=原價(1 席) | NT$1,000 | 折扣 | — | 應付 | NT$1,000 | 折扣不疊加,自動套用最划算的一種

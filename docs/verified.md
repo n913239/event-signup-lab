@@ -35,12 +35,13 @@
 | 2026-09-27 | 免費額度(Day 28) | D1 過去 24 小時 rows read 5,711 / written 1,711 / 193 kB;Workers 530 次請求、0 錯誤(dashboard);N+1 對照 JOIN 1 次 60 列 vs N+1 27 次 52 列(`devlog/raw/day28-free-tier/`) |
 | 2026-09-27 | Xcode 27.0 MCP 在本專案重跑 | 53 支工具;建置失敗時 `RunAllTests` 回 `isError`;全部跳過時 `failed 0` 且 `passed 0`(`devlog/raw/exp-day29-xcode-mcp/`) |
 | 2026-09-27 | push 前資安掃描 | gitleaks(歷史 141 commits:僅測試假金鑰)、`npm audit --omit=dev` 0、Fable 獨立複查 |
+| 2026-09-28 | web 畫面走查:Webwright(Claude / 地端模型)× 5 輪 + `@playwright/test`,前端金額 ×10 突變 | 只有期望值寫死的 Playwright 測試紅;AI 只在任務寫明「要跟資料庫對得上」時抓到(`devlog/raw/exp-06-webwright/`) |
 
 ## ❌ 尚未驗證 / 刻意不做
 
 | 項目 | 狀態 |
 |---|---|
-| web 畫面的自動化走查 | web 只有 `smoke.sh` 打 API 與人工操作,沒有瀏覽器自動化測試 |
+| web 畫面的自動化走查進 CI | 2026-09-28 本機實跑過(exp-06),但 Playwright 測試不在 `npm test` / CI 裡(需要瀏覽器與兩個 dev server) |
 | 限速(登入以外) | 刻意不做(非目標 / 刻意保留的醜);email 可被列舉、token 存 localStorage 同屬已知取捨 |
 | dev 相依的 2 個 moderate(vitest 鏈) | `npm audit` 顯示,只影響開發環境;production 相依 0 |
 | JWT「七項邊界外部清單」 | 2026-09-27 作者改定:不再作為驗收,改由 repo 內 6 個測試 + `check-jwt-timing.sh` 裁定 |
