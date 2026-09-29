@@ -1,6 +1,6 @@
 # Day 26:開賣那一秒(2026-09-27 線上實測)
 
-對象:線上 Worker(`8a285e0` 部署;之後到 `a057163` 沒有任何 src / schema 變動)。
+對象:線上 Worker(`8a285e0` 部署;之後到 `7df00e2` 沒有任何 src / schema 變動)。
 
 ## 1. 三方時鐘對照(`scripts/clock-check.sh`,`clock-check.txt`)
 

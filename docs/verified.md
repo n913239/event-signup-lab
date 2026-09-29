@@ -18,8 +18,8 @@
 | 2026-09-10 | schema 裁判(11 條斷言)先於 schema 寫好,並自我測試過 | `npm run test:schema:selftest`(壞 schema 各紅在對應那條 + good 不誤報) |
 | 2026-09-27 | schema(作者起稿)+ 18 條 endpoint 全部實作 | `npx vitest run` **245/245**(23 個測試檔);契約測試 `tests/contract.test.js` |
 | 2026-09-27 | 靜態檢查擴到 web 與 iOS(`check-money.sh` 掃 `web/src`、`ios/`) | `self-test.sh` **41 筆探針**(28 筆要抓到、13 筆不得誤報)全過;`npm run check:all` 五支全綠 |
-| 2026-09-27 | 時間注入收緊:讀時鐘只准在 `src/app.js` / `src/worker.js`,也擋 SQL 自己取時間與 `hono/jwt`(`193436a`,Day 24 發現的盲區) | `self-test.sh` **47 筆探針**(32 筆要抓到、15 筆不得誤報)+ 乾淨狀態 5 項全過;把 exp-05 的 AI 版 JWT 放進 `src/routes` 會紅 |
-| 2026-09-27 | schema 裁判「列舉不多不少」抓太寬修正(`c6aa609`) | `good.sql` 加布林旗標探針:舊版紅、新版綠 |
+| 2026-09-27 | 時間注入收緊:讀時鐘只准在 `src/app.js` / `src/worker.js`,也擋 SQL 自己取時間與 `hono/jwt`(`e5a8442`,Day 24 發現的盲區) | `self-test.sh` **47 筆探針**(32 筆要抓到、15 筆不得誤報)+ 乾淨狀態 5 項全過;把 exp-05 的 AI 版 JWT 放進 `src/routes` 會紅 |
+| 2026-09-27 | schema 裁判「列舉不多不少」抓太寬修正(`2c50aec`) | `good.sql` 加布林旗標探針:舊版紅、新版綠 |
 | 2026-09-27 | 開賣那一秒(線上)與三方時鐘對照 | 最後被拒 −58 ms、第一次成功 +39 ms;四個時鐘來源同秒(`devlog/raw/day26-opening/`) |
 | 2026-09-27 | 金額:擇優不疊加、整數分 | `tests/domain/money.test.js`;**fuzz 20,000 組**(seed 20260927)五條不變條件 + 獨立對照算法 0 違反,四個突變全紅(`devlog/raw/exp-02-money/README.md`) |
 | 2026-09-27 | 時間注入、價格快照(改價後既有訂單金額不變) | `tests/domain/time-rules.test.js`、`tests/routes/orders.test.js`;`check-time-injection.sh`、`check-price-snapshot.sh` |

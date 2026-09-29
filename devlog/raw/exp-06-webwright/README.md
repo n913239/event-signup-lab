@@ -2,7 +2,7 @@
 
 - 日期:2026-09-28
 - 工具:[microsoft/Webwright](https://github.com/microsoft/Webwright) @ `bc26750`(2026-08-03)。AI 不一步一步點,而是自己寫 Playwright 腳本、跑、看截圖,最後留下一支可重跑的 `final_script.py`
-- 受測:本 repo @ `597d05b` 的本機複本(`<lab>`),`wrangler dev` :8788 + vite :5173,`seed.sql` 的 member 帳號。**全部只打本機**
+- 受測:本 repo @ `8bd9959` 的本機複本(`<lab>`),`wrangler dev` :8788 + vite :5173,`seed.sql` 的 member 帳號。**全部只打本機**
 - 任務(每一輪相同,`runN/prompt.md` 逐字):登入 → 進「秋季音樂會」→ 用「一般」票種保留一個座位 → 確認 → 到「我的票券」確認看得到。回報座位號、金額、票券頁內容
 - 偏離 Webwright 預設:Playwright 的 Firefox 下載逾時,改用本機 Chrome(`chromium.launch(channel="chrome")`)
 - 路徑已換成代稱:`<lab>` 受測複本、`<webwright>` Webwright clone、`<workdir>` 每輪的工作目錄
