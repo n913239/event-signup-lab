@@ -1,0 +1,16 @@
+# 9/28 10:11(+08)把 run1 的 final_script.py 原封不動在原版與突變版(money.js /100→/10)各重跑一次;輸出以 grep -E "step 3|step 4|總計|FINAL" 過濾。9/29 從執行紀錄補存。
+
+baseline exit=0
+step 4 action: pick free seat A2; hold button='保留 1 席'
+總計 NT$1,000・確認於 2026/9/28 10:11:48
+總計 NT$1,000・確認於 2026/9/28 10:10:53
+FINAL_RESPONSE: seat=A2; hold_quote=原價(1 席) | NT$1,000 | 折扣 | — | 應付 | NT$1,000 | 折扣不疊加,自動套用最划算的一種
+ web/src/lib/money.js | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+mutant exit=0
+step 3 action: select ticket type 一般 (value=tt-general); selected='一般・NT$10,000・剩 58'
+step 4 action: pick free seat A3; hold button='保留 1 席'
+總計 NT$10,000・確認於 2026/9/28 10:11:53
+總計 NT$10,000・確認於 2026/9/28 10:11:48
+總計 NT$10,000・確認於 2026/9/28 10:10:53
+FINAL_RESPONSE: seat=A3; hold_quote=原價(1 席) | NT$10,000 | 折扣 | — | 應付 | NT$10,000 | 折扣不疊加,自動套用最划算的一種

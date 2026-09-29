@@ -38,6 +38,7 @@
 - `runN/`:prompt、`plan.md`、`final_script.py`、`final_script_log.txt`;run1–3b 另有 `result.md`(agent 的最後回覆與花費;run1、run2 的是 9/28 事後從執行紀錄補存)、run3 有 `mcp.json`;run4 有 harness 的指令歷史、`self_reflect_result.json` 和最後回覆;run5 有 agent 的最後回覆(`pi.log`)
 - `runN/screenshots/`:`final/` 是正式那次執行、`explore/` 是探索階段,檔名照 agent 自己取的
 - `e2e/`:改寫後的 `@playwright/test`。**不在 `npm test` 和 CI 裡**(要瀏覽器和兩個 dev server);重跑方式:把兩個檔放到 repo 根目錄、`npm i -D @playwright/test`、`npm run dev` + `cd web && npx vite`、`npm run db:seed`、`npx playwright test`
+- `run1/rerun-mutated.log`:run1 的 `final_script.py` 在原版與突變版各重跑一次的輸出(表格「1 重跑」那列);`e2e/playwright-run.log`:e2e 測試在原版綠、突變版紅的輸出。兩份都是 9/29 從執行紀錄補存
 - run1、run2 的截圖沒有留
 
 **Day 29 的重點:AI 走查能把流程跑完,也能留下一支好用的腳本 —— 但「對」是什麼,得有人先寫下來。換模型、加工具都沒改變這件事;唯一會一直紅的,是期望值寫死在測試裡的那一支。**

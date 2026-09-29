@@ -1,0 +1,10 @@
+# 9/28 10:15(+08)e2e/member-ticket.spec.js 先在原版、再在突變版跑 npx playwright test 的輸出(去色碼)。9/29 從執行紀錄補存。
+
+  ✓  1 e2e/member-ticket.spec.js:4:1 › 會員訂一般票:畫面上的金額要等於 seed 的票價 (598ms)
+
+  1 passed (1.2s)
+    Error: expect(locator).toContainText(expected) failed
+    Expected substring: "NT$1,000"
+    Received string:    "一般・NT$10,000・剩 59"
+    Error Context: test-results/member-ticket-會員訂一般票-畫面上的金額要等於-seed-的票價/error-context.md
+  1 failed
