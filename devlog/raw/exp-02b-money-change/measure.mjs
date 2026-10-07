@@ -25,4 +25,4 @@ const run = async (dir) => {
   }
   console.log(`  fuzz 20000:total 不同 ${tdiff} 組(最大差 ${maxGap} 分);套用種類不同 ${kdiff} 組(其中 total 相同 ${kdiffSameTotal} 組)`, ex ? JSON.stringify(ex) : '')
 }
-for (const r of ['A', 'B']) { console.log('== ' + r); await run('./' + r) }
+for (const r of ['A', 'B', 'C']) { console.log('== ' + r); await run('./' + r) }

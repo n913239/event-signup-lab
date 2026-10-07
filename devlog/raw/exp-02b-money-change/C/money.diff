@@ -1,0 +1,13 @@
+9c9,10
+< // 折扣額相同時,依早鳥 → 團體 → 優惠碼的順序取第一個;三者皆為 0 則不套用任何折扣。
+---
+> // 折扣額相同時,依優惠碼 → 早鳥 → 團體的順序取第一個;三者皆為 0 則不套用任何折扣。
+> // 沒被選中的優惠碼不算用掉(promo_discount 為 0、applied_discount 不是 'promo')。
+52a54
+>     { kind: 'promo', amount: Math.min(promoAmount, subtotal) },
+55d56
+<     { kind: 'promo', amount: Math.min(promoAmount, subtotal) },
+58c59
+<   // 取折扣額最大者;同額時保留先出現的(早鳥 → 團體 → 優惠碼)
+---
+>   // 取折扣額最大者;同額時保留先出現的(優惠碼 → 早鳥 → 團體)

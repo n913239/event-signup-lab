@@ -1,7 +1,7 @@
 // 平手專測:刻意讓兩種或三種折扣同額,看套用的是哪一種(作者規則:優惠碼 → 早鳥 → 團體)
 import { quote as ours } from '../../../src/domain/money.js'
 const norm = (k) => (k == null || k === 'none') ? 'none' : k
-for (const r of ['A', 'B']) {
+for (const r of ['A', 'B', 'C']) {
   const { quote: ai } = await import(new URL(`./${r}/money.js`, import.meta.url))
   let seed = 7, n = 0, diff = 0; const ex = {}
   const rnd = (k) => { seed = (seed * 1103515245 + 12345) % 2147483648; return seed % k }

@@ -1,0 +1,97 @@
+{
+  "duration_api_ms": 59897,
+  "stop_reason": "end_turn",
+  "total_cost_usd": 0.32976419999999995,
+  "usage": {
+    "input_tokens": 4,
+    "cache_creation_input_tokens": 2100,
+    "cache_read_input_tokens": 62430,
+    "output_tokens": 1331,
+    "output_tokens_details": {
+      "thinking_tokens": 86
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 2100,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 541,
+        "cache_read_input_tokens": 31785,
+        "cache_creation_input_tokens": 960,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 960
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard",
+    "fallback_credit": null
+  },
+  "modelUsage": {
+    "claude-opus-5-5": {
+      "inputTokens": 14,
+      "outputTokens": 5738,
+      "thinkingTokens": 479,
+      "cacheReadInputTokens": 184021,
+      "cacheCreationInputTokens": 22268,
+      "webSearchRequests": 0,
+      "costUSD": 0.32976419999999995,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 128000,
+      "canonicalModel": "claude-opus-5-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "permission_denials": [],
+  "terminal_reason": "completed",
+  "fast_mode_state": "off",
+  "fast_mode_disabled_reason": "sdk_opt_in_required",
+  "subagent_stats": {
+    "spawned": 0,
+    "requested": {
+      "background": 0,
+      "foreground": 0,
+      "unset": 0
+    },
+    "started_in_background": 0,
+    "max_depth": 0,
+    "spawned_by_subagents": 0,
+    "completed": 0,
+    "failed": 0,
+    "killed": {
+      "parent": 0,
+      "user": 0,
+      "system": 0
+    },
+    "refused": {
+      "depth_limit": 0,
+      "concurrency_limit": 0,
+      "budget": 0
+    },
+    "by_type": {}
+  },
+  "safety_stops": 0,
+  "is_error": false,
+  "num_turns": 3,
+  "subtype": "success",
+  "api_error_status": null,
+  "result": "我已照你的決定改好 `money.js`,這次同樣沒有實際跑過。\n\n**改了什麼**\n- 三種折扣的比較順序改成**優惠碼 → 早鳥 → 團體**。折扣額一樣時選排在前面的,所以同額時會用優惠碼。\n- 檔頭註解改成新的平手順序,也寫明沒被選中的優惠碼不算用掉。\n\n其餘四點都照你說的維持現狀,沒有再改:`group_applied` 代表實際套用、團體折扣以原價小計計算、碼沒被選中不提示客人、`applied_discount` 留著。\n\n**關於「沒被選中的優惠碼不算用掉」**:`quote()` 本身只負責算錢,不會核銷優惠碼。它能做的是在回傳裡標出碼有沒有被選中:沒選中時 `promo_discount` 是 0,`applied_discount` 也不會是 `'promo'`。真正扣掉使用次數的是呼叫端,要請那邊依 `applied_discount === 'promo'` 判斷要不要核銷。我沒有去看呼叫端現在是怎麼判斷的。\n\n用來確認平手的指令:`node --input-type=module -e \"import {quote} from './money.js'; console.log(quote({unit_price:100,qty:1,early_bird_pct:10,promo_amount:10}))\"`。優惠碼和早鳥都折 10 元,應該套用優惠碼(`applied_discount: 'promo'`),`total` 是 90。",
+  "ttft_ms": 2204,
+  "type": "result",
+  "duration_ms": 14117,
+  "ttft_stream_ms": 1342,
+  "time_to_request_ms": 62,
+  "first_content_frame_ms": 1343,
+  "queued_turn_count": 0,
+  "result_index": 0
+}
