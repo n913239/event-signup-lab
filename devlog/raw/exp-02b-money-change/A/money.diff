@@ -1,0 +1,72 @@
+diff --git money.js money.js
+index 77465db..745de58 100644
+--- money.js
++++ money.js
+@@ -1,13 +1,16 @@
+ // 活動報名訂單金額計算
+ //
+-// 計算順序(每一步都以前一步的結果為基準):
+-//   1. 小計       = unit_price × qty
+-//   2. 早鳥折扣   = 小計 × early_bird_pct%
+-//   3. 團體折扣   = (小計 − 早鳥折扣) × group_pct%     ← qty ≥ group_min_qty 才適用
+-//   4. 優惠碼折抵 = min(promo_amount, 剩餘金額)         ← 應付金額不會變成負數
++// 折扣不疊加:早鳥、團體、優惠碼三種只套用一種,選讓應付金額最低的那一種。
++// 小計 = unit_price × qty,三種折扣都以小計為基準:
++//   早鳥   = 小計 × early_bird_pct%
++//   團體   = 小計 × group_pct%                ← qty ≥ group_min_qty 才適用
++//   優惠碼 = min(promo_amount, 小計)           ← 應付金額不會變成負數,記實際折抵金額
++// 折抵金額為 0 視為不符合;三種都不符合就是原價(applied = 'none')。
++// 平手時依序選:優惠碼 → 早鳥 → 團體。沒被選中的折扣欄位一律為 0,
++// 所以 promo_discount > 0 才代表優惠碼被用掉。
+ //
+-// 金額以整數元計算,每一筆折扣各自四捨五入到整數元,
+-// 所以 subtotal − 各項折扣 === total 一定成立,不會有對不上的零頭。
++// 金額以整數元計算,百分比折扣四捨五入到整數元,
++// 所以 subtotal − discount_total === total 一定成立,不會有對不上的零頭。
+ 
+ function num(input, key, { integer = false, min = 0, max = Infinity, fallback } = {}) {
+   const value = input[key] ?? fallback;
+@@ -46,23 +49,30 @@ export function quote(input) {
+     throw new RangeError(`小計 ${subtotal} 超出可精確計算的範圍`);
+   }
+ 
+-  const earlyBirdDiscount = pctOf(subtotal, earlyBirdPct);
+-  let remaining = subtotal - earlyBirdDiscount;
++  const groupEligible = groupMinQty > 0 && groupPct > 0 && qty >= groupMinQty;
+ 
+-  const groupApplied = groupMinQty > 0 && groupPct > 0 && qty >= groupMinQty;
+-  const groupDiscount = groupApplied ? pctOf(remaining, groupPct) : 0;
+-  remaining -= groupDiscount;
++  // 依平手優先順序排列;只有折得更多(應付更低)才會取代前面的選項
++  const candidates = [
++    { type: 'promo', discount: Math.min(promoAmount, subtotal) },
++    { type: 'early_bird', discount: pctOf(subtotal, earlyBirdPct) },
++    { type: 'group', discount: groupEligible ? pctOf(subtotal, groupPct) : 0 },
++  ];
+ 
+-  const promoDiscount = Math.min(promoAmount, remaining);
+-  remaining -= promoDiscount;
++  let best = { type: 'none', discount: 0 };
++  for (const c of candidates) {
++    if (c.discount > best.discount) best = c;
++  }
++
++  const discountOf = (type) => (best.type === type ? best.discount : 0);
+ 
+   return {
+     subtotal,
+-    early_bird_discount: earlyBirdDiscount,
+-    group_discount: groupDiscount,
+-    group_applied: groupApplied,
+-    promo_discount: promoDiscount,
+-    discount_total: earlyBirdDiscount + groupDiscount + promoDiscount,
+-    total: remaining,
++    applied: best.type, // 'promo' | 'early_bird' | 'group' | 'none'
++    early_bird_discount: discountOf('early_bird'),
++    group_discount: discountOf('group'),
++    group_applied: best.type === 'group',
++    promo_discount: discountOf('promo'),
++    discount_total: best.discount,
++    total: subtotal - best.discount,
+   };
+ }
