@@ -1,0 +1,5 @@
+AUDITCOUNT|fix-dark|1-login|0
+AUDITCOUNT|fix-dark|2-events|0
+AUDITCOUNT|fix-dark|3-seats|0
+AUDITCOUNT|fix-dark|4-tickets|0
+AUDITCOUNT|fix-dark|5-ticket-detail|0

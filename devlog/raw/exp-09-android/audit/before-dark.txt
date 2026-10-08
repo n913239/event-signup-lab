@@ -1,0 +1,7 @@
+AUDITCOUNT|dark|1-login|0
+AUDITCOUNT|dark|2-events|0
+AUDIT|dark|3-seats|ERROR|SpeakableTextPresentCheck|這個項目可能含有螢幕閱讀器無法讀出的標籤。
+AUDIT|dark|3-seats|WARNING|TextContrastCheck|這個項目的文字對比度為 2.68。這個比值是根據系統預估的前景色彩 #FFFFFF 和背景色彩 #9E9E9E 計算而得。建議使用其他色彩，讓小型文字的對比度超過 4.50，或是讓大型文字的對比度超過 3.00。
+AUDITCOUNT|dark|3-seats|2
+AUDITCOUNT|dark|4-tickets|0
+AUDITCOUNT|dark|5-ticket-detail|0

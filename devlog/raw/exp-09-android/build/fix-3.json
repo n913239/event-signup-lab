@@ -1,0 +1,97 @@
+{
+ "duration_api_ms": 856424,
+ "stop_reason": "end_turn",
+ "total_cost_usd": 3.3861381999999995,
+ "usage": {
+  "input_tokens": 6,
+  "cache_creation_input_tokens": 9017,
+  "cache_read_input_tokens": 437916,
+  "output_tokens": 4075,
+  "output_tokens_details": {
+   "thinking_tokens": 2226
+  },
+  "server_tool_use": {
+   "web_search_requests": 0,
+   "web_fetch_requests": 0
+  },
+  "service_tier": "standard",
+  "cache_creation": {
+   "ephemeral_1h_input_tokens": 9017,
+   "ephemeral_5m_input_tokens": 0
+  },
+  "inference_geo": "not_available",
+  "iterations": [
+   {
+    "input_tokens": 2,
+    "output_tokens": 722,
+    "cache_read_input_tokens": 149459,
+    "cache_creation_input_tokens": 3112,
+    "cache_creation": {
+     "ephemeral_5m_input_tokens": 0,
+     "ephemeral_1h_input_tokens": 3112
+    },
+    "type": "message"
+   }
+  ],
+  "speed": "standard",
+  "fallback_credit": null
+ },
+ "modelUsage": {
+  "claude-opus-5-5": {
+   "inputTokens": 40,
+   "outputTokens": 91533,
+   "thinkingTokens": 52649,
+   "cacheReadInputTokens": 2092991,
+   "cacheCreationInputTokens": 142090,
+   "webSearchRequests": 0,
+   "costUSD": 3.3861381999999995,
+   "contextWindow": 1000000,
+   "maxOutputTokens": 128000,
+   "canonicalModel": "claude-opus-5-5",
+   "provider": "firstParty",
+   "costBasis": "list"
+  }
+ },
+ "permission_denials": [],
+ "terminal_reason": "completed",
+ "fast_mode_state": "off",
+ "fast_mode_disabled_reason": "sdk_opt_in_required",
+ "subagent_stats": {
+  "spawned": 0,
+  "requested": {
+   "background": 0,
+   "foreground": 0,
+   "unset": 0
+  },
+  "started_in_background": 0,
+  "max_depth": 0,
+  "spawned_by_subagents": 0,
+  "completed": 0,
+  "failed": 0,
+  "killed": {
+   "parent": 0,
+   "user": 0,
+   "system": 0
+  },
+  "refused": {
+   "depth_limit": 0,
+   "concurrency_limit": 0,
+   "budget": 0
+  },
+  "by_type": {}
+ },
+ "safety_stops": 0,
+ "is_error": false,
+ "num_turns": 6,
+ "subtype": "success",
+ "api_error_status": null,
+ "result": "上次那招沒用，這次換了做法，一樣還沒驗證。請再跑一次 `./gradlew :app:assembleDebug`。\n\n**上次為什麼沒用：** 你這次產生的 `.openapi-generator/FILES` 清單裡，`Health200Response.kt` 和 `DefaultApi.kt` 都還在，代表產生器沒有套用我設的 ignore 檔，或是 task 根本沒重跑。不跑指令我分不出是哪一種，所以這次改用不靠產生器的做法。\n\n**這次的改法：** 在 `api/build.gradle.kts` 的 source set 用 `kotlin.exclude(...)` 直接把這兩個檔案排除在編譯之外。這是 Gradle 本身的機制，所以不管檔案有沒有被產生、或是上次留下的舊檔，編譯器都看不到。App 不呼叫 `/health`，`DefaultApi` 裡也只有這一支，排除掉不影響任何功能。我也把沒作用的 `ignoreFileOverride` 設定拿掉了；每次產生前先清空輸出目錄的 `doFirst` 有保留。\n\n**請你手動做一件事：** 刪除 `api/.openapi-generator-ignore`。它現在已經沒有任何設定引用，留著只會讓人以為它有作用。我不能執行指令，所以沒辦法替你刪。\n\n上一輪改的 `LogoutRequest` → `RefreshRequest` 仍然需要。之前那個錯擋在 `:api` 前面，所以 `:app` 還沒被編譯過。如果接下來 `:app` 報錯，請把錯誤原文貼給我。",
+ "ttft_ms": 2528,
+ "type": "result",
+ "duration_ms": 43680,
+ "ttft_stream_ms": 786,
+ "time_to_request_ms": 41,
+ "first_content_frame_ms": 786,
+ "queued_turn_count": 0,
+ "result_index": 0
+}

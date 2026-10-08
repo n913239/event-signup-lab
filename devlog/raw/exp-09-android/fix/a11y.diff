@@ -1,0 +1,128 @@
+diff -ru --exclude=build --exclude=.gradle --exclude=audit-report.md --exclude=local.properties ../run1/app/src/main/java/com/example/eventreg/ui/events/SeatGrid.kt run/app/src/main/java/com/example/eventreg/ui/events/SeatGrid.kt
+--- ../run1/app/src/main/java/com/example/eventreg/ui/events/SeatGrid.kt	2026-10-08 18:18:36
++++ run/app/src/main/java/com/example/eventreg/ui/events/SeatGrid.kt	2026-10-08 18:40:42
+@@ -6,6 +6,7 @@
+ import androidx.compose.foundation.layout.Box
+ import androidx.compose.foundation.layout.Column
+ import androidx.compose.foundation.layout.Row
++import androidx.compose.foundation.layout.Spacer
+ import androidx.compose.foundation.layout.aspectRatio
+ import androidx.compose.foundation.layout.size
+ import androidx.compose.foundation.shape.RoundedCornerShape
+@@ -52,7 +53,8 @@
+     return when (state) {
+         SeatState.FREE -> SeatColors(scheme.surface, scheme.onSurface, scheme.outline)
+         SeatState.HELD -> SeatColors(Color(0xFFFFB300), Color.Black, Color(0xFFFFB300))
+-        SeatState.SOLD -> SeatColors(Color(0xFF9E9E9E), Color.White, Color(0xFF9E9E9E))
++        // 白字壓 #9E9E9E 對比只有 2.7,格內小字不夠;#616161 約 6.2
++        SeatState.SOLD -> SeatColors(Color(0xFF616161), Color.White, Color(0xFF616161))
+         SeatState.MINE -> SeatColors(Color(0xFF2E7D32), Color.White, Color(0xFF2E7D32))
+         SeatState.UNKNOWN -> SeatColors(scheme.surfaceVariant, scheme.onSurfaceVariant, scheme.outlineVariant)
+     }
+@@ -63,7 +65,8 @@
+ fun SeatGrid(seats: Map<String, SeatState>, modifier: Modifier = Modifier) {
+     Column(modifier.testTag("seat_grid"), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+         Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+-            AxisLabel("", Modifier.weight(1f))
++            // 左上角留白用 Spacer;空字串的 Text 會變成螢幕閱讀器讀不出內容的節點
++            Spacer(Modifier.weight(1f))
+             SEAT_COLS.forEach { col -> AxisLabel("$col", Modifier.weight(1f)) }
+         }
+         SEAT_ROWS.forEach { row ->
+diff -ru --exclude=build --exclude=.gradle --exclude=audit-report.md --exclude=local.properties ../run1/app/src/main/java/com/example/eventreg/ui/login/LoginScreen.kt run/app/src/main/java/com/example/eventreg/ui/login/LoginScreen.kt
+--- ../run1/app/src/main/java/com/example/eventreg/ui/login/LoginScreen.kt	2026-10-08 18:17:50
++++ run/app/src/main/java/com/example/eventreg/ui/login/LoginScreen.kt	2026-10-08 18:41:22
+@@ -1,14 +1,21 @@
+ package com.example.eventreg.ui.login
+ 
+ import androidx.compose.foundation.layout.Arrangement
++import androidx.compose.foundation.layout.BoxWithConstraints
+ import androidx.compose.foundation.layout.Column
++import androidx.compose.foundation.layout.Spacer
++import androidx.compose.foundation.layout.consumeWindowInsets
+ import androidx.compose.foundation.layout.fillMaxSize
+ import androidx.compose.foundation.layout.fillMaxWidth
++import androidx.compose.foundation.layout.height
++import androidx.compose.foundation.layout.heightIn
+ import androidx.compose.foundation.layout.imePadding
+ import androidx.compose.foundation.layout.padding
+ import androidx.compose.foundation.layout.size
++import androidx.compose.foundation.rememberScrollState
+ import androidx.compose.foundation.text.KeyboardActions
+ import androidx.compose.foundation.text.KeyboardOptions
++import androidx.compose.foundation.verticalScroll
+ import androidx.compose.material3.Button
+ import androidx.compose.material3.CircularProgressIndicator
+ import androidx.compose.material3.MaterialTheme
+@@ -74,32 +81,48 @@
+ @Composable
+ fun LoginScreen(vm: LoginViewModel) {
+     Scaffold { padding ->
++        // 小螢幕 + 大字級時鍵盤升起後放不下整份表單:表單區可捲動,「登入」固定在鍵盤上方
+         Column(
+-            Modifier.fillMaxSize().padding(padding).imePadding().padding(24.dp),
+-            verticalArrangement = Arrangement.spacedBy(12.dp, Alignment.CenterVertically),
++            Modifier
++                .fillMaxSize()
++                .padding(padding)
++                .consumeWindowInsets(padding)
++                .imePadding()
++                .padding(24.dp),
+         ) {
+-            Text("活動報名", style = MaterialTheme.typography.headlineMedium)
+-            OutlinedTextField(
+-                value = vm.email,
+-                onValueChange = { vm.email = it },
+-                label = { Text("Email") },
+-                singleLine = true,
+-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email, imeAction = ImeAction.Next),
+-                modifier = Modifier.fillMaxWidth().testTag("login_email"),
+-            )
+-            OutlinedTextField(
+-                value = vm.password,
+-                onValueChange = { vm.password = it },
+-                label = { Text("密碼") },
+-                singleLine = true,
+-                visualTransformation = PasswordVisualTransformation(),
+-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password, imeAction = ImeAction.Done),
+-                keyboardActions = KeyboardActions(onDone = { vm.submit() }),
+-                modifier = Modifier.fillMaxWidth().testTag("login_password"),
+-            )
+-            vm.error?.let {
+-                Text(it, color = MaterialTheme.colorScheme.error, modifier = Modifier.testTag("login_error"))
++            BoxWithConstraints(Modifier.weight(1f).fillMaxWidth()) {
++                Column(
++                    Modifier
++                        .fillMaxWidth()
++                        .verticalScroll(rememberScrollState())
++                        .heightIn(min = maxHeight),
++                    verticalArrangement = Arrangement.spacedBy(12.dp, Alignment.CenterVertically),
++                ) {
++                    Text("活動報名", style = MaterialTheme.typography.headlineMedium)
++                    OutlinedTextField(
++                        value = vm.email,
++                        onValueChange = { vm.email = it },
++                        label = { Text("Email") },
++                        singleLine = true,
++                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email, imeAction = ImeAction.Next),
++                        modifier = Modifier.fillMaxWidth().testTag("login_email"),
++                    )
++                    OutlinedTextField(
++                        value = vm.password,
++                        onValueChange = { vm.password = it },
++                        label = { Text("密碼") },
++                        singleLine = true,
++                        visualTransformation = PasswordVisualTransformation(),
++                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password, imeAction = ImeAction.Done),
++                        keyboardActions = KeyboardActions(onDone = { vm.submit() }),
++                        modifier = Modifier.fillMaxWidth().testTag("login_password"),
++                    )
++                    vm.error?.let {
++                        Text(it, color = MaterialTheme.colorScheme.error, modifier = Modifier.testTag("login_error"))
++                    }
++                }
+             }
++            Spacer(Modifier.height(12.dp))
+             Button(
+                 onClick = vm::submit,
+                 enabled = !vm.submitting,
