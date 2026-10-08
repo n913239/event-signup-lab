@@ -1,0 +1,5 @@
+# OpenAPI Generator 7.10 的 kotlin generator 不支援 3.1 的 `const`:
+# /health 的 `ok: { type: boolean, const: true }` 會被產成字串 enum,編譯失敗。
+# App 用不到 /health,略過它的 API(DefaultApi 只有這一支)與 model。
+**/apis/DefaultApi.kt
+**/models/Health200Response.kt

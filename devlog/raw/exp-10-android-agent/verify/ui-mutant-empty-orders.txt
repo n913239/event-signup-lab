@@ -1,0 +1,25 @@
+
+tw.example.eventsignup.LoginEventsOrdersFlowTest:
+Error in loginThenBrowseEventsAndTickets(tw.example.eventsignup.LoginEventsOrdersFlowTest):
+androidx.compose.ui.test.ComposeTimeoutException: Condition (at least one node matches (TestTag = 'order_item')) still not satisfied after 15000 ms
+	at androidx.compose.ui.test.AndroidComposeUiTestEnvironment$AndroidComposeUiTestImpl.waitUntil(ComposeUiTest.android.kt:441)
+	at androidx.compose.ui.test.ComposeUiTestKt.waitUntilAtLeastOneExists(ComposeUiTest.kt:236)
+	at androidx.compose.ui.test.junit4.AndroidComposeTestRule.waitUntilAtLeastOneExists(AndroidComposeTestRule.android.kt:322)
+	at tw.example.eventsignup.LoginEventsOrdersFlowTest.waitFor(LoginEventsOrdersFlowTest.kt:121)
+	at tw.example.eventsignup.LoginEventsOrdersFlowTest.loginThenBrowseEventsAndTickets(LoginEventsOrdersFlowTest.kt:102)
+
+
+Time: 17.099
+There was 1 failure:
+1) loginThenBrowseEventsAndTickets(tw.example.eventsignup.LoginEventsOrdersFlowTest)
+androidx.compose.ui.test.ComposeTimeoutException: Condition (at least one node matches (TestTag = 'order_item')) still not satisfied after 15000 ms
+	at androidx.compose.ui.test.AndroidComposeUiTestEnvironment$AndroidComposeUiTestImpl.waitUntil(ComposeUiTest.android.kt:441)
+	at androidx.compose.ui.test.ComposeUiTestKt.waitUntilAtLeastOneExists(ComposeUiTest.kt:236)
+	at androidx.compose.ui.test.junit4.AndroidComposeTestRule.waitUntilAtLeastOneExists(AndroidComposeTestRule.android.kt:322)
+	at tw.example.eventsignup.LoginEventsOrdersFlowTest.waitFor(LoginEventsOrdersFlowTest.kt:121)
+	at tw.example.eventsignup.LoginEventsOrdersFlowTest.loginThenBrowseEventsAndTickets(LoginEventsOrdersFlowTest.kt:102)
+
+FAILURES!!!
+Tests run: 1,  Failures: 1
+
+

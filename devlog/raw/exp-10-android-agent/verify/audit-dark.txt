@@ -1,0 +1,6 @@
+AUDIT|dark|1-login|WARNING|TextContrastCheck|這個項目的文字對比度為 2.84。這個比值是根據系統預估的前景色彩 #737078 和背景色彩 #2E2C32 計算而得。建議使用其他色彩，讓小型文字的對比度超過 4.50，或是讓大型文字的對比度超過 3.00。
+AUDITCOUNT|dark|1-login|1
+AUDITCOUNT|dark|2-events|0
+AUDITCOUNT|dark|3-seats|0
+AUDITCOUNT|dark|4-tickets|0
+AUDITCOUNT|dark|5-ticket-detail|0

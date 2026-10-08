@@ -1,0 +1,19 @@
+
+com.example.eventreg.DemoFlowTest:
+Error in login_thenEventSeatMap_thenTickets(com.example.eventreg.DemoFlowTest):
+java.lang.AssertionError: 票券列表是空的,但 demo 帳號應該有「秋季音樂會」的訂單
+	at org.junit.Assert.fail(Assert.java:89)
+	at com.example.eventreg.DemoFlowTest.login_thenEventSeatMap_thenTickets(DemoFlowTest.kt:86)
+
+
+Time: 1.923
+There was 1 failure:
+1) login_thenEventSeatMap_thenTickets(com.example.eventreg.DemoFlowTest)
+java.lang.AssertionError: 票券列表是空的,但 demo 帳號應該有「秋季音樂會」的訂單
+	at org.junit.Assert.fail(Assert.java:89)
+	at com.example.eventreg.DemoFlowTest.login_thenEventSeatMap_thenTickets(DemoFlowTest.kt:86)
+
+FAILURES!!!
+Tests run: 1,  Failures: 1
+
+

@@ -1,0 +1,2 @@
+AUDIT|small-font2|1-login|WARNING|TextContrastCheck|這個項目的文字對比度為 2.26。這個比值是根據系統預估的前景色彩 #979299 和背景色彩 #E2DCE4 計算而得。建議使用其他色彩，讓小型文字的對比度超過 4.50，或是讓大型文字的對比度超過 3.00。
+AUDITCOUNT|small-font2|1-login|1

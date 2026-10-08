@@ -59,3 +59,17 @@ Google Accessibility Test Framework(`AccessibilityCheckPreset.LATEST`,只算 ERR
 沒改、列出來要人決定的:登入按鈕位置的外觀變了;TalkBack 可能把座位符號讀兩次(沒驗證)。說「沒編譯、沒重跑」。
 
 修完重跑:五種環境稽核都 0;`DemoFlowTest` 五種環境都過。`android/` 是這一版。
+
+## 7. Android Lint(`lint/`)
+
+`./gradlew :app:lintDebug`(build 修好、無障礙修之前那一版):10 筆 Warning —— 8 筆依賴有新版、1 筆缺 App icon、1 筆 `DataExtractionRules`(建議 Android 12 以前另設 `fullBackupContent`;但 manifest 已有 `allowBackup="false"`,實際上已涵蓋)。
+鍵盤蓋住登入、對比、測試假綠燈,lint 都沒報。
+
+## 8. 讓 AI 補強 UI 測試(`testfix/`)
+
+無菌室放第 6 節修好的專案,告訴它突變結果(訂單回空清單照樣過)與示範訂單的內容,只准改測試、沒給 Bash:
+- 第 1 輪:13 輪、$0.43、79 秒 —— 空清單改成 `fail`、在列表裡找那張指定訂單(秋季音樂會、C3–C6、NT$4,444.20)再點、明細總計精確比對。**編譯失敗**:`import androidx.compose.ui.test.and`(`and` 是 `SemanticsMatcher` 的成員,不能這樣 import)
+- 第 2 輪(貼回錯誤原文):3 輪、$0.49、10 秒,刪掉那行
+- 驗證:正常版 × 10 → 10/10;突變版 → 紅(`票券列表是空的,但 demo 帳號應該有「秋季音樂會」的訂單`)
+
+`screens/` 裡的 `before-default-3-seats`、`before-small-font2-login-keyboard`、`after-small-font2-1-login` 三張,10/08 晚上用 SystemUI demo 模式重拍(狀態列 LTE、10:00)。

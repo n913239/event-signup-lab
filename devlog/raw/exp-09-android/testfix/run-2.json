@@ -1,0 +1,97 @@
+{
+ "duration_api_ms": 89565,
+ "stop_reason": "end_turn",
+ "total_cost_usd": 0.4852928,
+ "usage": {
+  "input_tokens": 6,
+  "cache_creation_input_tokens": 2448,
+  "cache_read_input_tokens": 125438,
+  "output_tokens": 777,
+  "output_tokens_details": {
+   "thinking_tokens": 128
+  },
+  "server_tool_use": {
+   "web_search_requests": 0,
+   "web_fetch_requests": 0
+  },
+  "service_tier": "standard",
+  "cache_creation": {
+   "ephemeral_1h_input_tokens": 2448,
+   "ephemeral_5m_input_tokens": 0
+  },
+  "inference_geo": "not_available",
+  "iterations": [
+   {
+    "input_tokens": 2,
+    "output_tokens": 359,
+    "cache_read_input_tokens": 42446,
+    "cache_creation_input_tokens": 863,
+    "cache_creation": {
+     "ephemeral_5m_input_tokens": 0,
+     "ephemeral_1h_input_tokens": 863
+    },
+    "type": "message"
+   }
+  ],
+  "speed": "standard",
+  "fallback_credit": null
+ },
+ "modelUsage": {
+  "claude-opus-5-5": {
+   "inputTokens": 20,
+   "outputTokens": 7812,
+   "thinkingTokens": 2837,
+   "cacheReadInputTokens": 331744,
+   "cacheCreationInputTokens": 32828,
+   "webSearchRequests": 0,
+   "costUSD": 0.4852928,
+   "contextWindow": 1000000,
+   "maxOutputTokens": 128000,
+   "canonicalModel": "claude-opus-5-5",
+   "provider": "firstParty",
+   "costBasis": "list"
+  }
+ },
+ "permission_denials": [],
+ "terminal_reason": "completed",
+ "fast_mode_state": "off",
+ "fast_mode_disabled_reason": "sdk_opt_in_required",
+ "subagent_stats": {
+  "spawned": 0,
+  "requested": {
+   "background": 0,
+   "foreground": 0,
+   "unset": 0
+  },
+  "started_in_background": 0,
+  "max_depth": 0,
+  "spawned_by_subagents": 0,
+  "completed": 0,
+  "failed": 0,
+  "killed": {
+   "parent": 0,
+   "user": 0,
+   "system": 0
+  },
+  "refused": {
+   "depth_limit": 0,
+   "concurrency_limit": 0,
+   "budget": 0
+  },
+  "by_type": {}
+ },
+ "safety_stops": 0,
+ "is_error": false,
+ "num_turns": 3,
+ "subtype": "success",
+ "api_error_status": null,
+ "result": "錯在我加的那行 `import androidx.compose.ui.test.and`,我已經把它刪掉了。`and` 是 `SemanticsMatcher` 自己的 infix 成員函式,本來就不用 import;`androidx.compose.ui.test` 底下也沒有叫 `and` 的頂層函式可以 import,所以這行會報 Unresolved reference。\n\n刪掉之後,`hasTestTag(\"order_item\") and hasText(...)` 這種寫法照樣可以用,其他程式碼都沒動。\n\n剩下的新 import 我也逐一確認過,都是 `androidx.compose.ui.test` 裡真的有的頂層函式:`assertTextEquals`、`hasAnyAncestor`、`hasTestTag`、`hasText`、`performScrollToNode`。\n\n我還是沒辦法自己 build,請你再跑一次 `./gradlew :app:installDebugAndroidTest`。如果還有錯,把訊息貼給我。",
+ "ttft_ms": 1635,
+ "type": "result",
+ "duration_ms": 10889,
+ "ttft_stream_ms": 1200,
+ "time_to_request_ms": 39,
+ "first_content_frame_ms": 1200,
+ "queued_turn_count": 0,
+ "result_index": 0
+}
