@@ -46,4 +46,12 @@ fi
 if ! scan "iOS 金額除法" "$DIV" ios/EventSignup/Sources ios/App; then
   echo ""; echo "❌ iOS 出現裸的 /100 —— 分 → 元只准在 Tickets/Money.swift"; exit 1
 fi
-echo "✅ 金額路徑零浮點(src + web/src + iOS)"
+# 2026-10-08(Day 28 補實驗 exp-07):Swift 的金額格式化不准跟裝置語系走 —— 連 Money.swift 也不例外。
+# c7cfe38 的第一版用 NumberFormatter,在 zh_TW 的開發機上共用向量 14/14 綠,de_DE 下紅 5 組
+# (NT$9.999.99);測試在開發機的語系下抓不到,所以這一條交給靜態檢查。日期的 .formatted(date:…) 不擋。
+unset SCAN_EXCLUDE_FILE
+SWIFT_LOCALE='NumberFormatter|\.formatted\( *\.(currency|number)|\.currency\(code:'
+if ! scan "iOS 金額格式跟語系走" "$SWIFT_LOCALE" ios/EventSignup/Sources ios/App; then
+  echo ""; echo "❌ iOS 金額用了跟裝置語系走的格式化 —— 千分位固定逗號,在 Tickets/Money.swift 自己拆"; exit 1
+fi
+echo "✅ 金額路徑零浮點(src + web/src + iOS),iOS 金額格式不跟語系走"

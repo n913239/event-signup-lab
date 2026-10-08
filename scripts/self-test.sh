@@ -109,6 +109,9 @@ check "web toFixed(T046)"       check-money.sh "export const y = (c) => (c / 100
 check "iOS Double(D1)"          check-money.sh "let y = Double(cents) / 100" "$PROBE_IOS"
 check "iOS 裸 /100(D1)"         check-money.sh "let y = cents / 100" "$PROBE_IOS"
 allow "iOS 時間 /1000 不誤報"   check-money.sh "let d = TimeInterval(ms) / 1000" "$PROBE_IOS"
+check "iOS NumberFormatter(exp-07)" check-money.sh "let f = NumberFormatter(); f.numberStyle = .decimal" "$PROBE_IOS"
+check "iOS .formatted(.number)(exp-07)" check-money.sh "let s = yuan.formatted(.number)" "$PROBE_IOS"
+allow "iOS 日期 .formatted 不誤報"  check-money.sh "let s = date.formatted(date: .abbreviated, time: .shortened)" "$PROBE_IOS"
 
 echo ""
 echo "=== 乾淨狀態應全過 ==="
