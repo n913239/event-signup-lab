@@ -111,6 +111,7 @@ check "iOS 裸 /100(D1)"         check-money.sh "let y = cents / 100" "$PROBE_IO
 allow "iOS 時間 /1000 不誤報"   check-money.sh "let d = TimeInterval(ms) / 1000" "$PROBE_IOS"
 check "iOS NumberFormatter(exp-07)" check-money.sh "let f = NumberFormatter(); f.numberStyle = .decimal" "$PROBE_IOS"
 check "iOS .formatted(.number)(exp-07)" check-money.sh "let s = yuan.formatted(.number)" "$PROBE_IOS"
+allow "iOS 排版 CGFloat 不誤報(exp-08)" check-money.sh "@ScaledMetric private var cell: CGFloat = 30" "$PROBE_IOS"
 allow "iOS 日期 .formatted 不誤報"  check-money.sh "let s = date.formatted(date: .abbreviated, time: .shortened)" "$PROBE_IOS"
 
 echo ""

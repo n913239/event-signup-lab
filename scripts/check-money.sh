@@ -38,7 +38,9 @@ fi
 # 2026-09-27(spec-kit analyze D1):iOS 也要管。Swift 的分 → 元只准在 Tickets/Money.swift,
 # 其他 Swift 檔出現 Double / Float / Decimal 或裸的 /100 一律紅燈。
 # 時間的 TimeInterval(ms) / 1000 不會中:它不是 /100,也沒有這三個型別字。
-SWIFT_FLOAT='\b(Double|Float|CGFloat|Decimal)\b'
+# 2026-10-08(exp-08 抓太寬):拿掉 CGFloat —— 它是排版尺寸的型別,AI 修無障礙時加的
+# @ScaledMetric var cell: CGFloat 被當成金額浮點擋下;金額不會用 CGFloat,Double / Float / Decimal 照擋。
+SWIFT_FLOAT='\b(Double|Float|Decimal)\b'
 export SCAN_EXCLUDE_FILE=Tickets/Money.swift
 if ! scan "iOS 金額浮點" "$SWIFT_FLOAT" ios/EventSignup/Sources ios/App; then
   echo ""; echo "❌ iOS 出現浮點型別 —— 金額顯示一律經 Tickets/Money.swift"; exit 1
