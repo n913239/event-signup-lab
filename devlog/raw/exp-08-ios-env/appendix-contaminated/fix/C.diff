@@ -1,0 +1,147 @@
+diff -ru ../src/AppModel.swift src/AppModel.swift
+--- ../src/AppModel.swift	2026-10-08 10:47:33
++++ src/AppModel.swift	2026-10-08 10:57:04
+@@ -33,3 +33,29 @@
+ func epochDate(_ ms: Int64) -> String {
+     Date(timeIntervalSince1970: TimeInterval(ms) / 1000).formatted(date: .abbreviated, time: .shortened)
+ }
++
++/// 錯誤與警示文字的顏色。系統的 .red / .orange 在淺色底上對比不到 4.5:1(橘色約 2:1),
++/// 淺色模式改用深一階的紅/橘;深色模式沿用系統色,在黑底與深灰列底上都過 4.5:1。
++enum Tone { case error, warning }
++
++private struct ToneStyle: ViewModifier {
++    let tone: Tone
++    @Environment(\.colorScheme) private var scheme
++
++    func body(content: Content) -> some View {
++        content.foregroundStyle(color)
++    }
++
++    private var color: Color {
++        switch (tone, scheme) {
++        case (.error, .dark): Color(red: 1, green: 0.27, blue: 0.23)
++        case (.error, _): Color(red: 0.75, green: 0, blue: 0)
++        case (.warning, .dark): Color(red: 1, green: 0.62, blue: 0.04)
++        case (.warning, _): Color(red: 0.6, green: 0.3, blue: 0)
++        }
++    }
++}
++
++extension View {
++    func tone(_ tone: Tone) -> some View { modifier(ToneStyle(tone: tone)) }
++}
+diff -ru ../src/EventDetailView.swift src/EventDetailView.swift
+--- ../src/EventDetailView.swift	2026-10-08 10:47:33
++++ src/EventDetailView.swift	2026-10-08 10:57:13
+@@ -6,7 +6,9 @@
+     let id: String
+     @State private var detail: Components.Schemas.EventDetail?
+     @State private var error: String?
+-    private let columns = Array(repeating: GridItem(.flexible(), spacing: 2), count: 10)
++    /// 座位格跟著字級放大;放大後一排 10 格塞不下就橫向捲動,不縮字。
++    @ScaledMetric(relativeTo: .caption2) private var cell: CGFloat = 30
++    private var columns: [GridItem] { Array(repeating: GridItem(.fixed(cell), spacing: 2), count: 10) }
+ 
+     public var body: some View {
+         ScrollView {
+@@ -17,14 +19,18 @@
+                     ForEach(d.value2.ticket_types, id: \.id) { t in
+                         Text("\(t.name)・\(Money.format(t.price_cents))・剩 \(t.remaining)").font(.caption)
+                     }
+-                    LazyVGrid(columns: columns, spacing: 2) {
+-                        ForEach(d.value2.seats, id: \.seat_no) { s in
+-                            Text(s.seat_no).font(.system(size: 9)).frame(maxWidth: .infinity, minHeight: 24)
+-                                .background(color(s.state)).clipShape(RoundedRectangle(cornerRadius: 3))
++                    ScrollView(.horizontal) {
++                        LazyVGrid(columns: columns, spacing: 2) {
++                            ForEach(d.value2.seats, id: \.seat_no) { s in
++                                Text(s.seat_no).font(.caption2).lineLimit(1).frame(width: cell, height: cell)
++                                    .foregroundStyle(foreground(s.state))
++                                    .background(color(s.state)).clipShape(RoundedRectangle(cornerRadius: 3))
++                                    .accessibilityLabel("\(s.seat_no),\(stateName(s.state))")
++                            }
+                         }
+                     }
+                 }.padding()
+-            } else if let error { Text(error).foregroundStyle(.red) }
++            } else if let error { Text(error).tone(.error) }
+         }
+         .navigationTitle("座位")
+         .task { await load() }
+@@ -32,6 +38,17 @@
+ 
+     func color(_ s: Components.Schemas.Seat.statePayload) -> Color {
+         switch s { case .free: .gray.opacity(0.2); case .held: .yellow; case .sold: .gray; case .mine: .green }
++    }
++
++    /// 字色跟底色配對,不吃預設的 .primary:深色模式下白字壓在黃/綠/灰底上對比不夠。
++    /// 淡灰底是半透明,跟著背景深淺走,所以留 .primary;其他三色在淺色/深色都是亮底,一律黑字。
++    func foreground(_ s: Components.Schemas.Seat.statePayload) -> Color {
++        switch s { case .free: .primary; case .held, .sold, .mine: .black }
++    }
++
++    /// 給螢幕閱讀器念的狀態:畫面上只有顏色,不念出來就分不出空位與已售。
++    func stateName(_ s: Components.Schemas.Seat.statePayload) -> String {
++        switch s { case .free: "空位"; case .held: "保留中"; case .sold: "已售出"; case .mine: "你的座位" }
+     }
+ 
+     func load() async {
+diff -ru ../src/EventListView.swift src/EventListView.swift
+--- ../src/EventListView.swift	2026-10-08 10:47:33
++++ src/EventListView.swift	2026-10-08 10:57:06
+@@ -18,7 +18,7 @@
+             }
+         }
+         .navigationDestination(for: String.self) { EventDetailView(id: $0) }
+-        .overlay { if let error { Text(error).foregroundStyle(.red) } }
++        .overlay { if let error { Text(error).tone(.error) } }
+         .navigationTitle("活動")
+         .task { await load() }
+         .refreshable { await load() }
+diff -ru ../src/LoginView.swift src/LoginView.swift
+--- ../src/LoginView.swift	2026-10-08 10:47:33
++++ src/LoginView.swift	2026-10-08 10:57:05
+@@ -12,7 +12,7 @@
+             TextField("email", text: $email).textContentType(.emailAddress)
+             SecureField("密碼", text: $password)
+             Button("登入") { Task { await login() } }.disabled(email.isEmpty || password.count < 8)
+-            if let error { Text(error).foregroundStyle(.red).font(.footnote) }
++            if let error { Text(error).tone(.error) }
+         }
+         .navigationTitle("登入")
+     }
+diff -ru ../src/TicketDetailView.swift src/TicketDetailView.swift
+--- ../src/TicketDetailView.swift	2026-10-08 10:47:33
++++ src/TicketDetailView.swift	2026-10-08 10:49:41
+@@ -8,6 +8,8 @@
+ 
+     public var body: some View {
+         List {
++            // 活動名稱可能很長,導覽列標題會被截斷;完整名稱放在內容裡讓它換行。
++            Text(order.event_name).font(.headline).accessibilityAddTraits(.isHeader)
+             ForEach(order.items, id: \.seat_no) { i in
+                 Text("\(i.seat_no) \(i.ticket_type_name) \(Money.format(i.unit_price_cents))")
+             }
+@@ -19,6 +21,9 @@
+             }
+         }
+         .navigationTitle(order.event_name)
++        #if os(iOS)
++        .navigationBarTitleDisplayMode(.inline)
++        #endif
+     }
+ 
+     func qr(_ text: String) -> CGImage? {
+diff -ru ../src/TicketListView.swift src/TicketListView.swift
+--- ../src/TicketListView.swift	2026-10-08 10:47:33
++++ src/TicketListView.swift	2026-10-08 10:57:07
+@@ -10,7 +10,7 @@
+ 
+     public var body: some View {
+         List {
+-            if offline { Text("離線資料").font(.caption).foregroundStyle(.orange) }
++            if offline { Text("離線資料").tone(.warning) }
+             ForEach(orders, id: \.id) { o in
+                 NavigationLink { TicketDetailView(order: o) } label: {
+                     VStack(alignment: .leading) {

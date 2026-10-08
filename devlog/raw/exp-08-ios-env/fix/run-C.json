@@ -1,0 +1,97 @@
+{
+ "duration_api_ms": 211527,
+ "stop_reason": "end_turn",
+ "total_cost_usd": 0.5889684,
+ "usage": {
+  "input_tokens": 6,
+  "cache_creation_input_tokens": 5498,
+  "cache_read_input_tokens": 127632,
+  "output_tokens": 3565,
+  "output_tokens_details": {
+   "thinking_tokens": 1463
+  },
+  "server_tool_use": {
+   "web_search_requests": 0,
+   "web_fetch_requests": 0
+  },
+  "service_tier": "standard",
+  "cache_creation": {
+   "ephemeral_1h_input_tokens": 5498,
+   "ephemeral_5m_input_tokens": 0
+  },
+  "inference_geo": "not_available",
+  "iterations": [
+   {
+    "input_tokens": 2,
+    "output_tokens": 684,
+    "cache_read_input_tokens": 45237,
+    "cache_creation_input_tokens": 599,
+    "cache_creation": {
+     "ephemeral_5m_input_tokens": 0,
+     "ephemeral_1h_input_tokens": 599
+    },
+    "type": "message"
+   }
+  ],
+  "speed": "standard",
+  "fallback_credit": null
+ },
+ "modelUsage": {
+  "claude-opus-5-5": {
+   "inputTokens": 20,
+   "outputTokens": 12002,
+   "thinkingTokens": 5641,
+   "cacheReadInputTokens": 330042,
+   "cacheCreationInputTokens": 35355,
+   "webSearchRequests": 0,
+   "costUSD": 0.5889684,
+   "contextWindow": 1000000,
+   "maxOutputTokens": 128000,
+   "canonicalModel": "claude-opus-5-5",
+   "provider": "firstParty",
+   "costBasis": "list"
+  }
+ },
+ "permission_denials": [],
+ "terminal_reason": "completed",
+ "fast_mode_state": "off",
+ "fast_mode_disabled_reason": "sdk_opt_in_required",
+ "subagent_stats": {
+  "spawned": 0,
+  "requested": {
+   "background": 0,
+   "foreground": 0,
+   "unset": 0
+  },
+  "started_in_background": 0,
+  "max_depth": 0,
+  "spawned_by_subagents": 0,
+  "completed": 0,
+  "failed": 0,
+  "killed": {
+   "parent": 0,
+   "user": 0,
+   "system": 0
+  },
+  "refused": {
+   "depth_limit": 0,
+   "concurrency_limit": 0,
+   "budget": 0
+  },
+  "by_type": {}
+ },
+ "safety_stops": 0,
+ "is_error": false,
+ "num_turns": 7,
+ "subtype": "success",
+ "api_error_status": null,
+ "result": "「離線資料」和三處錯誤訊息都改好了：顏色換成對比夠的，字也從小字改回一般內文字級。座位圖例和給螢幕閱讀器的狀態說明照你說的保留。這裡一樣**沒辦法編譯**，所以還沒編譯過，也沒重跑稽核。\n\n**新增 `src/StatusText.swift`**\n- 加了一個 `.statusText(.error / .warning)`，依深淺色模式套用不同色值。用的是 SwiftUI 的 `colorScheme`，不經過 UIKit。\n- 色值和對比是我自己算的（以 4.5:1 為標準）：\n\n| 用途 | 淺色模式 | 對白底 | 深色模式 | 對深色列底 #1C1C1E |\n|---|---|---|---|---|\n| 錯誤 | `#C41E1E` | 約 5.9:1 | `#FF6961` | 約 6:1 |\n| 警示（離線） | `#A34A00` | 約 5.9:1 | `#FFB340` | 約 9.6:1 |\n\n- 淺色模式的列表灰底比白底稍暗，算出來錯誤色對灰底約 5.3:1，也夠。\n\n**套用的地方**\n- `TicketListView.swift`：「離線資料」原本是橘色 `.caption`，改成警示色、一般字級。\n- `LoginView.swift`：錯誤訊息原本是紅色 `.footnote`，改成錯誤色、一般字級。\n- `EventListView.swift`、`EventDetailView.swift`：錯誤訊息原本用 `.red`，改成錯誤色。這兩處本來就是一般字級。\n\nAPI 呼叫和 `Money.swift` 沒動，也沒寫測試。其他還在用 `.caption` 的是一般顏色的輔助資訊，例如日期和剩餘席數，不在這次範圍內，所以沒改。",
+ "ttft_ms": 24365,
+ "type": "result",
+ "duration_ms": 59958,
+ "ttft_stream_ms": 1966,
+ "time_to_request_ms": 69,
+ "first_content_frame_ms": 1966,
+ "queued_turn_count": 0,
+ "result_index": 0
+}

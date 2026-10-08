@@ -1,0 +1,4 @@
+swift build(swift-tools-version 6.0 → Swift 6 語言模式,嚴格併發檢查)
+Sources/EventSignup(手寫):error 0,warning 0
+GeneratedSources(swift-openapi-generator 產生):warning 40,全是 public import 未使用
+Build complete! (35.24s)

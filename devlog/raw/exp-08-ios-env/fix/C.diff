@@ -1,0 +1,79 @@
+diff -ruN src-after1/EventDetailView.swift run/src/EventDetailView.swift
+--- src-after1/EventDetailView.swift	2026-10-08 11:11:57
++++ run/src/EventDetailView.swift	2026-10-08 11:12:50
+@@ -40,7 +40,7 @@
+                         }
+                     }
+                 }.padding()
+-            } else if let error { Text(error).foregroundStyle(.red) }
++            } else if let error { Text(error).statusText(.error) }
+         }
+         .navigationTitle("座位")
+         .task { await load() }
+diff -ruN src-after1/EventListView.swift run/src/EventListView.swift
+--- src-after1/EventListView.swift	2026-10-08 11:11:57
++++ run/src/EventListView.swift	2026-10-08 11:12:48
+@@ -18,7 +18,7 @@
+             }
+         }
+         .navigationDestination(for: String.self) { EventDetailView(id: $0) }
+-        .overlay { if let error { Text(error).foregroundStyle(.red) } }
++        .overlay { if let error { Text(error).statusText(.error) } }
+         .navigationTitle("活動")
+         .task { await load() }
+         .refreshable { await load() }
+diff -ruN src-after1/LoginView.swift run/src/LoginView.swift
+--- src-after1/LoginView.swift	2026-10-08 11:11:57
++++ run/src/LoginView.swift	2026-10-08 11:12:46
+@@ -12,7 +12,7 @@
+             TextField("email", text: $email).textContentType(.emailAddress)
+             SecureField("密碼", text: $password)
+             Button("登入") { Task { await login() } }.disabled(email.isEmpty || password.count < 8)
+-            if let error { Text(error).foregroundStyle(.red).font(.footnote) }
++            if let error { Text(error).statusText(.error) }
+         }
+         .navigationTitle("登入")
+     }
+diff -ruN src-after1/StatusText.swift run/src/StatusText.swift
+--- src-after1/StatusText.swift	1970-01-01 08:00:00
++++ run/src/StatusText.swift	2026-10-08 11:12:44
+@@ -0,0 +1,27 @@
++import SwiftUI
++
++/// 錯誤/警示文字色。系統 .red / .orange 在淺色底上對比不到 4.5:1,深淺色各給一組調過的色值
++/// (對白底、黑底、#1C1C1E 都 ≥ 5:1)。用 colorScheme 切換,不經 UIColor(不依賴 UIKit)。
++enum StatusTone { case error, warning }
++
++private struct StatusText: ViewModifier {
++    @Environment(\.colorScheme) private var scheme
++    let tone: StatusTone
++
++    func body(content: Content) -> some View {
++        content.foregroundStyle(color)
++    }
++
++    private var color: Color {
++        switch (tone, scheme) {
++        case (.error, .dark): Color(red: 1, green: 0x69 / 255, blue: 0x61 / 255)              // #FF6961
++        case (.error, _): Color(red: 0xC4 / 255, green: 0x1E / 255, blue: 0x1E / 255)         // #C41E1E
++        case (.warning, .dark): Color(red: 1, green: 0xB3 / 255, blue: 0x40 / 255)            // #FFB340
++        case (.warning, _): Color(red: 0xA3 / 255, green: 0x4A / 255, blue: 0)                // #A34A00
++        }
++    }
++}
++
++extension View {
++    func statusText(_ tone: StatusTone) -> some View { modifier(StatusText(tone: tone)) }
++}
+diff -ruN src-after1/TicketListView.swift run/src/TicketListView.swift
+--- src-after1/TicketListView.swift	2026-10-08 11:11:57
++++ run/src/TicketListView.swift	2026-10-08 11:12:45
+@@ -10,7 +10,7 @@
+ 
+     public var body: some View {
+         List {
+-            if offline { Text("離線資料").font(.caption).foregroundStyle(.orange) }
++            if offline { Text("離線資料").statusText(.warning) }
+             ForEach(orders, id: \.id) { o in
+                 NavigationLink { TicketDetailView(order: o) } label: {
+                     VStack(alignment: .leading) {

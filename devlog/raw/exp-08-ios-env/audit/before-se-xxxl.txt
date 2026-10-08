@@ -1,0 +1,111 @@
+AUDIT|xxxl|1-login|1|Contrast failed|9:登入
+AUDITCOUNT|xxxl|1-login|1
+AUDIT|xxxl|2-events|65536|Dynamic Type font sizes are unsupported|-
+AUDIT|xxxl|2-events|65536|Dynamic Type font sizes are unsupported|-
+AUDIT|xxxl|2-events|65536|Dynamic Type font sizes are unsupported|-
+AUDIT|xxxl|2-events|65536|Dynamic Type font sizes are unsupported|-
+AUDIT|xxxl|2-events|131072|Text clipped|-
+AUDIT|xxxl|2-events|1|Contrast failed|48:開賣 Jan 1, 1970 at 8:00 AM・截止 Jan 1, 2100 at 8:00 AM
+AUDITCOUNT|xxxl|2-events|6
+AUDIT|xxxl|3-seats|1|Contrast failed|48:A4
+AUDIT|xxxl|3-seats|1|Contrast failed|48:C4
+AUDIT|xxxl|3-seats|1|Contrast failed|48:C7
+AUDIT|xxxl|3-seats|1|Contrast failed|48:D4
+AUDIT|xxxl|3-seats|1|Contrast failed|48:E2
+AUDIT|xxxl|3-seats|1|Contrast failed|48:E3
+AUDIT|xxxl|3-seats|1|Contrast failed|48:E8
+AUDIT|xxxl|3-seats|1|Contrast failed|48:F1
+AUDIT|xxxl|3-seats|1|Contrast failed|48:F2
+AUDIT|xxxl|3-seats|1|Contrast failed|48:F3
+AUDIT|xxxl|3-seats|1|Contrast failed|48:F4
+AUDIT|xxxl|3-seats|1|Contrast failed|48:F7
+AUDIT|xxxl|3-seats|1|Contrast failed|48:F8
+AUDIT|xxxl|3-seats|1|Contrast failed|48:G1
+AUDIT|xxxl|3-seats|1|Contrast failed|48:G2
+AUDIT|xxxl|3-seats|1|Contrast nearly passed|48:G3
+AUDIT|xxxl|3-seats|1|Contrast failed|48:G4
+AUDIT|xxxl|3-seats|1|Contrast failed|48:G5
+AUDIT|xxxl|3-seats|1|Contrast failed|48:G6
+AUDIT|xxxl|3-seats|1|Contrast failed|48:G7
+AUDIT|xxxl|3-seats|1|Contrast failed|48:G8
+AUDIT|xxxl|3-seats|1|Contrast failed|48:G9
+AUDIT|xxxl|3-seats|1|Contrast failed|48:G10
+AUDIT|xxxl|3-seats|1|Contrast failed|48:H1
+AUDIT|xxxl|3-seats|1|Contrast failed|48:H2
+AUDIT|xxxl|3-seats|1|Contrast nearly passed|48:H3
+AUDIT|xxxl|3-seats|1|Contrast failed|48:H4
+AUDIT|xxxl|3-seats|1|Contrast failed|48:H5
+AUDIT|xxxl|3-seats|1|Contrast failed|48:H6
+AUDIT|xxxl|3-seats|1|Contrast failed|48:H7
+AUDIT|xxxl|3-seats|1|Contrast failed|48:H8
+AUDIT|xxxl|3-seats|1|Contrast failed|48:H9
+AUDIT|xxxl|3-seats|1|Contrast failed|48:H10
+AUDIT|xxxl|3-seats|65536|Dynamic Type font sizes are unsupported|48:E2
+AUDIT|xxxl|3-seats|65536|Dynamic Type font sizes are unsupported|48:B9
+AUDIT|xxxl|3-seats|65536|Dynamic Type font sizes are unsupported|48:A4
+AUDIT|xxxl|3-seats|65536|Dynamic Type font sizes are unsupported|48:A5
+AUDIT|xxxl|3-seats|65536|Dynamic Type font sizes are unsupported|48:E6
+AUDIT|xxxl|3-seats|65536|Dynamic Type font sizes are unsupported|48:A10
+AUDIT|xxxl|3-seats|65536|Dynamic Type font sizes are unsupported|48:F4
+AUDIT|xxxl|3-seats|65536|Dynamic Type font sizes are unsupported|48:F5
+AUDIT|xxxl|3-seats|65536|Dynamic Type font sizes are unsupported|48:F1
+AUDIT|xxxl|3-seats|65536|Dynamic Type font sizes are unsupported|48:B1
+AUDIT|xxxl|3-seats|65536|Dynamic Type font sizes are unsupported|48:A7
+AUDIT|xxxl|3-seats|65536|Dynamic Type font sizes are unsupported|48:A3
+AUDIT|xxxl|3-seats|65536|Dynamic Type font sizes are unsupported|48:D6
+AUDIT|xxxl|3-seats|65536|Dynamic Type font sizes are unsupported|48:C8
+AUDIT|xxxl|3-seats|65536|Dynamic Type font sizes are unsupported|48:A2
+AUDIT|xxxl|3-seats|65536|Dynamic Type font sizes are unsupported|48:F8
+AUDIT|xxxl|3-seats|65536|Dynamic Type font sizes are unsupported|48:F2
+AUDIT|xxxl|3-seats|65536|Dynamic Type font sizes are unsupported|48:D7
+AUDIT|xxxl|3-seats|65536|Dynamic Type font sizes are unsupported|48:B6
+AUDIT|xxxl|3-seats|65536|Dynamic Type font sizes are unsupported|48:D5
+AUDIT|xxxl|3-seats|65536|Dynamic Type font sizes are unsupported|48:E4
+AUDIT|xxxl|3-seats|65536|Dynamic Type font sizes are unsupported|48:F3
+AUDIT|xxxl|3-seats|65536|Dynamic Type font sizes are unsupported|48:C6
+AUDIT|xxxl|3-seats|65536|Dynamic Type font sizes are unsupported|48:E8
+AUDIT|xxxl|3-seats|65536|Dynamic Type font sizes are unsupported|48:E5
+AUDIT|xxxl|3-seats|65536|Dynamic Type font sizes are unsupported|48:D10
+AUDIT|xxxl|3-seats|65536|Dynamic Type font sizes are unsupported|48:C3
+AUDIT|xxxl|3-seats|65536|Dynamic Type font sizes are unsupported|48:C7
+AUDIT|xxxl|3-seats|65536|Dynamic Type font sizes are unsupported|48:D2
+AUDIT|xxxl|3-seats|65536|Dynamic Type font sizes are unsupported|48:D3
+AUDIT|xxxl|3-seats|65536|Dynamic Type font sizes are unsupported|48:C4
+AUDIT|xxxl|3-seats|65536|Dynamic Type font sizes are unsupported|48:E1
+AUDIT|xxxl|3-seats|65536|Dynamic Type font sizes are unsupported|48:B3
+AUDIT|xxxl|3-seats|65536|Dynamic Type font sizes are unsupported|48:F9
+AUDIT|xxxl|3-seats|65536|Dynamic Type font sizes are unsupported|48:A6
+AUDIT|xxxl|3-seats|65536|Dynamic Type font sizes are unsupported|48:A8
+AUDIT|xxxl|3-seats|65536|Dynamic Type font sizes are unsupported|48:C1
+AUDIT|xxxl|3-seats|65536|Dynamic Type font sizes are unsupported|48:D8
+AUDIT|xxxl|3-seats|65536|Dynamic Type font sizes are unsupported|48:B8
+AUDIT|xxxl|3-seats|65536|Dynamic Type font sizes are unsupported|48:E3
+AUDIT|xxxl|3-seats|65536|Dynamic Type font sizes are unsupported|48:C10
+AUDIT|xxxl|3-seats|65536|Dynamic Type font sizes are unsupported|48:A1
+AUDIT|xxxl|3-seats|65536|Dynamic Type font sizes are unsupported|48:D1
+AUDIT|xxxl|3-seats|65536|Dynamic Type font sizes are unsupported|48:B7
+AUDIT|xxxl|3-seats|65536|Dynamic Type font sizes are unsupported|48:C5
+AUDIT|xxxl|3-seats|65536|Dynamic Type font sizes are unsupported|48:F10
+AUDIT|xxxl|3-seats|65536|Dynamic Type font sizes are unsupported|48:C2
+AUDIT|xxxl|3-seats|65536|Dynamic Type font sizes are unsupported|48:F6
+AUDIT|xxxl|3-seats|65536|Dynamic Type font sizes are unsupported|48:B2
+AUDIT|xxxl|3-seats|65536|Dynamic Type font sizes are unsupported|48:E7
+AUDIT|xxxl|3-seats|65536|Dynamic Type font sizes are unsupported|48:E10
+AUDIT|xxxl|3-seats|65536|Dynamic Type font sizes are unsupported|48:B4
+AUDIT|xxxl|3-seats|65536|Dynamic Type font sizes are unsupported|48:B5
+AUDIT|xxxl|3-seats|65536|Dynamic Type font sizes are unsupported|48:D9
+AUDIT|xxxl|3-seats|65536|Dynamic Type font sizes are unsupported|48:A9
+AUDIT|xxxl|3-seats|65536|Dynamic Type font sizes are unsupported|48:E9
+AUDIT|xxxl|3-seats|65536|Dynamic Type font sizes are unsupported|48:B10
+AUDIT|xxxl|3-seats|65536|Dynamic Type font sizes are unsupported|48:C9
+AUDIT|xxxl|3-seats|65536|Dynamic Type font sizes are unsupported|48:F7
+AUDIT|xxxl|3-seats|65536|Dynamic Type font sizes are unsupported|48:D4
+AUDITCOUNT|xxxl|3-seats|93
+AUDIT|xxxl|4-tickets|65536|Dynamic Type font sizes are partially unsupported|9:登出
+AUDITCOUNT|xxxl|4-tickets|1
+AUDIT|xxxl|5-ticket-detail|1|Contrast failed|-
+AUDIT|xxxl|5-ticket-detail|65536|Dynamic Type font sizes are partially unsupported|-
+AUDIT|xxxl|5-ticket-detail|65536|Dynamic Type font sizes are unsupported|-
+AUDIT|xxxl|5-ticket-detail|65536|Dynamic Type font sizes are unsupported|-
+AUDIT|xxxl|5-ticket-detail|131072|Text clipped|48:示範活動:秋季音樂會
+AUDITCOUNT|xxxl|5-ticket-detail|5

@@ -1,0 +1,31 @@
+AUDIT|default|1-login|1|Contrast failed|9:登入
+AUDITCOUNT|default|1-login|1
+AUDIT|default|2-events|65536|Dynamic Type font sizes are unsupported|-
+AUDIT|default|2-events|65536|Dynamic Type font sizes are unsupported|-
+AUDIT|default|2-events|65536|Dynamic Type font sizes are unsupported|-
+AUDIT|default|2-events|65536|Dynamic Type font sizes are unsupported|-
+AUDIT|default|2-events|65536|Dynamic Type font sizes are unsupported|-
+AUDIT|default|2-events|65536|Dynamic Type font sizes are unsupported|-
+AUDIT|default|2-events|65536|Dynamic Type font sizes are unsupported|-
+AUDIT|default|2-events|65536|Dynamic Type font sizes are unsupported|-
+AUDIT|default|2-events|65536|Dynamic Type font sizes are unsupported|-
+AUDIT|default|2-events|131072|Text clipped|-
+AUDIT|default|2-events|131072|Text clipped|-
+AUDIT|default|2-events|131072|Text clipped|-
+AUDITCOUNT|default|2-events|12
+AUDIT|default|3-seats|1|Contrast failed|48:空位
+AUDIT|default|3-seats|1|Contrast failed|48:保留中
+AUDIT|default|3-seats|1|Contrast nearly passed|48:已售
+AUDIT|default|3-seats|1|Contrast failed|48:我的
+AUDITCOUNT|default|3-seats|4
+SEATLABEL|default|A1|A1 空位
+SEATLABEL|default|C3|C3 我的
+AUDIT|default|4-tickets|1|Contrast nearly passed|9:登出
+AUDIT|default|4-tickets|65536|Dynamic Type font sizes are partially unsupported|9:登出
+AUDITCOUNT|default|4-tickets|2
+AUDIT|default|5-ticket-detail|65536|Dynamic Type font sizes are unsupported|-
+AUDIT|default|5-ticket-detail|65536|Dynamic Type font sizes are partially unsupported|48:總計 NT$4,444.20
+AUDIT|default|5-ticket-detail|65536|Dynamic Type font sizes are unsupported|-
+AUDIT|default|5-ticket-detail|65536|Dynamic Type font sizes are unsupported|-
+AUDIT|default|5-ticket-detail|131072|Text clipped|-
+AUDITCOUNT|default|5-ticket-detail|5

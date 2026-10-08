@@ -1,0 +1,17 @@
+AUDIT|xxxl|1-login|1|Contrast failed|9:登入
+AUDITCOUNT|xxxl|1-login|1
+AUDIT|xxxl|2-events|65536|Dynamic Type font sizes are unsupported|-
+AUDIT|xxxl|2-events|65536|Dynamic Type font sizes are unsupported|-
+AUDIT|xxxl|2-events|65536|Dynamic Type font sizes are unsupported|-
+AUDIT|xxxl|2-events|65536|Dynamic Type font sizes are unsupported|-
+AUDIT|xxxl|2-events|131072|Text clipped|-
+AUDIT|xxxl|2-events|1|Contrast failed|48:開賣 Jan 1, 1970 at 8:00 AM・截止 Jan 1, 2100 at 8:00 AM
+AUDITCOUNT|xxxl|2-events|6
+AUDITCOUNT|xxxl|3-seats|0
+SEATLABEL|xxxl|A1|A1,空位
+SEATLABEL|xxxl|C3|C3,你的座位
+AUDIT|xxxl|4-tickets|65536|Dynamic Type font sizes are partially unsupported|9:登出
+AUDITCOUNT|xxxl|4-tickets|1
+AUDIT|xxxl|5-ticket-detail|65536|Dynamic Type font sizes are unsupported|-
+AUDIT|xxxl|5-ticket-detail|65536|Dynamic Type font sizes are unsupported|-
+AUDITCOUNT|xxxl|5-ticket-detail|2

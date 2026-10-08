@@ -1,0 +1,11 @@
+Test Case '-[EventSignupAppUITests.LiveWalkthroughTests testLoginEventsTickets]' passed (17.947 seconds).
+Test Case '-[EventSignupAppUITests.LiveWalkthroughTests testLoginEventsTickets]' passed (18.546 seconds).
+Test Case '-[EventSignupAppUITests.LiveWalkthroughTests testLoginEventsTickets]' passed (18.577 seconds).
+Test Case '-[EventSignupAppUITests.LiveWalkthroughTests testLoginEventsTickets]' passed (18.499 seconds).
+Test Case '-[EventSignupAppUITests.LiveWalkthroughTests testLoginEventsTickets]' passed (18.174 seconds).
+Test Case '-[EventSignupAppUITests.LiveWalkthroughTests testLoginEventsTickets]' passed (18.214 seconds).
+Test Case '-[EventSignupAppUITests.LiveWalkthroughTests testLoginEventsTickets]' passed (18.227 seconds).
+Test Case '-[EventSignupAppUITests.LiveWalkthroughTests testLoginEventsTickets]' passed (18.253 seconds).
+Test Case '-[EventSignupAppUITests.LiveWalkthroughTests testLoginEventsTickets]' passed (18.179 seconds).
+Test Case '-[EventSignupAppUITests.LiveWalkthroughTests testLoginEventsTickets]' passed (18.513 seconds).
+** TEST SUCCEEDED **

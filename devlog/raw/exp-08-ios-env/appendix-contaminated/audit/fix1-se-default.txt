@@ -1,0 +1,150 @@
+AUDIT|default|1-login|1|Contrast failed|9:登入
+AUDITCOUNT|default|1-login|1
+AUDIT|default|2-events|65536|Dynamic Type font sizes are unsupported|-
+AUDIT|default|2-events|65536|Dynamic Type font sizes are unsupported|-
+AUDIT|default|2-events|65536|Dynamic Type font sizes are unsupported|-
+AUDIT|default|2-events|65536|Dynamic Type font sizes are unsupported|-
+AUDIT|default|2-events|65536|Dynamic Type font sizes are unsupported|-
+AUDIT|default|2-events|65536|Dynamic Type font sizes are unsupported|-
+AUDIT|default|2-events|65536|Dynamic Type font sizes are unsupported|-
+AUDIT|default|2-events|65536|Dynamic Type font sizes are unsupported|-
+AUDIT|default|2-events|65536|Dynamic Type font sizes are unsupported|-
+AUDIT|default|2-events|131072|Text clipped|-
+AUDIT|default|2-events|131072|Text clipped|-
+AUDITCOUNT|default|2-events|11
+AUDIT|default|3-seats|65536|Dynamic Type font sizes are partially unsupported|48:D5
+AUDIT|default|3-seats|65536|Dynamic Type font sizes are partially unsupported|48:J6
+AUDIT|default|3-seats|65536|Dynamic Type font sizes are partially unsupported|48:A1
+AUDIT|default|3-seats|65536|Dynamic Type font sizes are partially unsupported|48:B7
+AUDIT|default|3-seats|65536|Dynamic Type font sizes are partially unsupported|48:F7
+AUDIT|default|3-seats|65536|Dynamic Type font sizes are partially unsupported|48:J4
+AUDIT|default|3-seats|65536|Dynamic Type font sizes are partially unsupported|48:C7
+AUDIT|default|3-seats|65536|Dynamic Type font sizes are partially unsupported|48:I4
+AUDIT|default|3-seats|65536|Dynamic Type font sizes are partially unsupported|48:A4
+AUDIT|default|3-seats|65536|Dynamic Type font sizes are partially unsupported|48:I3
+AUDIT|default|3-seats|65536|Dynamic Type font sizes are partially unsupported|48:F10
+AUDIT|default|3-seats|65536|Dynamic Type font sizes are partially unsupported|48:H3
+AUDIT|default|3-seats|65536|Dynamic Type font sizes are partially unsupported|48:E2
+AUDIT|default|3-seats|65536|Dynamic Type font sizes are partially unsupported|48:G7
+AUDIT|default|3-seats|65536|Dynamic Type font sizes are partially unsupported|48:H4
+AUDIT|default|3-seats|65536|Dynamic Type font sizes are partially unsupported|48:C3
+AUDIT|default|3-seats|65536|Dynamic Type font sizes are partially unsupported|48:H7
+AUDIT|default|3-seats|65536|Dynamic Type font sizes are partially unsupported|48:F5
+AUDIT|default|3-seats|65536|Dynamic Type font sizes are partially unsupported|48:H8
+AUDIT|default|3-seats|65536|Dynamic Type font sizes are partially unsupported|48:C10
+AUDIT|default|3-seats|65536|Dynamic Type font sizes are partially unsupported|48:I6
+AUDIT|default|3-seats|65536|Dynamic Type font sizes are partially unsupported|48:I7
+AUDIT|default|3-seats|65536|Dynamic Type font sizes are partially unsupported|48:E10
+AUDIT|default|3-seats|65536|Dynamic Type font sizes are partially unsupported|48:E3
+AUDIT|default|3-seats|65536|Dynamic Type font sizes are partially unsupported|48:A9
+AUDIT|default|3-seats|65536|Dynamic Type font sizes are partially unsupported|48:A10
+AUDIT|default|3-seats|65536|Dynamic Type font sizes are partially unsupported|48:G6
+AUDIT|default|3-seats|65536|Dynamic Type font sizes are partially unsupported|48:A2
+AUDIT|default|3-seats|65536|Dynamic Type font sizes are partially unsupported|48:H6
+AUDIT|default|3-seats|65536|Dynamic Type font sizes are partially unsupported|48:C2
+AUDIT|default|3-seats|65536|Dynamic Type font sizes are partially unsupported|48:C4
+AUDIT|default|3-seats|65536|Dynamic Type font sizes are partially unsupported|48:H1
+AUDIT|default|3-seats|65536|Dynamic Type font sizes are partially unsupported|48:E5
+AUDIT|default|3-seats|65536|Dynamic Type font sizes are partially unsupported|48:D2
+AUDIT|default|3-seats|65536|Dynamic Type font sizes are partially unsupported|48:I1
+AUDIT|default|3-seats|65536|Dynamic Type font sizes are partially unsupported|48:B1
+AUDIT|default|3-seats|65536|Dynamic Type font sizes are partially unsupported|48:A3
+AUDIT|default|3-seats|65536|Dynamic Type font sizes are partially unsupported|48:A6
+AUDIT|default|3-seats|65536|Dynamic Type font sizes are partially unsupported|48:A7
+AUDIT|default|3-seats|65536|Dynamic Type font sizes are partially unsupported|48:B2
+AUDIT|default|3-seats|65536|Dynamic Type font sizes are partially unsupported|48:J2
+AUDIT|default|3-seats|65536|Dynamic Type font sizes are partially unsupported|48:D6
+AUDIT|default|3-seats|65536|Dynamic Type font sizes are partially unsupported|48:E6
+AUDIT|default|3-seats|65536|Dynamic Type font sizes are partially unsupported|48:G10
+AUDIT|default|3-seats|65536|Dynamic Type font sizes are partially unsupported|48:H2
+AUDIT|default|3-seats|65536|Dynamic Type font sizes are partially unsupported|48:H9
+AUDIT|default|3-seats|65536|Dynamic Type font sizes are partially unsupported|48:C5
+AUDIT|default|3-seats|65536|Dynamic Type font sizes are partially unsupported|48:E7
+AUDIT|default|3-seats|65536|Dynamic Type font sizes are partially unsupported|48:H10
+AUDIT|default|3-seats|65536|Dynamic Type font sizes are partially unsupported|48:B8
+AUDIT|default|3-seats|65536|Dynamic Type font sizes are partially unsupported|48:B5
+AUDIT|default|3-seats|65536|Dynamic Type font sizes are partially unsupported|48:D7
+AUDIT|default|3-seats|65536|Dynamic Type font sizes are partially unsupported|48:I2
+AUDIT|default|3-seats|65536|Dynamic Type font sizes are partially unsupported|48:F4
+AUDIT|default|3-seats|65536|Dynamic Type font sizes are partially unsupported|48:D8
+AUDIT|default|3-seats|65536|Dynamic Type font sizes are partially unsupported|48:F8
+AUDIT|default|3-seats|65536|Dynamic Type font sizes are partially unsupported|48:G8
+AUDIT|default|3-seats|65536|Dynamic Type font sizes are partially unsupported|48:B6
+AUDIT|default|3-seats|65536|Dynamic Type font sizes are partially unsupported|48:G2
+AUDIT|default|3-seats|65536|Dynamic Type font sizes are partially unsupported|48:B9
+AUDIT|default|3-seats|65536|Dynamic Type font sizes are partially unsupported|48:I5
+AUDIT|default|3-seats|65536|Dynamic Type font sizes are partially unsupported|48:D10
+AUDIT|default|3-seats|65536|Dynamic Type font sizes are partially unsupported|48:D3
+AUDIT|default|3-seats|65536|Dynamic Type font sizes are partially unsupported|48:A8
+AUDIT|default|3-seats|65536|Dynamic Type font sizes are partially unsupported|48:F3
+AUDIT|default|3-seats|65536|Dynamic Type font sizes are partially unsupported|48:J7
+AUDIT|default|3-seats|65536|Dynamic Type font sizes are partially unsupported|48:B10
+AUDIT|default|3-seats|65536|Dynamic Type font sizes are partially unsupported|48:J10
+AUDIT|default|3-seats|65536|Dynamic Type font sizes are partially unsupported|48:D4
+AUDIT|default|3-seats|65536|Dynamic Type font sizes are partially unsupported|48:J5
+AUDIT|default|3-seats|65536|Dynamic Type font sizes are partially unsupported|48:F9
+AUDIT|default|3-seats|65536|Dynamic Type font sizes are partially unsupported|48:J8
+AUDIT|default|3-seats|65536|Dynamic Type font sizes are partially unsupported|48:B4
+AUDIT|default|3-seats|65536|Dynamic Type font sizes are partially unsupported|48:H5
+AUDIT|default|3-seats|65536|Dynamic Type font sizes are partially unsupported|48:B3
+AUDIT|default|3-seats|65536|Dynamic Type font sizes are partially unsupported|48:C6
+AUDIT|default|3-seats|65536|Dynamic Type font sizes are partially unsupported|48:G1
+AUDIT|default|3-seats|65536|Dynamic Type font sizes are partially unsupported|48:E4
+AUDIT|default|3-seats|65536|Dynamic Type font sizes are partially unsupported|48:G9
+AUDIT|default|3-seats|65536|Dynamic Type font sizes are partially unsupported|48:C1
+AUDIT|default|3-seats|65536|Dynamic Type font sizes are partially unsupported|48:E9
+AUDIT|default|3-seats|65536|Dynamic Type font sizes are partially unsupported|48:A5
+AUDIT|default|3-seats|65536|Dynamic Type font sizes are partially unsupported|48:E8
+AUDIT|default|3-seats|65536|Dynamic Type font sizes are partially unsupported|48:G3
+AUDIT|default|3-seats|65536|Dynamic Type font sizes are partially unsupported|48:G5
+AUDIT|default|3-seats|65536|Dynamic Type font sizes are partially unsupported|48:F2
+AUDIT|default|3-seats|65536|Dynamic Type font sizes are partially unsupported|48:J3
+AUDIT|default|3-seats|65536|Dynamic Type font sizes are partially unsupported|48:J1
+AUDIT|default|3-seats|65536|Dynamic Type font sizes are partially unsupported|48:I8
+AUDIT|default|3-seats|65536|Dynamic Type font sizes are partially unsupported|48:F6
+AUDIT|default|3-seats|65536|Dynamic Type font sizes are partially unsupported|48:F1
+AUDIT|default|3-seats|65536|Dynamic Type font sizes are partially unsupported|48:I10
+AUDIT|default|3-seats|65536|Dynamic Type font sizes are partially unsupported|48:C9
+AUDIT|default|3-seats|65536|Dynamic Type font sizes are partially unsupported|48:G4
+AUDIT|default|3-seats|65536|Dynamic Type font sizes are partially unsupported|48:D1
+AUDIT|default|3-seats|65536|Dynamic Type font sizes are partially unsupported|48:I9
+AUDIT|default|3-seats|65536|Dynamic Type font sizes are partially unsupported|48:J9
+AUDIT|default|3-seats|65536|Dynamic Type font sizes are partially unsupported|48:C8
+AUDIT|default|3-seats|65536|Dynamic Type font sizes are partially unsupported|48:D9
+AUDIT|default|3-seats|65536|Dynamic Type font sizes are partially unsupported|48:E1
+AUDIT|default|3-seats|1|Contrast nearly passed|48:A5
+AUDIT|default|3-seats|1|Contrast nearly passed|48:A7
+AUDIT|default|3-seats|1|Contrast nearly passed|48:B5
+AUDIT|default|3-seats|1|Contrast nearly passed|48:B7
+AUDIT|default|3-seats|1|Contrast nearly passed|48:C7
+AUDIT|default|3-seats|1|Contrast nearly passed|48:D5
+AUDIT|default|3-seats|1|Contrast nearly passed|48:D7
+AUDIT|default|3-seats|1|Contrast nearly passed|48:E1
+AUDIT|default|3-seats|1|Contrast nearly passed|48:E2
+AUDIT|default|3-seats|1|Contrast nearly passed|48:E3
+AUDIT|default|3-seats|1|Contrast nearly passed|48:E4
+AUDIT|default|3-seats|1|Contrast nearly passed|48:E5
+AUDIT|default|3-seats|1|Contrast nearly passed|48:E6
+AUDIT|default|3-seats|1|Contrast nearly passed|48:E7
+AUDIT|default|3-seats|1|Contrast nearly passed|48:E8
+AUDIT|default|3-seats|1|Contrast nearly passed|48:E9
+AUDIT|default|3-seats|1|Contrast nearly passed|48:F1
+AUDIT|default|3-seats|1|Contrast nearly passed|48:F5
+AUDIT|default|3-seats|1|Contrast nearly passed|48:F7
+AUDIT|default|3-seats|1|Contrast nearly passed|48:G7
+AUDIT|default|3-seats|1|Contrast nearly passed|48:H5
+AUDIT|default|3-seats|1|Contrast nearly passed|48:H7
+AUDIT|default|3-seats|1|Contrast nearly passed|48:I5
+AUDIT|default|3-seats|1|Contrast nearly passed|48:I7
+AUDIT|default|3-seats|1|Contrast nearly passed|48:J5
+AUDIT|default|3-seats|1|Contrast nearly passed|48:J7
+AUDITCOUNT|default|3-seats|126
+AUDIT|default|4-tickets|65536|Dynamic Type font sizes are partially unsupported|9:登出
+AUDIT|default|4-tickets|1|Contrast nearly passed|9:登出
+AUDITCOUNT|default|4-tickets|2
+AUDIT|default|5-ticket-detail|65536|Dynamic Type font sizes are unsupported|-
+AUDIT|default|5-ticket-detail|65536|Dynamic Type font sizes are partially unsupported|48:總計 NT$4,444.20
+AUDIT|default|5-ticket-detail|65536|Dynamic Type font sizes are unsupported|-
+AUDIT|default|5-ticket-detail|65536|Dynamic Type font sizes are partially unsupported|48:小計 NT$4,938・早鳥 0%・團體 10%
+AUDIT|default|5-ticket-detail|65536|Dynamic Type font sizes are unsupported|-
+AUDITCOUNT|default|5-ticket-detail|5

@@ -1,0 +1,32 @@
+AUDIT|xxxl|1-login|1|Contrast failed|9:登入
+AUDITCOUNT|xxxl|1-login|1
+AUDIT|xxxl|2-events|65536|Dynamic Type font sizes are unsupported|-
+AUDIT|xxxl|2-events|65536|Dynamic Type font sizes are unsupported|-
+AUDIT|xxxl|2-events|65536|Dynamic Type font sizes are unsupported|-
+AUDIT|xxxl|2-events|65536|Dynamic Type font sizes are unsupported|-
+AUDIT|xxxl|2-events|131072|Text clipped|-
+AUDITCOUNT|xxxl|2-events|5
+AUDIT|xxxl|3-seats|65536|Dynamic Type font sizes are partially unsupported|48:A1
+AUDIT|xxxl|3-seats|65536|Dynamic Type font sizes are partially unsupported|48:B1
+AUDIT|xxxl|3-seats|65536|Dynamic Type font sizes are partially unsupported|48:C2
+AUDIT|xxxl|3-seats|65536|Dynamic Type font sizes are partially unsupported|48:B3
+AUDIT|xxxl|3-seats|65536|Dynamic Type font sizes are partially unsupported|48:C1
+AUDIT|xxxl|3-seats|65536|Dynamic Type font sizes are partially unsupported|48:B2
+AUDIT|xxxl|3-seats|65536|Dynamic Type font sizes are partially unsupported|48:A3
+AUDIT|xxxl|3-seats|65536|Dynamic Type font sizes are partially unsupported|48:A2
+AUDIT|xxxl|3-seats|65536|Dynamic Type font sizes are partially unsupported|48:C3
+AUDIT|xxxl|3-seats|1|Contrast failed|48:A4
+AUDIT|xxxl|3-seats|1|Contrast failed|48:B4
+AUDIT|xxxl|3-seats|1|Contrast failed|48:C4
+AUDIT|xxxl|3-seats|1|Contrast failed|48:D1
+AUDIT|xxxl|3-seats|1|Contrast failed|48:D3
+AUDIT|xxxl|3-seats|1|Contrast failed|48:D4
+AUDITCOUNT|xxxl|3-seats|15
+AUDIT|xxxl|4-tickets|65536|Dynamic Type font sizes are partially unsupported|9:登出
+AUDITCOUNT|xxxl|4-tickets|1
+AUDIT|xxxl|5-ticket-detail|1|Contrast failed|48:小計 NT$4,938・早鳥 0%・團體 10%
+AUDIT|xxxl|5-ticket-detail|65536|Dynamic Type font sizes are unsupported|-
+AUDIT|xxxl|5-ticket-detail|65536|Dynamic Type font sizes are unsupported|-
+AUDIT|xxxl|5-ticket-detail|65536|Dynamic Type font sizes are unsupported|-
+AUDIT|xxxl|5-ticket-detail|131072|Text clipped|-
+AUDITCOUNT|xxxl|5-ticket-detail|5

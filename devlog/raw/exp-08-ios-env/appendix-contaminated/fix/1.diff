@@ -1,0 +1,67 @@
+diff -ru src/EventDetailView.swift run1/src/EventDetailView.swift
+--- src/EventDetailView.swift	2026-10-08 10:47:33
++++ run1/src/EventDetailView.swift	2026-10-08 10:49:37
+@@ -6,7 +6,9 @@
+     let id: String
+     @State private var detail: Components.Schemas.EventDetail?
+     @State private var error: String?
+-    private let columns = Array(repeating: GridItem(.flexible(), spacing: 2), count: 10)
++    /// 座位格跟著字級放大;放大後一排 10 格塞不下就橫向捲動,不縮字。
++    @ScaledMetric(relativeTo: .caption2) private var cell: CGFloat = 30
++    private var columns: [GridItem] { Array(repeating: GridItem(.fixed(cell), spacing: 2), count: 10) }
+ 
+     public var body: some View {
+         ScrollView {
+@@ -17,10 +19,13 @@
+                     ForEach(d.value2.ticket_types, id: \.id) { t in
+                         Text("\(t.name)・\(Money.format(t.price_cents))・剩 \(t.remaining)").font(.caption)
+                     }
+-                    LazyVGrid(columns: columns, spacing: 2) {
+-                        ForEach(d.value2.seats, id: \.seat_no) { s in
+-                            Text(s.seat_no).font(.system(size: 9)).frame(maxWidth: .infinity, minHeight: 24)
+-                                .background(color(s.state)).clipShape(RoundedRectangle(cornerRadius: 3))
++                    ScrollView(.horizontal) {
++                        LazyVGrid(columns: columns, spacing: 2) {
++                            ForEach(d.value2.seats, id: \.seat_no) { s in
++                                Text(s.seat_no).font(.caption2).lineLimit(1).frame(width: cell, height: cell)
++                                    .foregroundStyle(foreground(s.state))
++                                    .background(color(s.state)).clipShape(RoundedRectangle(cornerRadius: 3))
++                            }
+                         }
+                     }
+                 }.padding()
+@@ -32,6 +37,12 @@
+ 
+     func color(_ s: Components.Schemas.Seat.statePayload) -> Color {
+         switch s { case .free: .gray.opacity(0.2); case .held: .yellow; case .sold: .gray; case .mine: .green }
++    }
++
++    /// 字色跟底色配對,不吃預設的 .primary:深色模式下白字壓在黃/綠/灰底上對比不夠。
++    /// 淡灰底是半透明,跟著背景深淺走,所以留 .primary;其他三色在淺色/深色都是亮底,一律黑字。
++    func foreground(_ s: Components.Schemas.Seat.statePayload) -> Color {
++        switch s { case .free: .primary; case .held, .sold, .mine: .black }
+     }
+ 
+     func load() async {
+diff -ru src/TicketDetailView.swift run1/src/TicketDetailView.swift
+--- src/TicketDetailView.swift	2026-10-08 10:47:33
++++ run1/src/TicketDetailView.swift	2026-10-08 10:49:41
+@@ -8,6 +8,8 @@
+ 
+     public var body: some View {
+         List {
++            // 活動名稱可能很長,導覽列標題會被截斷;完整名稱放在內容裡讓它換行。
++            Text(order.event_name).font(.headline).accessibilityAddTraits(.isHeader)
+             ForEach(order.items, id: \.seat_no) { i in
+                 Text("\(i.seat_no) \(i.ticket_type_name) \(Money.format(i.unit_price_cents))")
+             }
+@@ -19,6 +21,9 @@
+             }
+         }
+         .navigationTitle(order.event_name)
++        #if os(iOS)
++        .navigationBarTitleDisplayMode(.inline)
++        #endif
+     }
+ 
+     func qr(_ text: String) -> CGImage? {

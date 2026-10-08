@@ -1,0 +1,2 @@
+Test Case '-[EventSignupAppUITests.LiveWalkthroughTests testLoginEventsTickets]' passed (18.081 seconds).
+** TEST SUCCEEDED **

@@ -1,0 +1,19 @@
+AUDIT|xxxl|1-login|1|Contrast failed|9:登入
+AUDITCOUNT|xxxl|1-login|1
+AUDIT|xxxl|2-events|65536|Dynamic Type font sizes are unsupported|-
+AUDIT|xxxl|2-events|65536|Dynamic Type font sizes are unsupported|-
+AUDIT|xxxl|2-events|65536|Dynamic Type font sizes are unsupported|-
+AUDIT|xxxl|2-events|65536|Dynamic Type font sizes are unsupported|-
+AUDIT|xxxl|2-events|131072|Text clipped|-
+AUDITCOUNT|xxxl|2-events|5
+AUDITCOUNT|xxxl|3-seats|0
+SEATLABEL|xxxl|A1|A1,空位
+SEATLABEL|xxxl|C3|C3,你的座位
+AUDIT|xxxl|4-tickets|65536|Dynamic Type font sizes are partially unsupported|9:登出
+AUDITCOUNT|xxxl|4-tickets|1
+AUDIT|xxxl|5-ticket-detail|1|Contrast failed|48:小計 NT$4,938・早鳥 0%・團體 10%
+AUDIT|xxxl|5-ticket-detail|65536|Dynamic Type font sizes are unsupported|-
+AUDIT|xxxl|5-ticket-detail|65536|Dynamic Type font sizes are unsupported|-
+AUDIT|xxxl|5-ticket-detail|65536|Dynamic Type font sizes are unsupported|-
+AUDIT|xxxl|5-ticket-detail|131072|Text clipped|-
+AUDITCOUNT|xxxl|5-ticket-detail|5

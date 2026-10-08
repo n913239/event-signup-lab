@@ -1,0 +1,3 @@
+-[EventSignupAppUITests.LiveWalkthroughTests testLoginEventsTickets] : XCTAssertTrue failed - 票券畫面是空的 —— GET /orders 沒回來
+Test Case '-[EventSignupAppUITests.LiveWalkthroughTests testLoginEventsTickets]' failed (33.151 seconds).
+** TEST FAILED **

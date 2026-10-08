@@ -1,0 +1,82 @@
+diff -ru src/EventDetailView.swift src-after1/EventDetailView.swift
+--- src/EventDetailView.swift	2026-10-08 10:47:33
++++ src-after1/EventDetailView.swift	2026-10-08 11:11:57
+@@ -6,7 +6,10 @@
+     let id: String
+     @State private var detail: Components.Schemas.EventDetail?
+     @State private var error: String?
+-    private let columns = Array(repeating: GridItem(.flexible(), spacing: 2), count: 10)
++    // 座位格跟著字級放大;10 欄固定是場地實際排法,放大後放不下就橫向捲動,不改欄數也不縮字。
++    @ScaledMetric(relativeTo: .caption2) private var cellWidth: CGFloat = 30
++    @ScaledMetric(relativeTo: .caption2) private var cellHeight: CGFloat = 24
++    private let states: [Components.Schemas.Seat.statePayload] = [.free, .held, .sold, .mine]
+ 
+     public var body: some View {
+         ScrollView {
+@@ -17,11 +20,24 @@
+                     ForEach(d.value2.ticket_types, id: \.id) { t in
+                         Text("\(t.name)・\(Money.format(t.price_cents))・剩 \(t.remaining)").font(.caption)
+                     }
+-                    LazyVGrid(columns: columns, spacing: 2) {
+-                        ForEach(d.value2.seats, id: \.seat_no) { s in
+-                            Text(s.seat_no).font(.system(size: 9)).frame(maxWidth: .infinity, minHeight: 24)
+-                                .background(color(s.state)).clipShape(RoundedRectangle(cornerRadius: 3))
++                    // 圖例:狀態不能只靠顏色分辨
++                    HStack(spacing: 12) {
++                        ForEach(states, id: \.self) { s in
++                            Label { Text(label(s)) } icon: {
++                                RoundedRectangle(cornerRadius: 3).fill(color(s)).frame(width: 12, height: 12)
++                            }
+                         }
++                    }.font(.caption)
++                    ScrollView(.horizontal) {
++                        LazyVGrid(columns: Array(repeating: GridItem(.fixed(cellWidth), spacing: 2), count: 10), spacing: 2) {
++                            ForEach(d.value2.seats, id: \.seat_no) { s in
++                                Text(s.seat_no).font(.caption2).lineLimit(1)
++                                    .foregroundStyle(textColor(s.state))
++                                    .frame(width: cellWidth, height: cellHeight)
++                                    .background(color(s.state)).clipShape(RoundedRectangle(cornerRadius: 3))
++                                    .accessibilityLabel("\(s.seat_no) \(label(s.state))")
++                            }
++                        }
+                     }
+                 }.padding()
+             } else if let error { Text(error).foregroundStyle(.red) }
+@@ -32,6 +48,15 @@
+ 
+     func color(_ s: Components.Schemas.Seat.statePayload) -> Color {
+         switch s { case .free: .gray.opacity(0.2); case .held: .yellow; case .sold: .gray; case .mine: .green }
++    }
++
++    /// 有色底(黃/灰/綠)在深淺色模式下都是亮色,字固定用黑色才夠對比;空位底近乎透明,跟著系統前景色。
++    func textColor(_ s: Components.Schemas.Seat.statePayload) -> Color {
++        s == .free ? .primary : .black
++    }
++
++    func label(_ s: Components.Schemas.Seat.statePayload) -> String {
++        switch s { case .free: "空位"; case .held: "保留中"; case .sold: "已售"; case .mine: "我的" }
+     }
+ 
+     func load() async {
+diff -ru src/TicketDetailView.swift src-after1/TicketDetailView.swift
+--- src/TicketDetailView.swift	2026-10-08 10:47:33
++++ src-after1/TicketDetailView.swift	2026-10-08 11:11:57
+@@ -8,6 +8,8 @@
+ 
+     public var body: some View {
+         List {
++            // 活動名稱放內文讓它能換行;大標題列放不下長名稱會被截斷
++            Text(order.event_name).font(.headline)
+             ForEach(order.items, id: \.seat_no) { i in
+                 Text("\(i.seat_no) \(i.ticket_type_name) \(Money.format(i.unit_price_cents))")
+             }
+@@ -19,6 +21,9 @@
+             }
+         }
+         .navigationTitle(order.event_name)
++        #if os(iOS)
++        .navigationBarTitleDisplayMode(.inline)
++        #endif
+     }
+ 
+     func qr(_ text: String) -> CGImage? {
