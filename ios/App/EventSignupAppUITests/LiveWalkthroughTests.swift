@@ -25,12 +25,14 @@ final class LiveWalkthroughTests: XCTestCase {
         app.buttons["登入"].tap()
 
         XCTAssertTrue(app.navigationBars["活動"].waitForExistence(timeout: 20), "登入後沒進活動列表")
-        sleep(3)                                                           // 等 GET /events 回來
+        // 2026-10-08(exp-08):原本 sleep(3) 後只斷言「沒有離線資料」—— 把票券頁的載入拿掉、畫面全空,測試照樣綠。
+        // 改成等到真的有列出現;示範帳號至少有一個活動、一張訂單。
+        XCTAssertTrue(app.cells.firstMatch.waitForExistence(timeout: 20), "活動列表是空的 —— GET /events 沒回來")
         snap(app, "2-events")
 
         app.tabBars.buttons["票券"].tap()
         XCTAssertTrue(app.navigationBars["我的票券"].waitForExistence(timeout: 20))
-        sleep(3)
+        XCTAssertTrue(app.cells.firstMatch.waitForExistence(timeout: 20), "票券畫面是空的 —— GET /orders 沒回來")
         snap(app, "3-tickets")
         XCTAssertFalse(app.staticTexts["離線資料"].exists, "票券畫面顯示離線資料 —— 沒連上線上 API")
     }
