@@ -1,0 +1,114 @@
+{
+ "duration_api_ms": 18977,
+ "stop_reason": "end_turn",
+ "total_cost_usd": 0.1877586,
+ "usage": {
+  "input_tokens": 10,
+  "cache_creation_input_tokens": 16422,
+  "cache_read_input_tokens": 113913,
+  "output_tokens": 1678,
+  "output_tokens_details": {
+   "thinking_tokens": 189
+  },
+  "server_tool_use": {
+   "web_search_requests": 0,
+   "web_fetch_requests": 0
+  },
+  "service_tier": "standard",
+  "cache_creation": {
+   "ephemeral_1h_input_tokens": 16422,
+   "ephemeral_5m_input_tokens": 0
+  },
+  "inference_geo": "not_available",
+  "iterations": [
+   {
+    "input_tokens": 2,
+    "output_tokens": 378,
+    "cache_read_input_tokens": 26552,
+    "cache_creation_input_tokens": 351,
+    "cache_creation": {
+     "ephemeral_5m_input_tokens": 0,
+     "ephemeral_1h_input_tokens": 351
+    },
+    "type": "message"
+   }
+  ],
+  "speed": "standard",
+  "fallback_credit": null
+ },
+ "modelUsage": {
+  "claude-opus-5-5": {
+   "inputTokens": 10,
+   "outputTokens": 1678,
+   "cacheReadInputTokens": 113913,
+   "cacheCreationInputTokens": 16422,
+   "webSearchRequests": 0,
+   "costUSD": 0.1877586,
+   "contextWindow": 1000000,
+   "maxOutputTokens": 128000,
+   "thinkingTokens": 189,
+   "canonicalModel": "claude-opus-5-5",
+   "provider": "firstParty",
+   "costBasis": "list"
+  }
+ },
+ "permission_denials": [
+  {
+   "tool_name": "Bash",
+   "tool_use_id": "toolu_017eWXM5fCEJhPuJvXuPUtws",
+   "tool_input": {
+    "command": "mkdir -p /tmp/moneychk && cd /tmp/moneychk && cp ./B/run3/Money.swift . && cat > main.swift <<'EOF'\nfor c in [444420, 0, 5, 99, 100, 100000, 123456789, -1250, -5, Int.max, Int.min] { print(c, Money.format(c)) }\nEOF\nswiftc Money.swift main.swift -o m 2>&1 && ./m",
+    "description": "Compile and spot-check outside project"
+   }
+  },
+  {
+   "tool_name": "Bash",
+   "tool_use_id": "toolu_01H57GKigBdUCR9L12GoYFhZ",
+   "tool_input": {
+    "command": "cd /tmp/moneychk && printf '%s\\n' 'for c in [444420, 0, 5, 99, 100, 100000, 123456789, -1250, -5, Int.max, Int.min] { print(c, Money.format(c)) }' > main.swift && swiftc Money.swift main.swift -o m 2>&1 && ./m",
+    "description": "Compile and spot-check in temp dir"
+   }
+  }
+ ],
+ "terminal_reason": "completed",
+ "fast_mode_state": "off",
+ "fast_mode_disabled_reason": "sdk_opt_in_required",
+ "subagent_stats": {
+  "spawned": 0,
+  "requested": {
+   "background": 0,
+   "foreground": 0,
+   "unset": 0
+  },
+  "started_in_background": 0,
+  "max_depth": 0,
+  "spawned_by_subagents": 0,
+  "completed": 0,
+  "failed": 0,
+  "killed": {
+   "parent": 0,
+   "user": 0,
+   "system": 0
+  },
+  "refused": {
+   "depth_limit": 0,
+   "concurrency_limit": 0,
+   "budget": 0
+  },
+  "by_type": {}
+ },
+ "safety_stops": 0,
+ "is_error": false,
+ "num_turns": 5,
+ "subtype": "success",
+ "api_error_status": null,
+ "result": "I wrote `Money.swift` but haven't compiled or run it. I tried a quick compile-and-run check in `/tmp`, but it needed your approval and didn't go through.\n\n`Money.format(444420)` returns `\"NT$4,444.20\"`. Two choices you might not expect:\n\n- **Fixed format, ignoring the phone's region setting.** I didn't use `NumberFormatter` or `.formatted(.currency)` on purpose. Those follow the device's region setting, so on some phones the same amount would show as `4.444,20` or `NT$4,444`. TWD often drops the decimals. Here the output is always a comma every three digits plus two decimal places.\n- **Whole-number math only.** It never converts to `Double` (a decimal type that can introduce tiny rounding errors). It also handles very large and very small values, including `Int.max` and `Int.min`, without crashing.\n\nNegative amounts put the minus sign in front: `-1250` → `-NT$12.50`. If refunds should look different, for example `NT$-12.50` or in parentheses, tell me and I'll change it.",
+ "ttft_ms": 1495,
+ "type": "result",
+ "duration_ms": 19168,
+ "ttft_stream_ms": 637,
+ "time_to_request_ms": 38,
+ "first_content_frame_ms": 637,
+ "queued_turn_count": 0,
+ "result_index": 0
+}

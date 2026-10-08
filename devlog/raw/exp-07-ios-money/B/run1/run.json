@@ -1,0 +1,114 @@
+{
+ "duration_api_ms": 22242,
+ "stop_reason": "end_turn",
+ "total_cost_usd": 0.19713340000000001,
+ "usage": {
+  "input_tokens": 10,
+  "cache_creation_input_tokens": 16736,
+  "cache_read_input_tokens": 114127,
+  "output_tokens": 2019,
+  "output_tokens_details": {
+   "thinking_tokens": 213
+  },
+  "server_tool_use": {
+   "web_search_requests": 0,
+   "web_fetch_requests": 0
+  },
+  "service_tier": "standard",
+  "cache_creation": {
+   "ephemeral_1h_input_tokens": 16736,
+   "ephemeral_5m_input_tokens": 0
+  },
+  "inference_geo": "not_available",
+  "iterations": [
+   {
+    "input_tokens": 2,
+    "output_tokens": 497,
+    "cache_read_input_tokens": 26671,
+    "cache_creation_input_tokens": 546,
+    "cache_creation": {
+     "ephemeral_5m_input_tokens": 0,
+     "ephemeral_1h_input_tokens": 546
+    },
+    "type": "message"
+   }
+  ],
+  "speed": "standard",
+  "fallback_credit": null
+ },
+ "modelUsage": {
+  "claude-opus-5-5": {
+   "inputTokens": 10,
+   "outputTokens": 2019,
+   "cacheReadInputTokens": 114127,
+   "cacheCreationInputTokens": 16736,
+   "webSearchRequests": 0,
+   "costUSD": 0.19713340000000001,
+   "contextWindow": 1000000,
+   "maxOutputTokens": 128000,
+   "thinkingTokens": 213,
+   "canonicalModel": "claude-opus-5-5",
+   "provider": "firstParty",
+   "costBasis": "list"
+  }
+ },
+ "permission_denials": [
+  {
+   "tool_name": "Bash",
+   "tool_use_id": "toolu_01889i529A46a9XodatKX24X",
+   "tool_input": {
+    "command": "cd /tmp && mkdir -p money_check && cp ./B/run1/Money.swift money_check/ && cat > money_check/main.swift <<'EOF'\nfor c in [444420, 0, 5, 100, 99999, 100000000, -444420, Int.min, Int.max] { print(c, Money.format(c)) }\nEOF\nswiftc money_check/Money.swift money_check/main.swift -o money_check/a 2>&1 && ./money_check/a; rm -rf money_check",
+    "description": "Compile and spot-check outside the project"
+   }
+  },
+  {
+   "tool_name": "Bash",
+   "tool_use_id": "toolu_0189ZtNB6W86xxYKP1FgG6HL",
+   "tool_input": {
+    "command": "mkdir -p /tmp/money_check && cp ./B/run1/Money.swift /tmp/money_check/ && printf 'for c in [444420, 0, 5, 100, 99999, 100000000, -444420, Int.min, Int.max] { print(c, Money.format(c)) }\\n' > /tmp/money_check/main.swift && swiftc /tmp/money_check/Money.swift /tmp/money_check/main.swift -o /tmp/money_check/a 2>&1 && /tmp/money_check/a; rm -rf /tmp/money_check",
+    "description": "Compile and spot-check in a temp dir"
+   }
+  }
+ ],
+ "terminal_reason": "completed",
+ "fast_mode_state": "off",
+ "fast_mode_disabled_reason": "sdk_opt_in_required",
+ "subagent_stats": {
+  "spawned": 0,
+  "requested": {
+   "background": 0,
+   "foreground": 0,
+   "unset": 0
+  },
+  "started_in_background": 0,
+  "max_depth": 0,
+  "spawned_by_subagents": 0,
+  "completed": 0,
+  "failed": 0,
+  "killed": {
+   "parent": 0,
+   "user": 0,
+   "system": 0
+  },
+  "refused": {
+   "depth_limit": 0,
+   "concurrency_limit": 0,
+   "budget": 0
+  },
+  "by_type": {}
+ },
+ "safety_stops": 0,
+ "is_error": false,
+ "num_turns": 5,
+ "subtype": "success",
+ "api_error_status": null,
+ "result": "我寫好了 `Money.swift`。想在暫存目錄編譯跑一下確認輸出，那個指令要你核准，沒有執行，所以這個檔還沒編譯過，也沒實際跑過。\n\n```swift\nMoney.format(444420)   // \"NT$4,444.20\"\nMoney.format(5)        // \"NT$0.05\"\nMoney.format(-444420)  // \"-NT$4,444.20\"\n```\n\n我自己多決定了幾件事：\n\n- **只用整數算**：用除以 100 和取餘數拆出元和分，沒有轉成 `Double`，不會出現 `4444.199999` 這類浮點誤差。\n- **不跟手機地區設定走**：沒用 `NumberFormatter`。千分位固定是 `,`，小數點固定是 `.`，永遠兩位小數。手機設成德文或法文這類地區時，系統格式會變成 `4.444,20`，票券上的金額就會亂掉。\n- **負數**：退款這類負金額顯示成 `-NT$4,444.20`，`Int.min` 也不會溢位。這個格式是我定的，如果設計稿要用 `NT$-4,444.20` 或括號，改 `sign` 那一行就行。\n- **一律顯示到分**：`NT$100` 也會顯示成 `NT$100.00`，因為你的範例有小數。如果整數金額想省略 `.00`，跟我說一聲。",
+ "ttft_ms": 2021,
+ "type": "result",
+ "duration_ms": 22431,
+ "ttft_stream_ms": 729,
+ "time_to_request_ms": 39,
+ "first_content_frame_ms": 730,
+ "queued_turn_count": 0,
+ "result_index": 0
+}

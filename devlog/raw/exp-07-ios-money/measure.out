@@ -1,0 +1,59 @@
+## A/run1
+locale=zh_TW  14/14 相同
+locale=de_DE  14/14 相同
+## B/run1
+  ✗ 0: got NT$0.00  want NT$0
+  ✗ 100: got NT$1.00  want NT$1
+  ✗ 100000: got NT$1,000.00  want NT$1,000
+  ✗ 1000000: got NT$10,000.00  want NT$10,000
+  ✗ -100000: got -NT$1,000.00  want -NT$1,000
+locale=zh_TW  9/14 相同
+  ✗ 0: got NT$0.00  want NT$0
+  ✗ 100: got NT$1.00  want NT$1
+  ✗ 100000: got NT$1,000.00  want NT$1,000
+  ✗ 1000000: got NT$10,000.00  want NT$10,000
+  ✗ -100000: got -NT$1,000.00  want -NT$1,000
+locale=de_DE  9/14 相同
+## A/run2
+locale=zh_TW  14/14 相同
+locale=de_DE  14/14 相同
+## B/run2
+  ✗ 0: got NT$0.00  want NT$0
+  ✗ 100: got NT$1.00  want NT$1
+  ✗ 100000: got NT$1,000.00  want NT$1,000
+  ✗ 1000000: got NT$10,000.00  want NT$10,000
+  ✗ -100000: got -NT$1,000.00  want -NT$1,000
+locale=zh_TW  9/14 相同
+  ✗ 0: got NT$0.00  want NT$0
+  ✗ 100: got NT$1.00  want NT$1
+  ✗ 100000: got NT$1,000.00  want NT$1,000
+  ✗ 1000000: got NT$10,000.00  want NT$10,000
+  ✗ -100000: got -NT$1,000.00  want -NT$1,000
+locale=de_DE  9/14 相同
+## A/run3
+locale=zh_TW  14/14 相同
+locale=de_DE  14/14 相同
+## B/run3
+  ✗ 0: got NT$0.00  want NT$0
+  ✗ 100: got NT$1.00  want NT$1
+  ✗ 100000: got NT$1,000.00  want NT$1,000
+  ✗ 1000000: got NT$10,000.00  want NT$10,000
+  ✗ -100000: got -NT$1,000.00  want -NT$1,000
+locale=zh_TW  9/14 相同
+  ✗ 0: got NT$0.00  want NT$0
+  ✗ 100: got NT$1.00  want NT$1
+  ✗ 100000: got NT$1,000.00  want NT$1,000
+  ✗ 1000000: got NT$10,000.00  want NT$10,000
+  ✗ -100000: got -NT$1,000.00  want -NT$1,000
+locale=de_DE  9/14 相同
+## ref-current
+locale=zh_TW  14/14 相同
+locale=de_DE  14/14 相同
+## ref-c7cfe38
+locale=zh_TW  14/14 相同
+  ✗ 100000: got NT$1.000  want NT$1,000
+  ✗ 999999: got NT$9.999.99  want NT$9,999.99
+  ✗ 1000000: got NT$10.000  want NT$10,000
+  ✗ 123456789: got NT$1.234.567.89  want NT$1,234,567.89
+  ✗ -100000: got -NT$1.000  want -NT$1,000
+locale=de_DE  9/14 相同
