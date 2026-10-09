@@ -4,6 +4,7 @@
 - 跟 exp-09 同一段需求(`prompt.md`),差別:
   1. **給執行權限**:`--allowedTools "Read,Edit,Write,Glob,Grep,Skill,Bash(./gradlew:*),Bash(gradle:*),Bash(adb:*),Bash(android:*)"` —— 只開這四類指令
   2. **Android CLI 的 skill** 裝在無菌室的專案裡(`android skills add android-cli --agent=claude-code --project=.`,不動全域設定);Android CLI 1.0.16500706
+     - `ai-built/.claude/skills/android-cli/` 是 Google 的 [android/skills](https://github.com/android/skills)(Apache-2.0)原樣安裝的檔案,不是我們寫的;留著是為了重現實驗條件
   3. prompt 多告訴它:模擬器開著、後端在本機、示範帳號與「這個帳號已經有一張訂單」,並要求「都通過了再交卷」
 - 無菌室在 repo 外(上層沒有 CLAUDE.md);後端本機 `wrangler dev` + seed;模擬器 Pixel 8 / Android 15
 - 注意:Gradle 快取(`~/.gradle`)跟 exp-09 共用,它在回覆裡提到「版本都已在本機快取」—— 選了跟 exp-09 一樣的版本(AGP 8.7.3、Kotlin 2.0.21、Compose BOM 2024.12.01、OpenAPI Generator 7.10.0)
