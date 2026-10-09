@@ -7,7 +7,7 @@
 
 ## 1. 寫出來(`ai-original/`)
 
-40 輪、$2.64、745 秒;31 個檔案、Kotlin 1,348 行。回覆照實寫「完全沒有 build 過」,並列出「第一次 build 最可能要修的地方」。
+40 輪、$2.64、745 秒;34 個檔案(Kotlin 24 個)、Kotlin 1,348 行。回覆照實寫「完全沒有 build 過」,並列出「第一次 build 最可能要修的地方」。
 Gradle wrapper 它寫不出來(`gradle-wrapper.properties` 被當成敏感檔擋下、jar 是二進位),請人跑 `gradle wrapper`。
 
 ## 2. 編起來(`build/`)
