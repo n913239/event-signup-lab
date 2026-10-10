@@ -1,0 +1,6 @@
+seat_no|ticket_type_id|status
+A1|tt-general|expired
+A1|tt-general|confirmed
+A2|tt-general|holding
+status|total_cents|seat_no|unit_price_cents
+confirmed|100000|A1|100000

@@ -1,0 +1,1 @@
+model=qwen3.6-35b-a3b-mlx limit=90m exit=0 秒數=928

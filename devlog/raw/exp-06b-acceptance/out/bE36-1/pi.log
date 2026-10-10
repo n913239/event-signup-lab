@@ -1,0 +1,20 @@
+
+
+Task completed. Here's the final summary:
+
+## ✅ Final Execution Summary
+
+| Checkpoint | Status | Details |
+|------------|--------|---------|
+| **CP1** 登入 | ✅ PASS | Login successful → `/#/events` |
+| **CP2** 進入活動頁 | ✅ PASS | Clicked "秋季音樂會 on_sale" → `/#/events/ev-1` |
+| **CP3** 選座+保留 | ✅ PASS | A1 fallback → booked **B1**, reached `/hold` confirmation page |
+| **CP4** 確認訂單 | ✅ PASS | Clicked "確認" → redirected to `/#/tickets` |
+| **CP5** 價格 NT$1,000 | ❌ FAIL | All prices show **NT$10,000** (general) — frontend format divides by 10 instead of 100 |
+| **CP6** 我的票券可見 | ✅ PASS | Two orders shown: A1 (prior) + B1 (this run), both with seat number & ticket type |
+| **CP7** 所有金額一致 NT$1,000 | ❌ FAIL | Every page (event, hold, tickets) uniformly displays NT$10,000 instead of NT$1,000 |
+
+**Key output files:**
+- `/work/outputs/member_ticket/verification_report.md` — Full report with CP1–CP7 analysis
+- `/work/outputs/member_ticket/final_runs/run_1/screenshots/` — 5 execution screenshots (login, event page, hold confirm, order confirmed, tickets page)
+- `/work/outputs/member_ticket/final_runs/run_1/final_script.py` — Automation script with A1→B1 auto-fallback logic

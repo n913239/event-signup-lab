@@ -1,0 +1,33 @@
+
+
+The complete workspace is ready and the task is fully completed. Here's a summary of everything:
+
+## Completed Deliverables
+
+**Workspace contract satisfied:**
+| File | Description |
+|------|-------------|
+| `/work/outputs/member_ticket/plan.md` | 7 Critical Points with full verification results (CP1–CP7), root cause analysis, and final conclusion |
+| `/work/outputs/member_ticket/final_runs/run_1/final_script.py` | Complete Playwright script (9 steps) |
+| `/work/outputs/member_ticket/final_runs/run_1/final_script_log.txt` | Step-by-step execution log |
+| 5 final screenshots + 9 exploration screenshots | Full visual evidence |
+
+## Verification Results (plan.md)
+
+| CP | Status |
+|----|--------|
+| **CP1** Login ✅ PASS | Successfully logged in as member@example.com |
+| **CP2** Navigate to event ✅ PASS | Clicked 秋季音樂會 link → #/events/ev-1 |
+| **CP3** Select 一般, price = NT$1,000 ⚠️ FAIL | Shows **NT$10,000** (should be NT$1,000) |
+| **CP4** Reserve 1 seat ✅ PASS (wrong price) | Seat A1 selected, "保留 1 席" worked |
+| **CP5** Confirm order + 我的票券 ✅ PASS (wrong price) | Order confirmed, ticket visible on /tickets |
+| **CP6** Price is NT$1,000 ❌ FAIL | **NO place on the site shows NT$1,000** — every UI element shows NT$10,000 |
+| **CP7** Report results ⚠️ Seat A1, but NT$10,000 | "A1 一般 NT$10,000・小計 NT$10,000・總計 NT$10,000" |
+
+## Root Cause
+
+**Frontend divides cents by 10 instead of ÷ 100:**
+- Database: `price_cents = 100000` → should display **NT$1,000**
+- Site displays: **NT$10,000** (exactly 10×)
+
+**Final conclusion: Task FAILED.** No place on the site displays NT$1,000 — every price shows NT$10,000. The task requirement ("every UI element displaying the price shows exactly NT$1,000") is not met.

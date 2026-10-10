@@ -1,0 +1,17 @@
+step 1 action: login as member@example.com
+step 1 action: logged in, URL: http://localhost:5173/#/events
+step 2 action: navigate to events list
+step 2 action: on event page, URL: http://localhost:5173/#/events/ev-1
+step 3 action: check for existing seat hold
+step 4 action: capture ticket pricing information
+step 5 action: select seat A1 on General ticket type
+step 5 action: clicked A1, reserve button: 保留 1 席
+step 6 action: click reserve button (保留 1 席)
+step 7 action: capture confirmation page prices
+step 7 action: final confirmation - prices shown: ['NT$10,000', 'NT$10,000']
+step 8 action: navigate to 我的票券 page
+step 8 action: already on tickets page: http://localhost:5173/#/tickets
+step 9 action: verify ticket price on my tickets page
+step 9 action: tickets page - heading: No heading found, prices: ['A1 一般 NT$10,000', '小計 NT$10,000・無折扣', '總計 NT$10,000・確認於 2026/10/11 02:20:30']
+
+FINAL_RESPONSE: Ticket: No heading found, Prices seen: ['一般・NT$10,000・剩 60', 'VIP・NT$20,000・剩 40・早鳥 10% 到 2026/10/18 02:20:22', 'NT$10,000', 'NT$10,000', 'A1 一般 NT$10,000', '小計 NT$10,000・無折扣', '總計 NT$10,000・確認於 2026/10/11 02:20:30']
