@@ -118,7 +118,7 @@ JWT 邊界:由 repo 內 `tests/jwt.test.js` 六個測試 + `scripts/check-jwt-ti
 | 6 | **一人幾個 hold** | **一個活動一個**。已有有效 hold 時再 `POST /holds` → 4xx | 防囤位;也讓「同一人重複送出」不會污染超賣測試 |
 | 7 | **座位釋放** | hold 過期後,**座位必須能被別人搶到**(行為要求;用什麼機制存放屬於 schema) | 這是行為契約,不是實作方式 |
 | 8 | **主辦** | `events.owner_id` = 建立該活動的 staff;其他 staff 對別人的活動一律 403 | 「僅主辦」與「staff」原本是兩個詞,現在有定義:staff 是角色,主辦是 owner |
-| 9 | **座位與名額** | 固定 10×10 = 100 席 = 活動總容量;不做無座位活動;票種各有名額,總和 ≤ 100;hold 綁「座位 + 票種」,售出以座位為準,票種名額是第二道上限 | 座位唯一是第一道,`UPDATE … WHERE remaining > 0` 是第二道 |
+| 9 | **座位與名額** | 固定 10×10 = 100 席 = 活動總容量;不做無座位活動;票種各有名額,總和 ≤ 100;hold 綁「座位 + 票種」,售出以座位為準,票種名額是第二道上限 | 座位唯一是第一道,票種名額是第二道:直接扣,扣到負數由 `CHECK (remaining >= 0)` 拋錯、整批回滾(R6;原本寫的 `UPDATE … WHERE remaining > 0` 已被 R6 取代) |
 | 10 | **hold 時長** | `events.hold_ttl_minutes`,預設 10,範圍 5–30,建活動時給 | 「預設 10 分鐘」原本沒說能不能改 |
 | 11 | **`draft` 可見性** | 列表預設不含 `draft`;成員看不到;主辦看得到自己的 | 沒有 publish endpoint,所以 draft 只有 SQL 進出的人自己看得到 |
 | 12 | **提前截止 / 改名額** | close 只擋新 hold,既有有效 hold 仍可在到期前確認 —— **confirm 不查活動 `status` / `deadline_at`,只查 hold 自己的 `expires_at`**;名額改到小於已售出 → 4xx | 不讓主辦一個操作就把別人手上的 hold 弄掉;confirm 若也查活動狀態,close 之後一定被擋,這條就是空話 |
@@ -191,8 +191,8 @@ hold 帶票種;票種名額不足時整批失敗,與座位衝突同樣是 4xx。
 > | `ON CONFLICT DO NOTHING` + 看 `changes` | 第二句 `changes=0` 但**不算失敗** → 整批照 commit,**第一個座位鎖住了** ❌ |
 >
 > **本專案採裸 `INSERT`**:`db.batch()` 裡逐筆 `INSERT INTO seat_holds …`,
-> catch `SQLITE_CONSTRAINT` 回 409。單座的超賣判斷仍然用
-> `UPDATE … WHERE remaining > 0` + 檢查 `changes`(那是另一件事)。
+> catch `SQLITE_CONSTRAINT` 回 409。名額也一樣靠拋錯回滾(R6:直接扣,扣到負數由
+> `CHECK (remaining >= 0)` 拋錯)—— 原本寫的「`UPDATE … WHERE remaining > 0` + 檢查 `changes`」已被 R6 取代。
 
 > 不用「使用者自己填同行人數」那種做法 —— 那是一個**沒有任何東西驗證它**的欄位,
 > 放進一個主張「每條規則都要有裁判」的專案裡站不住。

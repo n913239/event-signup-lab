@@ -105,6 +105,8 @@ describe.skipIf(!has)('併發', { timeout: 30_000 }, () => {
       expect(taken.length).toBeLessThanOrEqual(1)
       expect(ok[0]).toBe(409)                                   // 作者定:到期那一刻原持有人的確認一律輸(T077)
       expect(taken[0]?.member_id).not.toBe(owner.member.id)
+      expect(ok[1]).toBe(201)                                   // 別人搶同座成功
+      expect(taken[0]?.member_id).toBe(rival.member.id)        // 座位最後歸搶的人
       outcomes.push(JSON.stringify({ ok, owner: taken[0]?.member_id === owner.member.id }))
       await s.w.dispose(); s = null
     }
