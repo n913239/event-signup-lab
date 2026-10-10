@@ -1,0 +1,4 @@
+7:DELETE FROM ticket_types;
+19:INSERT INTO ticket_types (id, event_id, name, price_cents, capacity, remaining, early_bird_until, early_bird_pct) VALUES
+20:  ('tt-general', 'ev-1', '一般', 100000, 60, 60, NULL, 0),
+21:  ('tt-vip',     'ev-1', 'VIP',  200000, 40, 40, (unixepoch() + 7 * 86400) * 1000, 10);

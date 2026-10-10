@@ -1,0 +1,5 @@
+<lab>/web/src/pages/ui.js:22:export const fmtTime = (ms) => new Date(ms).toLocaleString('zh-TW', { hour12: false })
+<lab>/web/src/pages/tickets.js:20:      <p class="text-sm">${o.items.map((i) => `${esc(i.seat_no)} ${esc(i.ticket_type_name)} ${formatCents(i.unit_price_cents)}`).join('、')}</p>
+<lab>/web/src/pages/event.js:19:      <option value="${esc(t.id)}" ${t.remaining ? '' : 'disabled'}>${esc(t.name)}・${formatCents(t.price_cents)}・剩 ${t.remaining}${t.early_bird_until ? `・早鳥 ${t.early_bird_pct}% 到 ${fmtTime(t.early_bird_until)}` : ''}</option>`).join('')}
+<lab>/web/src/lib/countdown.js:16:  const s = (ms - (ms % 1000)) / 1000
+<lab>/web/src/lib/money.js:6:  const yuan = String((abs - (abs % 100)) / 10).replace(/\B(?=(\d{3})+(?!\d))/g, ',')

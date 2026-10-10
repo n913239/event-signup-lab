@@ -1,0 +1,27 @@
+-- 開發用種子資料(R11)。可重跑:先清掉這幾筆再插。時間以執行當下為準(unixepoch() × 1000 = epoch 毫秒)。
+-- 帳號:staff@example.com / member@example.com,密碼都是 password123(雜湊由 src/lib/password.js 算好貼上)。
+DELETE FROM order_items;
+DELETE FROM orders;
+DELETE FROM seat_holds;
+---
+CLAUDE.md
+LICENSE
+README.md
+devlog
+docs
+ios
+node_modules
+openapi.yaml
+package-lock.json
+package.json
+schema.sql
+scripts
+seed.sql
+specs
+src
+tests
+vitest.config.js
+web
+wrangler.toml
+---FIND---
+<lab>/seed.sql

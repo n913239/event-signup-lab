@@ -1,0 +1,2 @@
+seat_no|ticket_type_id|status
+A1|tt-general|cancelled
