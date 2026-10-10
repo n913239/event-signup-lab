@@ -1,0 +1,27 @@
+step 1 action: login as member@example.com -> url http://localhost:5173/#/events, 登出 button visible
+step 2 action: click 秋季音樂會 in event list -> http://localhost:5173/#/events/ev-1
+step 3 action: select ticket type 一般 -> option text '一般・NT$10,000・剩 60'
+step 4 action: click first free seat A1 -> button shows 保留 1 席
+step 5 action: click 保留 1 席 -> http://localhost:5173/#/events/ev-1/hold; title '秋季音樂會:保留 A1'; price '原價(1 席)
+NT$10,000 | 折扣
+— | 應付
+NT$10,000 | 折扣不疊加,自動套用最划算的一種'
+step 6 action: click 確認 -> redirected to http://localhost:5173/#/tickets
+step 7 action: open 我的票券 nav link; page text:
+我的票券
+秋季音樂會
+confirmed
+
+A1 一般 NT$10,000
+
+小計 NT$10,000・無折扣
+
+總計 NT$10,000・確認於 2026/10/9 20:46:22
+
+取消訂單
+step 8 action: read-only DB check -> ticket_types 一般 price_cents=100000 (= NT$1,000); latest order row=[('c7cf8931-3f00-422f-a724-4e179a1de095', 'confirmed', 100000, 100000, 'A1', 100000)]
+step 9 action: compare UI vs DB -> expected NT$1,000 on page: MISMATCH
+FINAL: seat=A1; order total (DB)=100000 cents = NT$1,000; UI shown amounts in '原價(1 席)
+NT$10,000 | 折扣
+— | 應付
+NT$10,000 | 折扣不疊加,自動套用最划算的一種'; tickets page='我的票券 / 秋季音樂會 / confirmed /  / A1 一般 NT$10,000 /  / 小計 NT$10,000・無折扣 /  / 總計 NT$10,000・確認於 2026/10/9 20:46:22 /  / 取消訂單'; UI==DB: False

@@ -1,0 +1,24 @@
+# Step 1
+head -10 <lab>/seed.sql && cat /work/outputs/member_ticket_20261009_203714/task.json
+
+# Step 2
+cat > /work/outputs/member_ticket_20261009_203714/plan.md << 'EOF'
+# Critical Points
+- [ ] CP1: Login as member user (member@example.com / password123)
+- [ ] CP2: Navigate to event list and enter "秋季音樂會" event
+- [ ] CP3: Select "一般" ticket type with one seat available
+- [ ] CP4: Confirm the order
+- [ ] CP5: Verify ticket appears in "我的票券"
+- [ ] CP6: Verify displayed price matches database value
+- [ ] CP7: Report seat number, order amount, and ticket page content
+EOF
+
+# Step 3
+cat > /work/outputs/member_ticket_20261009_203714/self_reflect_config.json << 'ENDOFJSON'
+{
+  "image_judge_system_prompt": "You are a harsh evaluator assessing if a screenshot provides evidence for critical points. Return ONLY these two lines: Reasoning: <analysis> Score: <1-5>",
+  "image_judge_user_prompt": "Task: Login as member, enter '秋季音樂會' event, select '一般' ticket with one seat, confirm order, verify in '我的票券'. Critical points: [list]. Evaluate this screenshot against ALL points.",
+  "final_verdict_system_prompt": "You are an aggregated judge. End with EXACTLY Status: success or Status: failure on its own line after Thoughts block.",
+  "final_verdict_user_prompt": "Task description and critical points. {action_history_log} {image_reasonings}"}
+ENDOFJSON
+

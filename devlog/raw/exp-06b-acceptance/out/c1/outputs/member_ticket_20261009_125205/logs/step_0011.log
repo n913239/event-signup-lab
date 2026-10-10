@@ -1,0 +1,18 @@
+tee: final_runs/run_001/final_script_log.txt: No such file or directory
+Traceback (most recent call last):
+  File "/work/outputs/member_ticket_20261009_125205/final_script.py", line 93, in <module>
+    asyncio.run(main())
+  File "/usr/lib/python3.11/asyncio/runners.py", line 190, in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.11/asyncio/runners.py", line 118, in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.11/asyncio/base_events.py", line 653, in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+  File "/work/outputs/member_ticket_20261009_125205/final_script.py", line 26, in main
+    log(1, "Login with member@example.com / password123")
+  File "/work/outputs/member_ticket_20261009_125205/final_script.py", line 16, in log
+    LOG_FILE.write_text(msg, mode="a")
+TypeError: Path.write_text() got an unexpected keyword argument 'mode'

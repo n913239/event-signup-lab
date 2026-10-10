@@ -1,0 +1,7 @@
+*
+!tmp/es-web-lab
+!webwright-lab
+**/node_modules
+**/.venv
+**/.wrangler
+**/.git

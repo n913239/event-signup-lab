@@ -1,0 +1,1 @@
+cd /work/outputs/member_ticket_20261009_125205 && python -m webwright.tools.self_reflection --config self_reflect_config.json --workspace-dir "/work/outputs/member_ticket_20261009_125205" --output final_runs/run_001/self_reflect_result.json 2>&1

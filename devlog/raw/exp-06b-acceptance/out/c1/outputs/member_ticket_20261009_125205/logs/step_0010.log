@@ -1,0 +1,21 @@
+final_script.py created successfully
+import asyncio
+from playwright.async_api import async_playwright
+import os
+from pathlib import Path
+
+WORKSPACE = Path(os.environ.get("WORKSPACE_DIR", "/work/outputs/member_ticket_20261009_125205"))
+RUN_DIR = WORKSPACE / "final_runs" / "run_001"
+SCREENSHOTS_DIR = RUN_DIR / "screenshots"
+LOG_FILE = RUN_DIR / "final_script_log.txt"
+
+SCREENSHOTS_DIR.mkdir(parents=True, exist_ok=True)
+LOG_FILE.write_text("")
+
+def log(step, action):
+    msg = f"step {step} action: {action}\n"
+    LOG_FILE.write_text(msg, mode="a")
+    print(msg.strip())
+
+async def main():
+    async with async_playwright() as p:

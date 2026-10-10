@@ -1,0 +1,5 @@
+# Webwright 的 OpenAI 相容後端指到本機 LM Studio(Responses API)
+model:
+  model_class: openai
+  model_name: qwen3.8-27b-mlx
+  openai_endpoint: http://host.docker.internal:1235/v1/responses

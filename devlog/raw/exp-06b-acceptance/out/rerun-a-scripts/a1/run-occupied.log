@@ -1,0 +1,40 @@
+step 1 action: login as member@example.com -> url http://localhost:5173/#/events, 登出 button visible
+step 2 action: click 秋季音樂會 in event list -> http://localhost:5173/#/events/ev-1
+step 3 action: select ticket type 一般 -> option text '一般・NT$10,000・剩 59'
+Traceback (most recent call last):
+  File "<workdir>/out/rerun-a-scripts/a1/final_script.py", line 85, in <module>
+    asyncio.run(main())
+    ~~~~~~~~~~~^^^^^^^^
+  File "/opt/homebrew/Cellar/python@3.14/3.14.7/Frameworks/Python.framework/Versions/3.14/lib/python3.14/asyncio/runners.py", line 205, in run
+    return runner.run(main)
+           ~~~~~~~~~~^^^^^^
+  File "/opt/homebrew/Cellar/python@3.14/3.14.7/Frameworks/Python.framework/Versions/3.14/lib/python3.14/asyncio/runners.py", line 128, in run
+    return self._loop.run_until_complete(task)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^
+  File "/opt/homebrew/Cellar/python@3.14/3.14.7/Frameworks/Python.framework/Versions/3.14/lib/python3.14/asyncio/base_events.py", line 720, in run_until_complete
+    return future.result()
+           ~~~~~~~~~~~~~^^
+  File "<workdir>/out/rerun-a-scripts/a1/final_script.py", line 50, in main
+    await pg.get_by_role("button", name="保留 1 席").wait_for()
+  File "<webwright>/.venv/lib/python3.14/site-packages/playwright/async_api/_generated.py", line 20672, in wait_for
+    await self._impl_obj.wait_for(timeout=to_milliseconds(timeout), state=state)
+  File "<webwright>/.venv/lib/python3.14/site-packages/playwright/_impl/_locator.py", line 752, in wait_for
+    await self._frame.wait_for_selector(
+        self._selector, strict=True, timeout=timeout, state=state
+    )
+  File "<webwright>/.venv/lib/python3.14/site-packages/playwright/_impl/_frame.py", line 395, in wait_for_selector
+    await self._channel.send(
+        "waitForSelector", self._timeout, locals_to_params(locals())
+    )
+  File "<webwright>/.venv/lib/python3.14/site-packages/playwright/_impl/_connection.py", line 76, in send
+    return await self._connection.wrap_api_call(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<3 lines>...
+    )
+    ^
+  File "<webwright>/.venv/lib/python3.14/site-packages/playwright/_impl/_connection.py", line 632, in wrap_api_call
+    raise rewrite_error(error, f"{parsed_st['apiName']}: {error}") from None
+playwright._impl._errors.TimeoutError: Locator.wait_for: Timeout 30000ms exceeded.
+Call log:
+  - waiting for get_by_role("button", name="保留 1 席") to be visible
+

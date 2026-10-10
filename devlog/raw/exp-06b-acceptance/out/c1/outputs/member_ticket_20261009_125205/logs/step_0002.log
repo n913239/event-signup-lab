@@ -1,0 +1,14 @@
+URL: http://localhost:5173/#/login
+TITLE: 活動報名
+ARIA SNAPSHOT:
+- link "活動報名":
+  - /url: "#/events"
+- link "我的票券":
+  - /url: "#/tickets"
+- main:
+  - heading "登入 / 註冊" [level=2]
+  - textbox "email"
+  - textbox "密碼(至少 8 字元)"
+  - textbox "暱稱(註冊才需要)"
+  - button "登入"
+  - button "註冊並登入"

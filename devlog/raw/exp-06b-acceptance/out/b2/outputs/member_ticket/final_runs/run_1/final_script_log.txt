@@ -1,0 +1,31 @@
+step 1 action: open start page
+step 2 action: logged in as member@example.com (小明)
+step 3 action: opened 秋季音樂會 event detail page
+step 4 action: selected 一般 ticket type from combobox (label='一般・NT$10,000・剩 60')
+step 5 action: clicked seat A1
+step 6 action: reserve button shows: '保留 1 席'
+step 7 action: clicked reserve button, confirmed 1 seat at A1
+step 8 action: clicked 確認 button to confirm order
+step 9 action: navigated to 我的票券 page
+
+FINAL_RESPONSE:
+=== FINAL REPORT ===
+座位號 (Seat):   A1
+訂單金額 (Price): NT$10,000
+票券數: 0
+
+=== Full page text ===
+活動報名
+我的票券
+登出
+我的票券
+秋季音樂會
+confirmed
+
+A1 一般 NT$10,000
+
+小計 NT$10,000・無折扣
+
+總計 NT$10,000・確認於 2026/10/9 13:15:51
+
+取消訂單

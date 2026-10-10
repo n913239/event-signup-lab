@@ -1,0 +1,1 @@
+model=laguna-xs-2.1 limit=90m exit=124 秒數=5400

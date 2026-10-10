@@ -1,0 +1,16 @@
+URL: http://localhost:5173/#/events
+TITLE: 活動報名
+ARIA SNAPSHOT:
+- link "活動報名":
+  - /url: "#/events"
+- link "我的票券":
+  - /url: "#/tickets"
+- button "登出"
+- main:
+  - heading "活動" [level=2]
+  - checkbox "全部狀態"
+  - text: 全部狀態
+  - link "秋季音樂會 on_sale 開賣 2026/10/8 13:24:00・截止 2026/11/8 13:24:00・剩 100 席":
+    - /url: "#/events/ev-1"
+    - heading "秋季音樂會 on_sale" [level=3]
+    - paragraph: 開賣 2026/10/8 13:24:00・截止 2026/11/8 13:24:00・剩 100 席

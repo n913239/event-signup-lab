@@ -1,0 +1,4 @@
+{"providers":{"lmstudio":{"baseUrl":"http://host.docker.internal:1235/v1","api":"openai-completions","apiKey":"via-proxy",
+ "models":[{"id":"qwen3.8-27b-mlx","name":"Qwen3.8 27B (local dense, 8-bit MLX)","reasoning":true,"input":["text"],
+ "contextWindow":32768,"maxTokens":8192,"samplingParams":{"temperature":1.0,"top_p":0.95,"top_k":20,"min_p":0.0},
+ "compat":{"supportsDeveloperRole":false,"supportsReasoningEffort":false}}]}}}

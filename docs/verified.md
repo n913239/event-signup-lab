@@ -36,6 +36,7 @@
 | 2026-09-27 | Xcode 27.0 MCP 在本專案重跑 | 53 支工具;建置失敗時 `RunAllTests` 回 `isError`;全部跳過時 `failed 0` 且 `passed 0`(`devlog/raw/exp-day29-xcode-mcp/`) |
 | 2026-09-27 | push 前資安掃描 | gitleaks(歷史 141 commits:僅測試假金鑰)、`npm audit --omit=dev` 0、Fable 獨立複查 |
 | 2026-09-28 | web 畫面走查:Webwright(Claude / 地端模型)× 5 輪 + `@playwright/test`,前端金額 ×10 突變 | 只有期望值寫死的 Playwright 測試紅;AI 只在任務寫明「要跟資料庫對得上」時抓到(`devlog/raw/exp-06-webwright/`) |
+| 2026-10-09 | web 畫面走查補跑:同一句驗收條件給每種組合(Claude、qwen3.6 / qwen3.8 / Laguna XS 2.1 × Pi / Webwright harness),不掛 MCP | Claude 2/2 抓到(腳本仍零斷言,重跑 exit 0);地端 8 輪 0 抓到(查到 100000 仍判相符,或流程做不完)(`devlog/raw/exp-06b-acceptance/`) |
 
 ## ❌ 尚未驗證 / 刻意不做
 

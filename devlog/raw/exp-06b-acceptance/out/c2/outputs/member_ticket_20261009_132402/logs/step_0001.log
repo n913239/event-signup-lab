@@ -1,0 +1,1 @@
+-- 帳號:staff@example.com / member@example.com,密碼都是 password123(雜湊由 src/lib/password.js 算好貼上)。

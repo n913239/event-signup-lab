@@ -1,0 +1,16 @@
+[
+  {
+    "index": 0,
+    "spec": "base.yaml",
+    "kind": "file",
+    "resolved_path": "<webwright>/src/webwright/config/base.yaml",
+    "saved_copy": "outputs/member_ticket_20261009_125205/config_snapshot/00_base.yaml"
+  },
+  {
+    "index": 1,
+    "spec": "/cfg/model_lmstudio.yaml",
+    "kind": "file",
+    "resolved_path": "/cfg/model_lmstudio.yaml",
+    "saved_copy": "outputs/member_ticket_20261009_125205/config_snapshot/01_model_lmstudio.yaml"
+  }
+]

@@ -1,0 +1,5 @@
+{
+  "image_judge_system_prompt": "You are a harsh evaluator assessing if a screenshot provides evidence for critical points. Return ONLY these two lines: Reasoning: <analysis> Score: <1-5>",
+  "image_judge_user_prompt": "Task: Login as member, enter '秋季音樂會' event, select '一般' ticket with one seat, confirm order, verify in '我的票券'. Critical points: [list]. Evaluate this screenshot against ALL points.",
+  "final_verdict_system_prompt": "You are an aggregated judge. End with EXACTLY Status: success or Status: failure on its own line after Thoughts block.",
+  "final_verdict_user_prompt": "Task description and critical points. {action_history_log} {image_reasonings}"}

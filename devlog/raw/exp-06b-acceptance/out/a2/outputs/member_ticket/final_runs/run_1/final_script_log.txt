@@ -1,0 +1,20 @@
+step 1 action: login as member@example.com; url=http://localhost:5173/#/events; nav=
+  header: 活動報名 | 我的票券 | 登出 | 活動 | 全部狀態 | 秋季音樂會
+step 2 action: open events list; url=http://localhost:5173/#/events
+step 3 action: enter 秋季音樂會 detail; url=http://localhost:5173/#/events/ev-1
+step 4 action: select ticket type value=tt-general text='一般・NT$10,000・剩 60', pick seat A1; hold button='保留 1 席'
+step 5 action: hold placed; title='秋季音樂會:保留 A1'; quote='原價(1 席) / NT$10,000 / 折扣 / — / 應付 / NT$10,000 / 折扣不疊加,自動套用最划算的一種'
+  DB seat_holds: [('cf3f4b6e-3218-450f-9d2c-4ae409d342df', 'b14e166c-65e1-4dc0-9399-d0b605a3c8f5', 0, 'ev-1', 'A1', 'tt-general', 'member-1', 'holding', 1791550879936, 1791550279936)]
+step 6 action: confirm order; url=http://localhost:5173/#/tickets
+step 7 action: my tickets card: 秋季音樂會 / confirmed /  / A1 一般 NT$10,000 /  / 小計 NT$10,000・無折扣 /  / 總計 NT$10,000・確認於 2026/10/9 20:51:21 /  / 取消訂單
+  DB ticket_types 一般: [('tt-general', '一般', 100000)]
+  DB orders(member-1): [('d49d39a9-d169-4dd3-8e0a-f742698157cb', 'confirmed', 100000, 100000)]
+  DB order_items: [('d49d39a9-d169-4dd3-8e0a-f742698157cb', 'A1', 'tt-general', 100000)]
+  API POST http://localhost:5173/api/auth/login 200 {"access_token":"<jwt>","refresh_token":"<redacted>","expires_at":1791551176649,"member":{"id":"member-1","email":"member@example.com","nickname":"小明","role":"member"}}
+  API POST http://localhost:5173/api/events/ev-1/holds 201 {"id":"b14e166c-65e1-4dc0-9399-d0b605a3c8f5","event_id":"ev-1","ticket_type_id":"tt-general","seat_nos":["A1"],"status":"holding","expires_at":1791550879936,"server_now":1791550279936}
+  API POST http://localhost:5173/api/holds/b14e166c-65e1-4dc0-9399-d0b605a3c8f5/quote 200 {"subtotal_cents":100000,"applied":null,"early_bird_pct":0,"group_pct":0,"promo_cents":0,"total_cents":100000,"promo_status":"none","server_now":1791550279959}
+  API POST http://localhost:5173/api/holds/b14e166c-65e1-4dc0-9399-d0b605a3c8f5/confirm 201 {"id":"d49d39a9-d169-4dd3-8e0a-f742698157cb","event_id":"ev-1","event_name":"秋季音樂會","member_id":"member-1","status":"confirmed","items":[{"seat_no":"A1","ticket_type_id":"tt-general","ticket_type_name":"一般","unit_price_cents":100000}],"subtotal_cents":100000,"early_bird_pct":0,"group_pct":0,"promo_code":null,"promo_cents":0,"total_cents":100000,"confirmed_at":1791550281570,"qr_payload":"d49d39a9-d
+  API GET http://localhost:5173/api/orders 200 {"orders":[{"id":"d49d39a9-d169-4dd3-8e0a-f742698157cb","event_id":"ev-1","event_name":"秋季音樂會","member_id":"member-1","status":"confirmed","items":[{"seat_no":"A1","ticket_type_id":"tt-general","ticket_type_name":"一般","unit_price_cents":100000}],"subtotal_cents":100000,"early_bird_pct":0,"group_pct":0,"promo_code":null,"promo_cents":0,"total_cents":100000,"confirmed_at":1791550281570,"qr_payload":
+
+DB 票價 price_cents=100000 → 應顯示 NT$1,000; 票券頁顯示: ['總計 NT$10,000・確認於 2026/10/9 20:51:21']; 一致=False
+FINAL_RESPONSE: seat=A1; hold quote='原價(1 席) / NT$10,000 / 折扣 / — / 應付 / NT$10,000 / 折扣不疊加,自動套用最划算的一種'; tickets card='秋季音樂會 / confirmed /  / A1 一般 NT$10,000 /  / 小計 NT$10,000・無折扣 /  / 總計 NT$10,000・確認於 2026/10/9 20:51:21 /  / 取消訂單'; DB price=NT$1,000; amount_matches_db=False

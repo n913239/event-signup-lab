@@ -1,0 +1,7 @@
+=== SELECT ELEMENT ===
+
+      <option value="tt-general">一般・NT$10,000・剩 60</option>
+      <option value="tt-vip">VIP・NT$20,000・剩 40・早鳥 10% 到 2026/10/16 13:24:00</option>
+    
+Option 0: value='tt-general', text='一般・NT$10,000・剩 60'
+Option 1: value='tt-vip', text='VIP・NT$20,000・剩 40・早鳥 10% 到 2026/10/16 13:24:00'

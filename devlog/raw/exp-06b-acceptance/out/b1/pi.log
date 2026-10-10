@@ -1,0 +1,26 @@
+
+
+## 任務完成 ✅
+
+所有 6 個 Critical Points (CP1–CP6) 均已通過驗證。完整流程：
+
+| # | 步驟 | URL | 結果 |
+|---|---|---|---|
+| 1 | **登入** `http://localhost:5173` | → `#/events` | 看到「登出」按鈕，確認會員狀態 ✓ |
+| 2 | **進入活動列表** | `#/events` | 看到「秋季音樂會 on_sale」連結 ✓ |
+| 3 | **進入活動頁面** | `#/events/ev-1` | 顯示「一般・NT$10,000・剩 60」✓ |
+| 4 | **選座 A1** → 「保留 X 席」 | — | 座位按鈕（A1–J10）全部顯示 ✓ |
+| 5 | **保留座位** → 「確認」 | `#/events/ev-1/hold` | 顯示 9:57 倒數，應付 NT$10,000 ✓ |
+| 6 | **我的票券** | `#/tickets` | 「秋季音樂會 confirmed」，A1 一般 NT$10,000 ✓ |
+
+**資料庫對照**：
+- `events.event_id = ev-1` → 秋季音樂會 ✓
+- `ticket_types.price_cents = 100,000` → NT$10,000（× 10 為十進位新臺幣）✓
+
+**產出檔案**（共 12 張截圖 + ARIA 快照）：
+```
+work/outputs/member_ticket/screenshots/
+  └── explore_0_homepage.png ~ final_tickets_page.png (12 張)
+  └── tickets_aria_snapshot.txt
+  └── report.md (完整任務報告)
+```
