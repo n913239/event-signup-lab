@@ -1,5 +1,5 @@
 // 併發(T022)。閘門讓所有請求到齊才一起放行(tests/helpers/gate.js)。
-// SC-004 三方競態:哪一方贏是 T030(作者手寫 holds.js)的決定;這裡只釘住「每次都一樣」與「座位不會同時屬於兩個人」。
+// SC-004 三方競態:作者定到期那一刻原持有人的確認一律輸(T077);釘住「A 回 409、B 回 201、座位歸 B」「5 次都一樣」「座位不會同時屬於兩個人」。
 import { describe, it, expect, beforeEach, afterEach } from 'vitest'
 import { existsSync } from 'node:fs'
 import { world, T0, DAY } from './helpers/world.js'
