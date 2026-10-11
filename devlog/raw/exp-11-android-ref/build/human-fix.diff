@@ -1,0 +1,50 @@
+diff -ru -x b ai-original/app/build.gradle.kts run1/app/build.gradle.kts
+--- ai-original/app/build.gradle.kts	2026-10-12 00:47:27
++++ run1/app/build.gradle.kts	2026-10-12 00:48:52
+@@ -106,3 +106,13 @@
+     androidTestImplementation(libs.androidx.test.ext.junit)
+     debugImplementation(libs.compose.ui.test.manifest)
+ }
++
++// [人工修正,同 exp-09 的繞法] /health 的 `const: true` 讓 7.10.0 產生器產出型別不合的程式碼;
++// App 不呼叫 /health,DefaultApi 只有這一支 —— 產生後刪掉這兩個檔。
++tasks.named("openApiGenerate") {
++    doLast {
++        val base = File(generatedApiDir, "src/main/kotlin/com/example/eventsignup/api")
++        File(base, "models/Health200Response.kt").delete()
++        File(base, "apis/DefaultApi.kt").delete()
++    }
++}
+diff -ru -x b ai-original/app/src/androidTest/java/com/example/eventsignup/WalkthroughTest.kt run1/app/src/androidTest/java/com/example/eventsignup/WalkthroughTest.kt
+--- ai-original/app/src/androidTest/java/com/example/eventsignup/WalkthroughTest.kt	2026-10-12 00:47:27
++++ run1/app/src/androidTest/java/com/example/eventsignup/WalkthroughTest.kt	2026-10-12 00:55:47
+@@ -2,6 +2,7 @@
+ 
+ import androidx.compose.ui.semantics.SemanticsProperties
+ import androidx.compose.ui.test.SemanticsMatcher
++import androidx.compose.ui.semantics.getOrNull
+ import androidx.compose.ui.test.assertCountEquals
+ import androidx.compose.ui.test.assertIsDisplayed
+ import androidx.compose.ui.test.assertTextContains
+diff -ru -x b ai-original/app/src/main/java/com/example/eventsignup/auth/Session.kt run1/app/src/main/java/com/example/eventsignup/auth/Session.kt
+--- ai-original/app/src/main/java/com/example/eventsignup/auth/Session.kt	2026-10-12 00:47:27
++++ run1/app/src/main/java/com/example/eventsignup/auth/Session.kt	2026-10-12 00:48:42
+@@ -2,7 +2,7 @@
+ 
+ import com.example.eventsignup.api.apis.AuthApi
+ import com.example.eventsignup.api.models.LoginRequest
+-import com.example.eventsignup.api.models.LogoutRequest
++import com.example.eventsignup.api.models.RefreshRequest
+ import com.example.eventsignup.ui.common.describeError
+ import com.example.eventsignup.ui.common.describeIo
+ import kotlinx.coroutines.Dispatchers
+@@ -36,7 +36,7 @@
+         refresher.refreshIfExpiring()
+         val refresh = store.refreshToken ?: run { store.clear(); return@withContext true }
+         try {
+-            authApi.logout(LogoutRequest(refreshToken = refresh))
++            authApi.logout(RefreshRequest(refreshToken = refresh))
+         } catch (e: IOException) {
+             return@withContext false
+         }
+Only in run1/app/src/test/java: exp
