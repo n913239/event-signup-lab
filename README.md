@@ -31,7 +31,7 @@ Cloudflare Workers + Hono + D1 · Pages(web)· SwiftUI(iOS)· 自製 JWT · Open
 尺與被量的東西都有了:18 條 endpoint、web、iOS 骨架,部署在 Cloudflare(Workers + D1 + Pages)。
 
 ```bash
-sh scripts/self-test.sh        # 41 筆探針:五支靜態檢查抓得到、而且不誤報
+sh scripts/self-test.sh        # 51 筆探針(34 筆要抓到、17 筆不得誤報):靜態檢查抓得到、而且不誤報
 npm test                       # 245 個測試(含 fuzz 20,000 組、契約測試)
 npm run check:all              # 五支靜態檢查(含 web/src、ios/)
 npm run test:race              # 單一 process 閘門併發,每條重跑 5 次
